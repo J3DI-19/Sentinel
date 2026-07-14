@@ -67,4 +67,13 @@ It does not claim production readiness, legal admissibility, live interception, 
 
 ## Project status
 
-This repository contains the project synopsis and documentation baseline. Implementation, dataset adapters, deterministic analytics, dashboard modules, tests, and evaluation artifacts are the planned deliverables described in the synopsis.
+The project is in the planning and documentation phase, with the implementation roadmap organized into progressive milestones:
+
+1. **Foundation** — establish the React/Vite frontend, FastAPI backend, SQLite storage, shared contracts, and local Ollama/Qwen setup.
+2. **Evidence pipeline** — add upload validation, hashing, canonical event normalization, and adapters for simulated data, TON_IoT, and CICIoT2023.
+3. **Deterministic investigation** — implement filtering, stable sorting, detection rules, risk scoring, event correlation, timelines, graphs, and chart data.
+4. **Investigator dashboard** — connect live APIs to case pages, results views, evidence tables, visualizations, risk breakdowns, and reanalysis controls.
+5. **Bounded AI and delivery** — add allow-listed visualization layouts, evidence-grounded Qwen assistance, case chat, approved email drafts, report export, and offline fallbacks.
+6. **Validation** — test each phase, verify reproducibility, confirm AI cannot alter forensic values, and prepare a complete demonstration case with setup and usage documentation.
+
+The current repository provides the synopsis and roadmap baseline. Implementation will proceed from the foundation through the evidence pipeline and deterministic analytics before integrating the dashboard and local AI capabilities.
