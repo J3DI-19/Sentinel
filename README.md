@@ -77,3 +77,66 @@ The project is in the planning and documentation phase, with the implementation 
 6. **Validation** — test each phase, verify reproducibility, confirm AI cannot alter forensic values, and prepare a complete demonstration case with setup and usage documentation.
 
 The current repository provides the synopsis and roadmap baseline. Implementation will proceed from the foundation through the evidence pipeline and deterministic analytics before integrating the dashboard and local AI capabilities.
+
+## Step 1 setup and run
+
+Step 1 provides the initialization foundation only: FastAPI health APIs, minimal SQLite initialization, a React/Vite status shell, and optional Ollama availability detection. Evidence ingestion, analytics, authentication, and investigation features are not included yet.
+
+### Prerequisites
+
+- Python 3.11 or newer
+- Node.js 20 or newer and npm
+- Optional: Ollama for local Qwen availability checks
+
+From the repository root, create the local environment file:
+
+```powershell
+Copy-Item .env.example backend\.env
+```
+
+### Backend installation and tests
+
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pytest
+```
+
+Start the backend from `backend/`:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Health endpoints are available at:
+
+- `http://127.0.0.1:8000/api/v1/health`
+- `http://127.0.0.1:8000/api/v1/health/db`
+- `http://127.0.0.1:8000/api/v1/health/ai`
+
+### Frontend installation and tests
+
+In a second terminal from the repository root:
+
+```powershell
+cd frontend
+npm install
+npm test
+npm run build
+npm run dev
+```
+
+Open `http://localhost:5173`. The Vite proxy forwards `/api` requests to the backend at `http://127.0.0.1:8000`.
+
+### Optional Ollama setup
+
+Install Ollama separately, start its local service, and pull the selected Qwen 9B Q4_K_M model. Set the exact installed model name in `backend\.env` as `OLLAMA_MODEL`. Then check:
+
+```powershell
+ollama list
+Invoke-RestMethod http://127.0.0.1:8000/api/v1/health/ai
+```
+
+If Ollama is not installed or stopped, the AI health endpoint returns an unavailable optional status while the API, SQLite, and frontend continue to work.

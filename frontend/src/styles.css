@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { margin: 0; font-family: Arial, sans-serif; }
+.page { max-width: 640px; margin: 40px auto; padding: 0 20px; }
+h1 { margin-bottom: 4px; }
+section { margin-top: 32px; }
+.status-list { margin-top: 16px; }
+.status-item { display: flex; justify-content: space-between; max-width: 360px; padding: 8px 0; border-bottom: 1px solid #ddd; }
+.ready { color: green; }
+.unavailable { color: #777; }
