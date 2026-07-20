@@ -1,29 +1,45 @@
-# Sentinel
+# Traceveil
 
-Sentinel is an AI-assisted smart-home IoT digital forensics and incident response platform. It is an academic prototype that turns heterogeneous IoT evidence into explainable alerts, risk scores, correlated events, reconstructed timelines, device graphs, and investigation-ready reports.
+**Traceveil: AI-Assisted Real-Time Smart Home IoT Digital Forensics and Incident Response Platform** is a final-year academic prototype that combines historical/batch IoT evidence analysis with controlled real-time IoT telemetry monitoring and alerting. It is designed to turn heterogeneous records into explainable alerts, risk scores, correlated events, reconstructed timelines, device/entity graphs, and investigation-ready reports without presenting itself as a production IDS or SIEM.
 
 ## What it does
 
-- Ingests public IoT datasets and simulated smart-home incidents.
-- Preserves evidence provenance, source hashes, adapter versions, and validation errors.
-- Normalizes heterogeneous records into a canonical event model.
-- Runs deterministic rules, behavioral baselines, bounded risk scoring, correlation, and timeline reconstruction.
-- Presents findings through a React dashboard with metrics, charts, evidence tables, timelines, and device graphs.
-- Uses a local Qwen 9B Q4_K_M model through Ollama for evidence-grounded summaries, explanations, investigation chat, email drafts, and visualization layout planning.
-- Exports reports and supports investigator-approved SMTP notifications.
+Traceveil is planned to:
 
-Python remains the computational authority: the language model may explain validated results, but it cannot calculate forensic values, invent evidence, execute code, modify evidence, or send messages autonomously.
+- Ingest public IoT datasets, simulated incidents, and uploaded evidence files.
+- Receive live telemetry from an Arduino-compatible microcontroller and IoT test device in an authorized laboratory setup.
+- Normalize batch and live records into one canonical event model while preserving source, device, ingestion, and raw-record provenance.
+- Apply deterministic rules, behavioural baselines, bounded risk scoring, event correlation, and timeline reconstruction.
+- Generate device/entity relationships, chart-ready aggregates, and live alerts from verified backend values.
+- Preserve accepted live events as evidence for later forensic investigation.
+- Present historical and incoming findings through a React investigation dashboard.
+- Use a local Qwen 9B Q4_K_M model through Ollama only for evidence-grounded summaries, explanations, investigation chat, email drafts, and visualization layout planning.
+
+Python remains the computational authority. The language model may explain validated results, but it cannot calculate forensic values, create unsupported alerts, invent or alter evidence, execute attack logic, run arbitrary code, or send messages autonomously. Alerting, scoring, detection, correlation, timelines, graphs, and chart values remain deterministic for both ingestion paths.
 
 ## Architecture
 
+Traceveil uses two input paths that converge before analysis:
+
+```text
+Batch Evidence -----\
+                     -> Canonical Events -> Common Investigation Pipeline
+Live IoT Events ----/
+```
+
 The platform is organized into these layers:
 
-1. **Evidence and adapter layer** — registers cases, hashes inputs, validates dataset fields, and emits canonical events or documented rejections.
-2. **Detection and risk engine** — applies rules and baselines and returns condition traces, evidence references, and factorized scores.
-3. **Correlation and timeline engine** — links events using declared entity keys and time windows and produces stable, reproducible chronologies.
-4. **Graph and query engine** — calculates graph relationships, filters, aggregates, and chart-ready values.
-5. **API, storage, and alerts** — provides FastAPI/Pydantic contracts, SQLite persistence, audit history, exports, and approved SMTP delivery.
-6. **Visualization and AI** — renders allow-listed React components and provides bounded local assistance.
+1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts simulated data, TON_IoT, and CICIoT2023 records.
+2. **Live IoT Collection Layer** — receives controlled device telemetry, validates message structure and source identifiers, and records ingestion metadata. MQTT and/or HTTP will be selected during implementation.
+3. **Canonical Event and Normalization Layer** — maps accepted batch and live inputs into one versioned event model with retained provenance.
+4. **Detection and Risk Engine** — applies deterministic rules, behavioural baselines, and bounded factorized scores.
+5. **Correlation and Timeline Engine** — links events through declared entity keys and time windows and produces stable, reproducible chronologies.
+6. **Graph and Query Engine** — calculates device/entity relationships, filters, aggregates, and chart-ready values.
+7. **API, Storage and Real-Time Event Delivery** — provides FastAPI/Pydantic contracts, SQLite persistence, audit history, exports, approved SMTP delivery, and planned SSE or WebSocket updates.
+8. **Visualization and AI Layer** — renders allow-listed React components and provides bounded local assistance over validated evidence.
+9. **React Investigation Dashboard** — presents cases, evidence, metrics, live status, event and alert feeds, timelines, graphs, charts, findings, chat, and reports.
+
+The live path is not a separate analytics system. Accepted live telemetry passes through the same canonical model and deterministic investigation pipeline as batch evidence, then remains available for historical review.
 
 ## Technology stack
 
@@ -31,32 +47,47 @@ The platform is organized into these layers:
 - **Backend:** Python, FastAPI, Pandas, NetworkX, Pydantic
 - **Storage:** SQLite, with a repository boundary for future PostgreSQL support
 - **Local AI:** Ollama with Qwen 9B Q4_K_M
-- **Testing and tooling:** Pytest, Git, GitHub, SMTP, and a modern browser
+- **Planned live communication:** MQTT and/or HTTP for device telemetry; SSE or WebSockets for server-driven frontend updates
+- **Testing and tooling:** Pytest, Vitest, Git, GitHub, SMTP, and a modern browser
+
+No live communication protocol or supporting library has been selected or implemented yet.
 
 ## Data sources and evaluation
 
-The synopsis identifies TON_IoT and CICIoT2023 as public benchmark sources, supplemented by controlled simulated cases. Evaluation is intended to measure normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, and performance under declared configurations.
+Traceveil uses TON_IoT and CICIoT2023 as public benchmark sources, supplemented by controlled simulated cases and a small authorized IoT laboratory demonstration. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
 
-Representative golden cases should preserve expected normalized records, rule matches, risk factors, correlation edges, and ordered timelines so reviewers can verify the full investigation path.
+Representative golden cases will preserve expected normalized records, rule matches, risk factors, correlation edges, and ordered timelines. Live evaluation will additionally cover valid and malformed telemetry, device/source identification, evidence persistence, temporary disconnections, reconnect behaviour, delivery latency, and a controlled suspicious-event scenario.
 
 ## Scope and safeguards
 
-Sentinel covers batch imports, case management, deterministic analysis, dashboard review, local AI assistance, SQLite case history, SMTP alerts, and report export.
+In scope are batch imports, case management, controlled laboratory live telemetry acquisition, deterministic analysis, near-real-time alerts, dashboard review, preservation of live events, local AI assistance, SQLite case history, investigator-approved SMTP alerts, and report export. The controlled demonstration may use repeated authentication failures, abnormal request frequency, unexpected command sequences, deliberate telemetry spikes, or simulated suspicious state changes against owned or authorized test devices.
 
-It does not claim production readiness, legal admissibility, live interception, firmware extraction, autonomous containment, or replacement of enterprise SIEM, IoT security, or forensic products. Evidence is processed locally where possible, model context is bounded, secrets stay outside the repository, and deterministic findings are kept distinct from AI-generated narrative.
+Out of scope are production-scale IoT monitoring, passive interception of arbitrary third-party networks, unauthorized device access, firmware extraction, production fleet management, automated containment, autonomous attack execution, legal-admissibility claims, and replacement of enterprise SIEM or IoT security products. Evidence is processed locally where possible, model context is bounded, secrets remain outside the repository, and deterministic findings are kept distinct from AI-generated narrative.
 
 ## Requirements
+
+### Development computer
 
 - 64-bit quad-core processor
 - 16 GB RAM minimum; 24–32 GB recommended for local inference
 - 30 GB free SSD space
 - Optional supported GPU for faster Ollama responses
-- Python, Node.js, SQLite, Git, and Ollama with the selected model
+- Python 3.11 or newer, Node.js 20 or newer, SQLite, Git, and Ollama with the selected model
+
+### Controlled live demonstration
+
+- Arduino-compatible microcontroller
+- At least one IoT test device or controllable IoT endpoint
+- Local network or Wi-Fi environment
+- Supporting data cables and power as required by the selected hardware
+
+Exact hardware and communication protocols remain implementation decisions.
 
 ## Project documents
 
-- [Full project synopsis (DOCX)](docs/synopsis/Sentinel_Full_Synopsis.docx)
-- [Full project synopsis (PDF)](docs/synopsis/Sentinel_Full_Synopsis.pdf)
+- [Full project synopsis (DOCX)](docs/synopsis/Traceveil_Full_Synopsis.docx)
+- [Full project synopsis (PDF)](docs/synopsis/Traceveil_Full_Synopsis.pdf)
+- [Implementation roadmap](docs/roadmap.md)
 
 ## Team
 
@@ -67,20 +98,15 @@ It does not claim production readiness, legal admissibility, live interception, 
 
 ## Project status
 
-The project is in the planning and documentation phase, with the implementation roadmap organized into progressive milestones:
+Step 1 initialization is implemented: the repository contains a React/Vite status shell, FastAPI health endpoints, minimal SQLite initialization, frontend/backend connectivity, dependency manifests, tests, and optional Ollama availability/model detection. Local Ollama installation and Qwen model verification remain pending.
 
-1. **Foundation** — establish the React/Vite frontend, FastAPI backend, SQLite storage, shared contracts, and local Ollama/Qwen setup.
-2. **Evidence pipeline** — add upload validation, hashing, canonical event normalization, and adapters for simulated data, TON_IoT, and CICIoT2023.
-3. **Deterministic investigation** — implement filtering, stable sorting, detection rules, risk scoring, event correlation, timelines, graphs, and chart data.
-4. **Investigator dashboard** — connect live APIs to case pages, results views, evidence tables, visualizations, risk breakdowns, and reanalysis controls.
-5. **Bounded AI and delivery** — add allow-listed visualization layouts, evidence-grounded Qwen assistance, case chat, approved email drafts, report export, and offline fallbacks.
-6. **Validation** — test each phase, verify reproducibility, confirm AI cannot alter forensic values, and prepare a complete demonstration case with setup and usage documentation.
+The expanded investigation frontend, evidence pipeline, deterministic analytics, live collector, real-time delivery, live dashboard feeds, physical laboratory setup, AI investigation features, reports, and complete batch/live demonstrations are planned work and are not marked as implemented. See the [roadmap](docs/roadmap.md) for the phase-by-phase checklist.
 
 The current repository provides the synopsis and roadmap baseline. Implementation will proceed from the foundation through the evidence pipeline and deterministic analytics before integrating the dashboard and local AI capabilities.
 
 ## Step 1 setup and run
 
-Step 1 provides the initialization foundation only: FastAPI health APIs, minimal SQLite initialization, a React/Vite status shell, and optional Ollama availability detection. Evidence ingestion, analytics, authentication, and investigation features are not included yet.
+Step 1 provides the initialization foundation only: FastAPI health APIs, minimal SQLite initialization, a React/Vite status shell, and optional Ollama availability detection. Evidence ingestion, analytics, authentication, investigation features, and live IoT monitoring are not included yet.
 
 ### Prerequisites
 
