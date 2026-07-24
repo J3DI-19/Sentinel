@@ -14,5 +14,8 @@ node_modules/
 dist/
 coverage/
 .vite/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 data/*
 !data/.gitkeep
