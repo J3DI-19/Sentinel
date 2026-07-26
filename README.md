@@ -98,11 +98,11 @@ Exact hardware and communication protocols remain implementation decisions.
 
 ## Project status
 
-Step 1 initialization is implemented: the repository contains a React/Vite status shell, FastAPI health endpoints, minimal SQLite initialization, frontend/backend connectivity, dependency manifests, tests, and optional Ollama availability/model detection. Local Ollama installation and Qwen model verification remain pending.
+Steps 1 and 2 are complete. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, and local Ollama/Qwen setup. The frontend now includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualizations, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
 
-The expanded investigation frontend, evidence pipeline, deterministic analytics, live collector, real-time delivery, live dashboard feeds, physical laboratory setup, AI investigation features, reports, and complete batch/live demonstrations are planned work and are not marked as implemented. See the [roadmap](docs/roadmap.md) for the phase-by-phase checklist.
+Step 2 interfaces currently operate on structured mock data. Backend evidence validation, canonical normalization, live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [roadmap](docs/roadmap.md) for the phase-by-phase checklist.
 
-The current repository provides the synopsis and roadmap baseline. Implementation will proceed from the foundation through the evidence pipeline and deterministic analytics before integrating the dashboard and local AI capabilities.
+Implementation now proceeds from Step 3: input checks and evidence validation, followed by the canonical event pipeline and backend analytical integration.
 
 ## Step 1 setup and run
 
