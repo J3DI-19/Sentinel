@@ -75,12 +75,6 @@ export const categoryData = [
   { name: "Authentication", value: 28 }, { name: "Network", value: 34 }, { name: "Command", value: 17 }, { name: "State", value: 21 },
 ];
 
-export const assistantMessages = [
-  { role: "assistant", text: "I’m ready to reason over the mock evidence selected for TV-2026-024. I’ll cite evidence IDs and keep observations separate from conclusions." },
-  { role: "user", text: "Explain why FND-1042 is critical." },
-  { role: "assistant", text: "FND-1042 links three high-confidence stages: repeated privileged login failures, a successful session from the same external IP, and camera control traffic 74 seconds later. Asset criticality (92), temporal correlation (97), and three preserved evidence records produce a risk score of 96." },
-];
-
 export const graphNodes = [
   { id: "internet", position: { x: 30, y: 175 }, data: { label: "185.77.12.44\nExternal actor", kind: "external", risk: 96 }, type: "default" },
   { id: "gateway", position: { x: 290, y: 175 }, data: { label: "Northbridge Gateway", kind: "gateway", risk: 79 } },

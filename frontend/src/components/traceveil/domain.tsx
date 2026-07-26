@@ -13,9 +13,6 @@ export function LiveAlertFeed({ alerts, onInvestigate }: { alerts: Alert[]; onIn
 export function RiskBreakdown({ factors }: { factors: Finding["factors"] }) {
   return <div className="risk-breakdown">{factors.map(f => <div key={f.label}><div><span>{f.label}</span><b>{f.value}</b></div><div className="bar"><i style={{width: `${f.value}%`}}/></div></div>)}</div>;
 }
-export function FindingCard({ finding }: { finding: Finding }) {
-  return <article className="finding-card"><div className="finding-head"><div><div className="inline-meta"><code>{finding.id}</code>{finding.liveDetected && <span className="live-chip">● Live detected</span>}</div><h3>{finding.title}</h3></div><div><SeverityBadge severity={finding.severity}/><RiskBadge score={finding.risk}/></div></div><p>{finding.summary}</p><div className="finding-grid"><RiskBreakdown factors={finding.factors}/><div className="condition-trace"><span className="field-label">Condition trace</span>{finding.trace.map((step,i)=><div key={step}><i>{i+1}</i><span>{step}</span></div>)}</div></div><div className="reference-row"><span>Evidence</span>{finding.evidence.map(id=><code key={id}>{id}</code>)}<span>Devices</span>{finding.devices.map(d=><em key={d}>{d}</em>)}</div></article>;
-}
 export function InvestigationTimeline({ entries }: { entries: TimelineEntry[] }) {
   return <div className="timeline">{entries.map((item)=><article className="timeline-entry" key={item.id}><div className={`timeline-marker timeline-${item.type}`}>{item.type === "alert" ? "!" : item.type === "finding" ? "◆" : "·"}</div><time>{item.time}</time><div><div><SeverityBadge severity={item.severity}/><span className="type-label">{item.type}</span>{item.evidenceId && <code>{item.evidenceId}</code>}</div><h3>{item.title}</h3><p>{item.description}</p></div></article>)}</div>;
 }

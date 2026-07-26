@@ -1,8 +1,8 @@
 import { GlobalAssistantWorkspace, type PinnedAssistantReference } from "../features/assistant/GlobalAssistantWorkspace";
 import { cases } from "../mocks/data";
 
-export function GlobalInvestigationAssistantPage() {
-  const params = new URLSearchParams(window.location.search);
+export function GlobalInvestigationAssistantPage({ search = window.location.search }: { search?: string }) {
+  const params = new URLSearchParams(search);
   const pins: PinnedAssistantReference[] = [];
   const caseValue = params.get("case");
   if (caseValue) { const item = cases.find(entry=>entry.reference===caseValue||entry.id===caseValue); pins.push({ id:item?.reference||caseValue, label:item?.reference||caseValue, kind:"Case" }); }

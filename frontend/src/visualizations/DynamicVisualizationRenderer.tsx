@@ -52,13 +52,13 @@ function DeviceGraph({ data }: RendererProps) {
   return <div className="dynamic-graph"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="Correlation graph">{graph.edges.map(edge=>{const from=node(edge.from),to=node(edge.to);return <g key={`${edge.from}-${edge.to}`}><line x1={from.x+6} y1={from.y} x2={to.x} y2={to.y} /><text x={(from.x+to.x)/2} y={(from.y+to.y)/2-2}>{edge.label}</text></g>})}</svg>{graph.nodes.map(n=><div key={n.id} className={`graph-chip graph-${n.kind}`} style={{left:`${n.x}%`,top:`${n.y}%`}}><i/>{n.label}<small>{n.kind}</small></div>)}</div>;
 }
 
-export const dynamicVisualizationRegistry: Record<string, (props: RendererProps) => React.JSX.Element> = {
+const dynamicVisualizationRegistry: Record<string, (props: RendererProps) => React.JSX.Element> = {
   "metric-card": Metric, "bar-chart": MultiBar, "line-chart": ActivityArea, "area-chart": ActivityArea, "pie-chart": Distribution,
   "evidence-table": EvidenceTable, "investigation-timeline": Timeline, "device-graph": DeviceGraph,
   "finding-panel": Finding, "risk-breakdown": Risk, "text-summary": Summary,
 };
 
-export function VisualizationFallback({ spec, reason }: { spec: VisualizationComponentSpec; reason: "unknown-component" | "missing-data" }) {
+function VisualizationFallback({ spec, reason }: { spec: VisualizationComponentSpec; reason: "unknown-component" | "missing-data" }) {
   return <div className="visualization-fallback" role="status"><span>◇</span><strong>Visualization unavailable</strong><p>{reason === "unknown-component" ? `“${spec.type}” is not in the approved registry.` : `Dataset “${spec.dataRef}” could not be resolved.`}</p></div>;
 }
 

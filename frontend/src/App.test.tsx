@@ -106,6 +106,8 @@ describe("Traceveil investigation interface", () => {
   it("redirects the legacy case Assistant route with case context", async () => {
     window.history.replaceState({}, "", "/cases/case-024/assistant");
     render(<App />);
+    expect(screen.queryByText("Opening Investigation Assistant")).not.toBeInTheDocument();
+    expect(screen.queryByText("Preserving the selected case context.")).not.toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Traceveil Assistant" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/assistant");
     expect(window.location.search).toContain("case=case-024");

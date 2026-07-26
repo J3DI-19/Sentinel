@@ -1,5 +1,5 @@
 export type Severity = "Critical" | "High" | "Medium" | "Low" | "Info";
-export type CaseType = "Batch" | "Live" | "Hybrid";
+type CaseType = "Batch" | "Live" | "Hybrid";
 
 export interface InvestigationCase {
   id: string; name: string; reference: string; type: CaseType;

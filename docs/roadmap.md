@@ -7,36 +7,39 @@
 - [x] Install required libraries
 - [x] Connect frontend and backend
 - [x] Add Ollama configuration and optional availability/model health checks
-- [ ] Install Ollama, pull the selected Qwen 9B Q4_K_M model, and verify it locally
+- [x] Install Ollama, pull the selected Qwen 9B Q4_K_M model, and verify it locally
 
-**Current result:** The Traceveil frontend status shell connects to FastAPI and
-reports API, SQLite, and optional Ollama health. Backend health tests pass (4
-tests), and the frontend test and production build pass (1 test). Traceveil
-remains usable when Ollama is offline.
+**Current result:** Step 1 is complete. The Traceveil frontend connects to
+FastAPI and reports API, SQLite, and Ollama health. Backend health tests pass (4
+tests), and the frontend test suite passes (14 tests). Traceveil remains usable
+when Ollama is offline.
 
 ## 2. Frontend and Investigation Interface
 - [x] Build the initial Step 1 service-status shell
-- [ ] Build the global application layout and navigation
-- [ ] Build case pages
-- [ ] Build evidence upload/import page
-- [ ] Build main investigation dashboard
-- [ ] Add metric and severity cards
-- [ ] Add evidence tables
-- [ ] Add chart placeholders
-- [ ] Add incident timeline placeholder
-- [ ] Add device/entity graph placeholder
-- [ ] Add recommendations/findings panels
-- [ ] Add live monitoring status indicators
-- [ ] Add live event feed
-- [ ] Add live alert feed
-- [ ] Add device connection/status components
-- [ ] Add chat section
-- [ ] Add email/report sections
-- [ ] Use structured mock data before backend feature integration
+- [x] Build the global application layout and navigation
+- [x] Build case pages
+- [x] Build evidence upload/import page
+- [x] Build main investigation dashboard
+- [x] Add metric and severity cards
+- [x] Add evidence tables
+- [x] Add chart placeholders
+- [x] Add incident timeline placeholder
+- [x] Add device/entity graph placeholder
+- [x] Add recommendations/findings panels
+- [x] Add live monitoring status indicators
+- [x] Add live event feed
+- [x] Add live alert feed
+- [x] Add device connection/status components
+- [x] Add chat section
+- [x] Add email/report sections
+- [x] Use structured mock data before backend feature integration
 
-**Current result:** The existing frontend remains an initialization/status shell
-only. The case, investigation, visualization, live-monitoring, chat, email, and
-report interfaces are planned but not implemented.
+**Current result:** Step 2 is complete. The frontend now provides the global
+application shell, case workspaces, evidence import flow, investigation
+dashboard, metrics, evidence tables, deterministic visualizations, timeline,
+entity graph, findings, live-monitoring views, Investigation Assistant, and
+report review experience. These interfaces currently use structured mock data;
+backend evidence ingestion and analytical integration begin in Step 3.
 
 ## 3. Input Check and Evidence Validation
 - [ ] Accept supported evidence file types
