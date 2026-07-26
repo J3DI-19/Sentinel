@@ -3,14 +3,35 @@ import { cases, devices, evidence, findings } from "../mocks/data";
 
 export interface RouteState { path: string; navigate: (path: string) => void; }
 
-const workspaceNav = [
-  { path: "/", label: "Overview", icon: "▦" },
-  { path: "/assistant", label: "Investigation Assistant", icon: "◎" },
-  { path: "/cases", label: "Cases", icon: "□" },
-  { path: "/live", label: "Live Monitor", icon: "◉" },
-  { path: "/import", label: "Import Evidence", icon: "⇧" },
+type IconName = "overview" | "assistant" | "cases" | "live" | "import" | "status" | "settings";
+type NavItem = { path: string; label: string; icon: IconName };
+
+const investigationNav: NavItem[] = [
+  { path: "/", label: "Overview", icon: "overview" },
+  { path: "/assistant", label: "Investigation Assistant", icon: "assistant" },
+  { path: "/cases", label: "Cases", icon: "cases" },
 ];
-const platformNav = [{ path: "/status", label: "System Status", icon: "⌁" }, { path: "/settings", label: "Settings", icon: "⚙" }];
+const operationsNav: NavItem[] = [
+  { path: "/live", label: "Live Monitor", icon: "live" },
+  { path: "/import", label: "Import Evidence", icon: "import" },
+];
+const systemNav: NavItem[] = [
+  { path: "/status", label: "System Status", icon: "status" },
+  { path: "/settings", label: "Settings", icon: "settings" },
+];
+
+function NavIcon({ name }: { name: IconName }) {
+  const paths: Record<IconName, ReactNode> = {
+    overview: <><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></>,
+    assistant: <><path d="M5.5 17.5 4 21l3.8-1.4A8.5 8.5 0 1 0 5.5 17.5Z"/><path d="m12 7 .55 1.45L14 9l-1.45.55L12 11l-.55-1.45L10 9l1.45-.55L12 7ZM16.5 11.5l.38 1.12 1.12.38-1.12.38-.38 1.12-.38-1.12L15 13l1.12-.38.38-1.12ZM8 12h2"/></>,
+    cases: <><path d="M4 7.5h16v11A2.5 2.5 0 0 1 17.5 21h-11A2.5 2.5 0 0 1 4 18.5v-11Z"/><path d="M9 7.5V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2.5M4 12h16M10 12v2h4v-2"/></>,
+    live: <><path d="M5.6 18.4a9 9 0 0 1 0-12.8M8.5 15.5a5 5 0 0 1 0-7M18.4 5.6a9 9 0 0 1 0 12.8M15.5 8.5a5 5 0 0 1 0 7"/><circle cx="12" cy="12" r="2"/></>,
+    import: <><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></>,
+    status: <><path d="M3 12h4l2.2-5 4.1 10 2.2-5H21"/><path d="M20 7a9 9 0 1 0 .5 9"/></>,
+    settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.15.38.38.72.7 1 .3.25.7.4 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.8.6Z"/></>,
+  };
+  return <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
+}
 
 export function useLocationPath() {
   const [location, setLocation] = useState(() => ({ path: window.location.pathname, search: window.location.search }));
@@ -59,14 +80,23 @@ export function AppShell({ children, route }: { children: ReactNode; route: Rout
     window.addEventListener("keydown", shortcut); return () => window.removeEventListener("keydown", shortcut);
   }, []);
 
-  const renderNav = (items: typeof workspaceNav) => <nav>{items.map(item => <button key={item.path} title={collapsed ? item.label : undefined} aria-label={item.label} className={activeFor(item.path) ? "active" : ""} onClick={() => { route.navigate(item.path); setMobile(false); }}><span>{item.icon}</span><b>{item.label}</b></button>)}</nav>;
+  const renderNav = (items: NavItem[]) => <nav>{items.map(item => <button key={item.path} title={collapsed ? item.label : undefined} aria-label={item.label} aria-current={activeFor(item.path) ? "page" : undefined} className={activeFor(item.path) ? "active" : ""} onClick={() => { route.navigate(item.path); setMobile(false); }}><span className="nav-icon-wrap"><NavIcon name={item.icon}/>{item.icon === "live" && <i className="nav-live-dot"/>}</span><b>{item.label}</b></button>)}</nav>;
 
   return <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""}`}>
     <aside className={`sidebar ${mobile ? "mobile-open" : ""}`}>
-      <button className="brand" onClick={() => route.navigate("/")} aria-label="Traceveil overview"><span className="brand-mark">T</span><span className="brand-copy"><strong>Traceveil</strong><small>IoT DFIR Platform</small></span></button>
-      <div className="nav-label">Workspace</div>{renderNav(workspaceNav)}
-      <div className="nav-label">Platform</div>{renderNav(platformNav)}
-      <div className="sidebar-collapse-area"><button className="collapse-button" onClick={() => setCollapsed(!collapsed)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>{collapsed ? "›" : "‹"}</button></div>
+      <button className="brand" onClick={() => route.navigate("/")} aria-label="Traceveil overview">
+        <span className="brand-emblem"><img className="brand-logo brand-logo-dark" src="/traceveil-logo-dark.png" alt=""/><img className="brand-logo brand-logo-transparent" src="/traceveil-logo-glow.png" alt=""/></span>
+        <span className="brand-copy"><strong className="brand-wordmark">Trace<em>veil</em></strong><small>IoT digital forensics</small></span>
+      </button>
+      <div className="nav-groups">
+        <section className="nav-section" aria-label="Investigation navigation"><div className="nav-label">Investigation</div>{renderNav(investigationNav)}</section>
+        <section className="nav-section" aria-label="Operations navigation"><div className="nav-label">Operations</div>{renderNav(operationsNav)}</section>
+        <section className="nav-section" aria-label="System navigation"><div className="nav-label">System</div>{renderNav(systemNav)}</section>
+      </div>
+      <div className="sidebar-footer">
+        <div className="investigator-profile"><span>IN</span><div><b>Investigator</b><small>Local workspace</small></div><button aria-label="Profile options">•••</button></div>
+        <div className="sidebar-collapse-area"><button className="collapse-button" onClick={() => setCollapsed(!collapsed)} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={collapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"}/></svg></button></div>
+      </div>
     </aside>
     <div className="app-main">
       <header className="topbar">
