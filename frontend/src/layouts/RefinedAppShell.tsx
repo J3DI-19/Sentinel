@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { cases, devices, evidence, findings } from "../mocks/data";
 
-export interface RouteState { path: string; navigate: (path: string) => void; }
+interface RouteState { path: string; search: string; navigate: (path: string) => void; }
 
 type IconName = "overview" | "assistant" | "cases" | "live" | "import" | "status" | "settings";
 type NavItem = { path: string; label: string; icon: IconName };
@@ -33,11 +33,35 @@ function NavIcon({ name }: { name: IconName }) {
   return <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
 
+function canonicalLocation(path: string, search: string) {
+  const legacyAssistant = path.match(/^\/cases\/([^/]+)\/assistant$/);
+  if (!legacyAssistant) return { path, search };
+  const params = new URLSearchParams(search);
+  params.set("case", decodeURIComponent(legacyAssistant[1]));
+  return { path: "/assistant", search: `?${params.toString()}` };
+}
+
 export function useLocationPath() {
-  const [location, setLocation] = useState(() => ({ path: window.location.pathname, search: window.location.search }));
-  useEffect(() => { const update = () => setLocation({ path: window.location.pathname, search: window.location.search }); window.addEventListener("popstate", update); return () => window.removeEventListener("popstate", update); }, []);
-  const navigate = (next: string) => { const target = new URL(next, window.location.origin); window.history.pushState({}, "", next); setLocation({ path: target.pathname, search: target.search }); if (!navigator.userAgent.includes("jsdom")) window.scrollTo({ top: 0, behavior: "smooth" }); };
-  return { path: location.path, navigate };
+  const [location, setLocation] = useState(() => canonicalLocation(window.location.pathname, window.location.search));
+  useLayoutEffect(() => {
+    const current = `${window.location.pathname}${window.location.search}`;
+    const canonical = `${location.path}${location.search}`;
+    if (current !== canonical) window.history.replaceState(window.history.state, "", canonical);
+  }, [location]);
+  useEffect(() => {
+    const update = () => setLocation(canonicalLocation(window.location.pathname, window.location.search));
+    window.addEventListener("popstate", update);
+    return () => window.removeEventListener("popstate", update);
+  }, []);
+  const navigate = (next: string) => {
+    const target = new URL(next, window.location.origin);
+    const canonical = canonicalLocation(target.pathname, target.search);
+    const destination = `${canonical.path}${canonical.search}${target.hash}`;
+    window.history.pushState({}, "", destination);
+    setLocation(canonical);
+    if (!navigator.userAgent.includes("jsdom")) window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  return { path: location.path, search: location.search, navigate };
 }
 
 function Breadcrumbs({ path, navigate }: { path: string; navigate: (path: string) => void }) {
@@ -80,7 +104,7 @@ export function AppShell({ children, route }: { children: ReactNode; route: Rout
     window.addEventListener("keydown", shortcut); return () => window.removeEventListener("keydown", shortcut);
   }, []);
 
-  const renderNav = (items: NavItem[]) => <nav>{items.map(item => <button key={item.path} title={collapsed ? item.label : undefined} aria-label={item.label} aria-current={activeFor(item.path) ? "page" : undefined} className={activeFor(item.path) ? "active" : ""} onClick={() => { route.navigate(item.path); setMobile(false); }}><span className="nav-icon-wrap"><NavIcon name={item.icon}/>{item.icon === "live" && <i className="nav-live-dot"/>}</span><b>{item.label}</b></button>)}</nav>;
+  const renderNav = (items: NavItem[]) => <nav>{items.map(item => <button key={item.path} data-label={item.label} aria-label={item.label} aria-current={activeFor(item.path) ? "page" : undefined} className={activeFor(item.path) ? "active" : ""} onClick={() => { route.navigate(item.path); setMobile(false); }}><span className="nav-icon-wrap"><NavIcon name={item.icon}/>{item.icon === "live" && <i className="nav-live-dot"/>}</span><b>{item.label}</b></button>)}</nav>;
 
   return <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""}`}>
     <aside className={`sidebar ${mobile ? "mobile-open" : ""}`}>

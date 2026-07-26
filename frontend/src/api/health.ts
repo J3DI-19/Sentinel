@@ -6,7 +6,7 @@ export type ServiceStatus = {
   model_installed?: boolean;
 };
 
-export async function getHealth(path: string): Promise<ServiceStatus> {
+async function getHealth(path: string): Promise<ServiceStatus> {
   const endpoint = path ? `/api/v1/health/${path}` : "/api/v1/health";
   const response = await fetch(endpoint);
   if (!response.ok) throw new Error(`Health request failed: ${response.status}`);
@@ -21,4 +21,3 @@ export async function getSystemStatus(): Promise<ServiceStatus[]> {
       : { service: ["api", "database", "ollama"][index], status: "unavailable" },
   );
 }
-

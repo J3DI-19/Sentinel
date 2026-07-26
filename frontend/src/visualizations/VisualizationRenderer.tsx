@@ -10,8 +10,7 @@ function RiskDistribution() { return <ResponsiveContainer width="100%" height="1
 function DeviceActivity() { return <ResponsiveContainer width="100%" height="100%"><BarChart data={deviceActivity} layout="vertical"><CartesianGrid stroke="#18253a" horizontal={false}/><XAxis type="number" stroke="#63738a"/><YAxis dataKey="name" type="category" width={78} stroke="#8796aa"/><Tooltip contentStyle={tooltipStyle}/><Bar dataKey="events" fill="#27c2e8" radius={[0,5,5,0]}/></BarChart></ResponsiveContainer>; }
 function EventCategories() { return <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoryData} dataKey="value" nameKey="name" outerRadius={80} paddingAngle={2}>{["#27c2e8","#3869e8","#8866f2","#4bc59f"].map((c,i)=><Cell key={c} fill={c}/>)}</Pie><Tooltip contentStyle={tooltipStyle}/></PieChart></ResponsiveContainer>; }
 
-export const visualizationRegistry: Record<VisualizationType, () => React.JSX.Element> = {
+const visualizationRegistry: Record<VisualizationType, () => React.JSX.Element> = {
   eventActivity: EventActivity, severityDistribution: SeverityDistribution, riskDistribution: RiskDistribution, deviceActivity: DeviceActivity, eventCategories: EventCategories,
 };
 export function VisualizationRenderer({ type }: { type: VisualizationType }) { const Component = visualizationRegistry[type]; return <Component/>; }
-

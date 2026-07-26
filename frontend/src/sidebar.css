@@ -1,5 +1,10 @@
 .sidebar {
   --sidebar-pad: 14px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
   width: var(--sidebar);
   padding: 0 var(--sidebar-pad);
   overflow: visible;
@@ -23,12 +28,15 @@
 .brand {
   width: 100%;
   height: 94px;
+  display: flex;
+  align-items: center;
   padding: 0 6px;
   gap: 10px;
   border: 0;
   border-bottom: 1px solid rgba(103, 179, 209, .12);
   background: none;
   color: inherit;
+  cursor: pointer;
 }
 .brand-emblem {
   position: relative;
@@ -99,7 +107,12 @@
   padding: 18px 11px 9px;
   color: #536a7f;
   font-size: 8px;
+  font-weight: 700;
   letter-spacing: 1.75px;
+  text-transform: uppercase;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .14s ease .12s, transform .2s ease .08s, visibility 0s linear .08s;
 }
 .nav-groups { display: flex; flex-direction: column; }
 .nav-section { min-width: 0; }
@@ -118,15 +131,21 @@
   background: linear-gradient(90deg, rgba(83, 146, 174, .24), rgba(83, 146, 174, .04));
 }
 .nav-section:first-child .nav-label { padding-top: 22px; }
-.sidebar nav { gap: 5px; }
+.sidebar nav { display: grid; gap: 5px; }
 .sidebar nav button {
   height: 45px;
+  display: flex;
+  align-items: center;
   gap: 11px;
   padding: 0 10px;
   border: 1px solid transparent;
   border-radius: 10px;
+  background: none;
   color: #8298aa;
+  cursor: pointer;
   overflow: hidden;
+  position: relative;
+  text-align: left;
   transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease;
 }
 .sidebar nav button::before {
@@ -156,7 +175,18 @@
   box-shadow: inset 0 1px rgba(255,255,255,.025), 0 8px 22px rgba(0,0,0,.16);
 }
 .sidebar nav button.active::before { opacity: 1; transform: scaleY(1); }
-.sidebar nav button b { font-size: 10px; font-weight: 600; letter-spacing: .05px; }
+.sidebar nav button b {
+  max-width: 170px;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .05px;
+  opacity: 1;
+  transform: translateX(0);
+  white-space: nowrap;
+  visibility: visible;
+  transition: max-width .24s cubic-bezier(.22, 1, .36, 1), opacity .14s ease .12s, transform .2s ease .08s, visibility 0s linear .08s;
+}
 .nav-icon-wrap {
   position: relative;
   width: 29px !important;
@@ -245,14 +275,54 @@
 .sidebar-collapsed .brand:hover .brand-logo-dark { opacity: 0; }
 .sidebar-collapsed .brand:hover .brand-logo-transparent { opacity: 1; }
 .sidebar-collapsed .brand-copy,
-.sidebar-collapsed .nav-label,
-.sidebar-collapsed .sidebar nav button b,
 .sidebar-collapsed .investigator-profile div,
 .sidebar-collapsed .investigator-profile button { display: none; }
-.sidebar-collapsed .sidebar nav { gap: 7px; }
-.sidebar-collapsed .nav-section + .nav-section { margin-top: 10px; padding-top: 11px; }
+.sidebar-collapsed .nav-label {
+  opacity: 0;
+  transform: translateX(-4px);
+  visibility: hidden;
+  transition-delay: 0s;
+}
+.sidebar-collapsed .sidebar nav button b {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  visibility: hidden;
+  transition-delay: 0s;
+}
+.sidebar-collapsed .sidebar nav { gap: 5px; }
+.sidebar-collapsed .nav-section + .nav-section { margin-top: 10px; padding-top: 10px; }
 .sidebar-collapsed .nav-section + .nav-section::before { left: 9px; right: 9px; }
-.sidebar-collapsed .sidebar nav button { justify-content: center; padding: 0; }
+.sidebar-collapsed .sidebar nav button { justify-content: center; padding: 0; overflow: visible; }
+.sidebar-collapsed .sidebar nav button::after {
+  content: attr(data-label);
+  position: absolute;
+  z-index: 4;
+  left: calc(100% + 10px);
+  top: 50%;
+  padding: 6px 8px;
+  border: 1px solid rgba(63, 164, 199, .25);
+  border-radius: 6px;
+  background: rgba(5, 15, 25, .97);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .38);
+  color: #bcd5df;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(4px, -50%);
+  white-space: nowrap;
+  visibility: hidden;
+  transition: opacity .12s ease, transform .12s ease, visibility 0s linear .12s;
+}
+.sidebar-collapsed .sidebar nav button:hover::after,
+.sidebar-collapsed .sidebar nav button:focus-visible::after {
+  opacity: 1;
+  transform: translate(0, -50%);
+  visibility: visible;
+  transition-delay: .18s;
+}
 .sidebar-collapsed .sidebar nav button:hover { transform: none; }
 .sidebar-collapsed .investigator-profile { justify-content: center; padding-inline: 0; }
 .sidebar-collapsed .sidebar-collapse-area { right: -13px; }
@@ -267,11 +337,12 @@
   .sidebar-collapsed .brand:hover .brand-logo-dark { opacity: 1; }
   .sidebar-collapsed .brand:hover .brand-logo-transparent { opacity: 0; }
   .sidebar-collapsed .brand-copy,
-  .sidebar-collapsed .nav-label,
-  .sidebar-collapsed .sidebar nav button b,
   .sidebar-collapsed .investigator-profile div,
   .sidebar-collapsed .investigator-profile button { display: flex; }
+  .sidebar-collapsed .nav-label { opacity: 1; transform: none; visibility: visible; }
+  .sidebar-collapsed .sidebar nav button b { display: block; max-width: 170px; opacity: 1; transform: none; visibility: visible; }
   .sidebar-collapsed .sidebar nav button { justify-content: flex-start; padding: 0 10px; }
+  .sidebar-collapsed .sidebar nav button::after { display: none; }
   .sidebar-collapsed .investigator-profile { justify-content: flex-start; padding: 8px 7px 0; }
   .sidebar-collapse-area { display: none; }
 }

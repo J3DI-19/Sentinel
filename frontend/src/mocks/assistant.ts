@@ -1,6 +1,6 @@
 import type { Severity, TimelineEntry } from "../types/domain";
 
-export type VisualizationComponentType =
+type VisualizationComponentType =
   | "metric-card"
   | "bar-chart"
   | "line-chart"
@@ -30,7 +30,7 @@ export interface VisualizationSpec {
   components: VisualizationComponentSpec[];
 }
 
-export interface AssistantPrompt {
+interface AssistantPrompt {
   id: string;
   label: string;
   request: string;
@@ -47,19 +47,6 @@ export interface AssistantMessageData {
   kind?: "verified" | "narration";
   references?: string[];
 }
-
-export const assistantContext = [
-  { id: "FND-1042", label: "Finding F-019", kind: "Finding" },
-  { id: "ALT-8831", label: "Alert ALT-012", kind: "Alert" },
-  { id: "EVD-2026-8F21", label: "Evidence EVT-00421", kind: "Evidence" },
-  { id: "dev-camera-01", label: "Device CAM-01", kind: "Device" },
-];
-
-export const initialAssistantMessages: AssistantMessageData[] = [
-  { id: "welcome", role: "assistant", kind: "narration", text: "I’m ready to help examine this case. I’ll keep verified evidence separate from explanatory narration and cite every record used." },
-  { id: "request-1", role: "user", text: "Show me the device activity surrounding this alert." },
-  { id: "answer-1", role: "assistant", kind: "verified", text: "CAM-01 showed a burst of failed authentication attempts followed by a successful login from an unseen peer. Related activity was also observed on the Northbridge gateway within the configured 120-second correlation window.", references: ["EVT-421", "EVT-428", "ALT-012", "F-019"] },
-];
 
 export const assistantPrompts: AssistantPrompt[] = [
   { id: "global-date", label: "Summarize 17 July", request: "Summarize what happened on 17 July.", response: "Verified retrieval found activity across three investigations on 17 July: 31 alerts, four critical findings, and a concentrated authentication spike affecting the Northbridge camera environment. The related records span live capture and preserved batch evidence.", narration: "The strongest pattern is the Northbridge credential-attack sequence, while the thermostat and gateway investigations contribute lower-confidence supporting activity. Review the cited cases and preserved records before treating that relationship as a conclusion.", references: ["TV-2026-024", "TV-2026-023", "TV-2026-021", "FND-1042", "ALT-8831", "EVD-2026-8F21"], specId: "global-july17" },

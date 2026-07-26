@@ -5,10 +5,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "Sentinel"
+    app_name: str = "Traceveil"
     environment: str = "development"
     api_prefix: str = "/api/v1"
-    database_url: str = "sqlite:///./data/sentinel.db"
+    database_url: str = "sqlite:///./data/traceveil.db"
     frontend_origins: list[str] = Field(
         default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"]
     )
@@ -29,4 +29,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
