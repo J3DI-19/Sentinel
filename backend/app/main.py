@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.db.sqlite import SQLiteRepository
+from app.evidence.service import EvidenceValidationService
 
 
 @asynccontextmanager
@@ -14,6 +15,11 @@ async def lifespan(app: FastAPI):
     repository = SQLiteRepository(settings.database_url)
     repository.initialize()
     app.state.repository = repository
+    app.state.evidence_validation_service = EvidenceValidationService(
+        repository,
+        max_file_size_bytes=settings.max_evidence_file_bytes,
+        max_issues=settings.max_validation_issues,
+    )
     yield
     repository.close()
 

@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen9b-q4_k_m"
     ollama_timeout_seconds: float = Field(default=2.0, gt=0)
+    max_evidence_file_bytes: int = Field(default=50 * 1024 * 1024, gt=0)
+    max_validation_issues: int = Field(default=100, gt=0)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 

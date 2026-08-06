@@ -42,18 +42,18 @@ report review experience. These interfaces currently use structured mock data;
 backend evidence ingestion and analytical integration begin in Step 3.
 
 ## 3. Input Check and Evidence Validation
-- [ ] Accept supported evidence file types
-- [ ] Check file size and structure
-- [ ] Validate required columns
-- [ ] Detect missing or invalid values
-- [ ] Hash and store evidence metadata
-- [ ] Preserve source metadata
-- [ ] Show validation errors
-- [ ] Define validated live telemetry input contracts
-- [ ] Validate incoming device identifiers and event types
-- [ ] Reject malformed live telemetry
-- [ ] Record live ingestion timestamps
-- [ ] Preserve source/device provenance for live evidence
+- [x] Accept supported evidence file types
+- [x] Check file size and structure
+- [x] Validate required columns
+- [x] Detect missing or invalid values
+- [x] Hash and store evidence metadata
+- [x] Preserve source metadata
+- [x] Return structured validation errors for later API/frontend integration
+- [x] Define validated live telemetry input contracts
+- [x] Validate incoming device identifiers and event types
+- [x] Reject malformed live telemetry
+- [x] Record live ingestion timestamps
+- [x] Preserve source/device provenance for live evidence
 
 ## 4. Canonical Event Model and Normalization
 - [ ] Create the common canonical event schema
