@@ -4,7 +4,7 @@ import math
 import re
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -66,6 +66,27 @@ class EvidenceValidationReport(BaseModel):
                 "accepted_records plus rejected_records must equal total_records"
             )
         return self
+
+
+class ValidatedBatchRecord(BaseModel):
+    """A row that passed the selected Step 3 validation profile."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    evidence_id: UUID
+    source_type: EvidenceSource
+    dataset_profile: str
+    validator_version: str
+    row_number: int = Field(ge=1)
+    record: dict[str, Any]
+    raw_record_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class EvidenceValidationOutcome(BaseModel):
+    """Validation report plus only the rows authorized for normalization."""
+
+    report: EvidenceValidationReport
+    accepted_records: list[ValidatedBatchRecord] = Field(default_factory=list)
 
 
 TelemetryScalar = str | int | float | bool | None

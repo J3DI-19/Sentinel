@@ -7,6 +7,7 @@ from app.api.health import router as health_router
 from app.core.config import get_settings
 from app.db.sqlite import SQLiteRepository
 from app.evidence.service import EvidenceValidationService
+from app.normalization.service import NormalizationService
 
 
 @asynccontextmanager
@@ -20,6 +21,7 @@ async def lifespan(app: FastAPI):
         max_file_size_bytes=settings.max_evidence_file_bytes,
         max_issues=settings.max_validation_issues,
     )
+    app.state.normalization_service = NormalizationService()
     yield
     repository.close()
 

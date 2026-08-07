@@ -56,16 +56,16 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Preserve source/device provenance for live evidence
 
 ## 4. Canonical Event Model and Normalization
-- [ ] Create the common canonical event schema
-- [ ] Map simulated data
-- [ ] Map TON_IoT data
-- [ ] Map CICIoT2023 data
-- [ ] Standardize timestamps
-- [ ] Standardize device and entity fields
-- [ ] Preserve source row references
-- [ ] Create a live telemetry adapter
-- [ ] Normalize live device events into the canonical event model
-- [ ] Preserve live source and ingestion metadata
+- [x] Create the common canonical event schema
+- [x] Map simulated data
+- [x] Map TON_IoT data
+- [x] Map CICIoT2023 data
+- [x] Standardize timestamps
+- [x] Standardize device and entity fields
+- [x] Preserve source row references
+- [x] Create a live telemetry adapter
+- [x] Normalize live device events into the canonical event model
+- [x] Preserve live source and ingestion metadata
 
 **Convergence point:** Uploaded/batch evidence and accepted live telemetry both
 become canonical events and enter the same deterministic investigation pipeline.

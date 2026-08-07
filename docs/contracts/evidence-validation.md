@@ -18,6 +18,8 @@ Every attempt produces an `EvidenceValidationReport` containing:
 
 Invalid data is never silently repaired. A mixed file may be accepted with warnings when at least one record is valid. A file-level failure, a missing required column, or a file with no valid records is rejected.
 
+`validate_with_records` is the Step 3-to-Step 4 boundary. In addition to the report, it returns a `ValidatedBatchRecord` for each accepted row and never returns rejected rows. Each handoff contains the evidence ID, source type, dataset profile, validator version, original row number, parsed record, and a deterministic SHA-256 record hash. Step 4 verifies all of those values against the evidence metadata and recomputes the record hash before normalization; callers cannot bypass Step 3 by supplying an arbitrary row dictionary.
+
 ## Versioned profiles
 
 | Profile | Minimal required columns |
@@ -28,6 +30,8 @@ Invalid data is never silently repaired. A mixed file may be accepted with warni
 | `generic@1.0` | No dataset-specific columns; structural checks still apply |
 
 The TON_IoT profile intentionally names the network subset because TON_IoT contains heterogeneous sources. Additional TON_IoT subsets must receive separate profiles instead of weakening this contract. Small synthetic contract fixtures preserve the expected headers without redistributing dataset records; they must be compared with the exact selected dataset release before an adapter is finalized in Step 4.
+
+Generic validation has no dataset-specific required columns, but Step 4 still rejects a row that cannot produce any meaningful canonical time, type, identity, label, or attribute.
 
 ## Live telemetry handoff
 

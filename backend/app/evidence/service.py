@@ -8,15 +8,17 @@ from pathlib import PurePosixPath, PureWindowsPath
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from app.evidence.hashing import sha256_bytes
+from app.evidence.hashing import sha256_bytes, sha256_record
 from app.evidence.profiles import DatasetProfile, get_profile
 from app.evidence.schemas import (
     EvidenceMetadata,
     EvidenceSource,
+    EvidenceValidationOutcome,
     EvidenceValidationIssue,
     EvidenceValidationReport,
     IssueLevel,
     ValidationStatus,
+    ValidatedBatchRecord,
 )
 
 if TYPE_CHECKING:
@@ -50,6 +52,23 @@ class EvidenceValidationService:
         case_id: int | None = None,
         media_type: str | None = None,
     ) -> EvidenceValidationReport:
+        return self.validate_with_records(
+            filename=filename,
+            content=content,
+            source_type=source_type,
+            case_id=case_id,
+            media_type=media_type,
+        ).report
+
+    def validate_with_records(
+        self,
+        *,
+        filename: str,
+        content: bytes,
+        source_type: EvidenceSource,
+        case_id: int | None = None,
+        media_type: str | None = None,
+    ) -> EvidenceValidationOutcome:
         profile = get_profile(source_type)
         digest = sha256_bytes(content)
         sanitized_filename, filename_issue = self._validate_filename(filename)
@@ -89,13 +108,16 @@ class EvidenceValidationService:
 
         accepted = 0
         rejected = 0
+        accepted_row_numbers: list[int] = []
         if records and not self._has_file_errors(issues):
             column_issues = self._validate_columns(records, profile)
             issues.extend(column_issues)
             if column_issues:
                 rejected = len(records)
             else:
-                accepted, rejected, record_issues = self._validate_records(records, profile)
+                accepted, rejected, record_issues, accepted_row_numbers = self._validate_records(
+                    records, profile
+                )
                 issues.extend(record_issues)
 
         if self.repository is not None and case_id is not None:
@@ -121,7 +143,22 @@ class EvidenceValidationService:
         )
         if self.repository is not None:
             self.repository.store_evidence_validation(report)
-        return report
+        validated_records = [
+            ValidatedBatchRecord(
+                evidence_id=metadata.evidence_id,
+                source_type=metadata.source_type,
+                dataset_profile=metadata.dataset_profile,
+                validator_version=metadata.validator_version,
+                row_number=row_number,
+                record=records[row_number - 1],
+                raw_record_hash=sha256_record(records[row_number - 1]),
+            )
+            for row_number in accepted_row_numbers
+        ]
+        return EvidenceValidationOutcome(
+            report=report,
+            accepted_records=validated_records,
+        )
 
     def _parse(self, extension: str, content: bytes) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:
@@ -189,10 +226,11 @@ class EvidenceValidationService:
 
     def _validate_records(
         self, records: list[dict[str, Any]], profile: DatasetProfile
-    ) -> tuple[int, int, list[EvidenceValidationIssue]]:
+    ) -> tuple[int, int, list[EvidenceValidationIssue], list[int]]:
         accepted = 0
         rejected = 0
         issues: list[EvidenceValidationIssue] = []
+        accepted_row_numbers: list[int] = []
         for row_number, record in enumerate(records, start=1):
             normalized_record = {str(key).strip().casefold(): value for key, value in record.items()}
             row_valid = True
@@ -213,9 +251,10 @@ class EvidenceValidationService:
                         )
             if row_valid:
                 accepted += 1
+                accepted_row_numbers.append(row_number)
             else:
                 rejected += 1
-        return accepted, rejected, issues
+        return accepted, rejected, issues, accepted_row_numbers
 
     @staticmethod
     def _validate_filename(filename: str) -> tuple[str, EvidenceValidationIssue | None]:

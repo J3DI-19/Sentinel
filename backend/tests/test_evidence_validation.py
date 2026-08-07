@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from app.db.sqlite import SQLiteRepository
-from app.evidence.hashing import sha256_bytes
+from app.evidence.hashing import sha256_bytes, sha256_record
 from app.evidence.schemas import EvidenceSource, IssueLevel, ValidationStatus
 from app.evidence.service import EvidenceValidationService
 
@@ -105,6 +105,29 @@ def test_accepts_valid_rows_and_documents_invalid_rows():
         (2, "timestamp", "INVALID_TIMESTAMP"),
         (3, "device_id", "MISSING_VALUE"),
     }
+
+
+def test_validation_outcome_hands_off_only_accepted_rows_with_hashes():
+    content = (
+        b"timestamp,device_id,event_type\n"
+        b"2026-08-06T10:00:00Z,sensor-1,telemetry\n"
+        b"not-a-time,sensor-2,telemetry\n"
+    )
+
+    outcome = EvidenceValidationService().validate_with_records(
+        filename="mixed.csv",
+        content=content,
+        source_type=EvidenceSource.SIMULATED,
+        case_id=1,
+    )
+
+    assert outcome.report.accepted_records == 1
+    assert outcome.report.rejected_records == 1
+    assert len(outcome.accepted_records) == 1
+    accepted = outcome.accepted_records[0]
+    assert accepted.evidence_id == outcome.report.metadata.evidence_id
+    assert accepted.row_number == 1
+    assert accepted.raw_record_hash == sha256_record(accepted.record)
 
 
 def test_validates_json_records_and_rejects_malformed_shape():
