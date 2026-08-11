@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.analysis.service import AnalysisService
 from app.core.config import get_settings
 from app.db.sqlite import SQLiteRepository
 from app.evidence.service import EvidenceValidationService
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
         max_issues=settings.max_validation_issues,
     )
     app.state.normalization_service = NormalizationService()
+    app.state.analysis_service = AnalysisService()
     yield
     repository.close()
 

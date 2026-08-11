@@ -86,17 +86,26 @@ become canonical events and enter the same deterministic investigation pipeline.
 - [ ] Verify end-to-end live ingestion
 
 ## 6. Filtering, Detection, Risk and Correlation
-- [ ] Add deterministic filters
-- [ ] Add stable sorting
-- [ ] Add detection rules
-- [ ] Add behavioural baselines
-- [ ] Add bounded risk scoring
-- [ ] Add event correlation
-- [ ] Build incident timelines
-- [ ] Generate graph data
-- [ ] Generate chart-ready aggregates
-- [ ] Support analysis of both batch and live events
-- [ ] Trigger alerts from qualifying live events
+- [x] Add deterministic filters
+- [x] Add stable sorting
+- [x] Add detection rules
+- [x] Add behavioural baselines
+- [x] Add bounded risk scoring
+- [x] Add event correlation
+- [x] Build incident timelines
+- [x] Generate graph data
+- [x] Generate chart-ready aggregates
+- [x] Support analysis of both batch and live events
+- [x] Trigger alerts from qualifying live events
+
+**Current result:** Step 6 is complete. The backend provides a versioned
+deterministic analysis service over canonical batch and live events. It returns
+rule traces, baseline samples, bounded five-factor risk scores, explicit
+correlation reasons, incident components, stable timelines, NetworkX graph
+data, Pandas chart aggregates, and pending alerts for actual live triggers.
+Golden and adversarial tests verify reproducibility, phase boundaries, missing
+observed time, stable filtering, and batch/live alert behaviour. APIs,
+real-time delivery, and persistence of derived artifacts remain later steps.
 
 ## 7. Real-Time Event Delivery
 - [ ] Add backend real-time event delivery
