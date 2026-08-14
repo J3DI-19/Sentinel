@@ -98,11 +98,11 @@ Exact hardware and communication protocols remain implementation decisions.
 
 ## Project status
 
-Steps 1 and 2 are complete. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, and local Ollama/Qwen setup. The frontend now includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualizations, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
+Steps 1 through 4 and Step 6 are complete. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, local Ollama/Qwen setup, backend evidence validation, the versioned canonical event/normalization pipeline, and the deterministic investigation engine. The frontend includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualization placeholders, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
 
-Step 2 interfaces currently operate on structured mock data. Backend evidence validation, canonical normalization, live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [roadmap](docs/roadmap.md) for the phase-by-phase checklist.
+Step 2 interfaces currently operate on structured mock data. Step 3 supplies deterministic validation and the shared live-telemetry input contract. Step 4 maps simulated, TON_IoT, CICIoT2023, generic, and accepted live inputs into one strict canonical schema with deterministic identifiers and complete source provenance. Step 6 applies versioned filters, stable sorting, rules, behavioural baselines, bounded factorized scoring, correlation, incidents, timelines, graphs, aggregates, and live-trigger alert creation. Live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), and [roadmap](docs/roadmap.md).
 
-Implementation now proceeds from Step 3: input checks and evidence validation, followed by the canonical event pipeline and backend analytical integration.
+Implementation can now proceed with Step 5 live collection, Step 7 real-time delivery, and Step 8 investigation APIs against the finalized validation, canonical-event, and deterministic-analysis contracts.
 
 ## Step 1 setup and run
 

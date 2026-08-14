@@ -1,0 +1,2 @@
+flow_duration,Protocol Type,Header_Length,Duration,Rate,label
+1.25,6,40,64,8.0,BenignTraffic

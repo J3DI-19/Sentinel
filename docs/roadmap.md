@@ -42,30 +42,30 @@ report review experience. These interfaces currently use structured mock data;
 backend evidence ingestion and analytical integration begin in Step 3.
 
 ## 3. Input Check and Evidence Validation
-- [ ] Accept supported evidence file types
-- [ ] Check file size and structure
-- [ ] Validate required columns
-- [ ] Detect missing or invalid values
-- [ ] Hash and store evidence metadata
-- [ ] Preserve source metadata
-- [ ] Show validation errors
-- [ ] Define validated live telemetry input contracts
-- [ ] Validate incoming device identifiers and event types
-- [ ] Reject malformed live telemetry
-- [ ] Record live ingestion timestamps
-- [ ] Preserve source/device provenance for live evidence
+- [x] Accept supported evidence file types
+- [x] Check file size and structure
+- [x] Validate required columns
+- [x] Detect missing or invalid values
+- [x] Hash and store evidence metadata
+- [x] Preserve source metadata
+- [x] Return structured validation errors for later API/frontend integration
+- [x] Define validated live telemetry input contracts
+- [x] Validate incoming device identifiers and event types
+- [x] Reject malformed live telemetry
+- [x] Record live ingestion timestamps
+- [x] Preserve source/device provenance for live evidence
 
 ## 4. Canonical Event Model and Normalization
-- [ ] Create the common canonical event schema
-- [ ] Map simulated data
-- [ ] Map TON_IoT data
-- [ ] Map CICIoT2023 data
-- [ ] Standardize timestamps
-- [ ] Standardize device and entity fields
-- [ ] Preserve source row references
-- [ ] Create a live telemetry adapter
-- [ ] Normalize live device events into the canonical event model
-- [ ] Preserve live source and ingestion metadata
+- [x] Create the common canonical event schema
+- [x] Map simulated data
+- [x] Map TON_IoT data
+- [x] Map CICIoT2023 data
+- [x] Standardize timestamps
+- [x] Standardize device and entity fields
+- [x] Preserve source row references
+- [x] Create a live telemetry adapter
+- [x] Normalize live device events into the canonical event model
+- [x] Preserve live source and ingestion metadata
 
 **Convergence point:** Uploaded/batch evidence and accepted live telemetry both
 become canonical events and enter the same deterministic investigation pipeline.
@@ -86,17 +86,26 @@ become canonical events and enter the same deterministic investigation pipeline.
 - [ ] Verify end-to-end live ingestion
 
 ## 6. Filtering, Detection, Risk and Correlation
-- [ ] Add deterministic filters
-- [ ] Add stable sorting
-- [ ] Add detection rules
-- [ ] Add behavioural baselines
-- [ ] Add bounded risk scoring
-- [ ] Add event correlation
-- [ ] Build incident timelines
-- [ ] Generate graph data
-- [ ] Generate chart-ready aggregates
-- [ ] Support analysis of both batch and live events
-- [ ] Trigger alerts from qualifying live events
+- [x] Add deterministic filters
+- [x] Add stable sorting
+- [x] Add detection rules
+- [x] Add behavioural baselines
+- [x] Add bounded risk scoring
+- [x] Add event correlation
+- [x] Build incident timelines
+- [x] Generate graph data
+- [x] Generate chart-ready aggregates
+- [x] Support analysis of both batch and live events
+- [x] Trigger alerts from qualifying live events
+
+**Current result:** Step 6 is complete. The backend provides a versioned
+deterministic analysis service over canonical batch and live events. It returns
+rule traces, baseline samples, bounded five-factor risk scores, explicit
+correlation reasons, incident components, stable timelines, NetworkX graph
+data, Pandas chart aggregates, and pending alerts for actual live triggers.
+Golden and adversarial tests verify reproducibility, phase boundaries, missing
+observed time, stable filtering, and batch/live alert behaviour. APIs,
+real-time delivery, and persistence of derived artifacts remain later steps.
 
 ## 7. Real-Time Event Delivery
 - [ ] Add backend real-time event delivery
