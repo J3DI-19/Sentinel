@@ -31,6 +31,13 @@ Invalid data is never silently repaired. A mixed file may be accepted with warni
 
 The TON_IoT profile intentionally names the network subset because TON_IoT contains heterogeneous sources. Additional TON_IoT subsets must receive separate profiles instead of weakening this contract. Small synthetic contract fixtures preserve the expected headers without redistributing dataset records; they must be compared with the exact selected dataset release before an adapter is finalized in Step 4.
 
+The project evaluation scope selects CASAS smart-home telemetry, TON_IoT
+smart-device telemetry, and controlled simulation as its primary batch sources.
+Dedicated, versioned CASAS and TON_IoT telemetry profiles are not yet defined in
+this contract. The existing TON_IoT network and CICIoT2023 network profiles are
+secondary compatibility paths and do not substitute for those planned telemetry
+profiles.
+
 Generic validation has no dataset-specific required columns, but Step 4 still rejects a row that cannot produce any meaningful canonical time, type, identity, label, or attribute.
 
 ## Live telemetry handoff

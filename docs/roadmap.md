@@ -58,8 +58,10 @@ backend evidence ingestion and analytical integration begin in Step 3.
 ## 4. Canonical Event Model and Normalization
 - [x] Create the common canonical event schema
 - [x] Map simulated data
-- [x] Map TON_IoT data
-- [x] Map CICIoT2023 data
+- [ ] Map CASAS smart-home telemetry data
+- [ ] Map TON_IoT smart-device telemetry data
+- [x] Retain TON_IoT network data as a secondary compatibility adapter
+- [x] Retain CICIoT2023 network data as a secondary compatibility adapter
 - [x] Standardize timestamps
 - [x] Standardize device and entity fields
 - [x] Preserve source row references
@@ -69,6 +71,13 @@ backend evidence ingestion and analytical integration begin in Step 3.
 
 **Convergence point:** Uploaded/batch evidence and accepted live telemetry both
 become canonical events and enter the same deterministic investigation pipeline.
+
+**Selected evaluation sources:** CASAS smart-home telemetry, TON_IoT
+smart-device telemetry, and controlled simulation are the primary batch sources.
+The existing TON_IoT network and CICIoT2023 adapters remain useful compatibility
+paths, but CICIoT2023 is not a primary smart-home evaluation dataset. Step 4 is
+not complete for the selected scope until the CASAS and TON_IoT telemetry
+profiles and adapters are implemented and verified against pinned releases.
 
 ## 5. Live IoT Integration
 - [ ] Select the Arduino-compatible microcontroller

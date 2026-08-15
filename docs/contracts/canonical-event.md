@@ -83,3 +83,10 @@ Flat source fields not mapped into common fields remain in `attributes`. CSV str
 Every event retains evidence ID, original evidence hash, logical row/sequence reference, deterministic raw-record hash, source type/name/ID, batch/live origin, adapter version, and normalization version. Batch normalization accepts only a `ValidatedBatchRecord` issued by Step 3, verifies its metadata, and recomputes its row hash before mapping. Source fields that collapse to the same normalized name, such as `src-ip` and `src_ip`, are rejected as ambiguous instead of selecting one value. The original evidence remains the authority for full raw-record review.
 
 The current TON_IoT and CICIoT2023 adapters are pinned to the versioned Step 3 profile fixtures. The exact selected dataset release must match those headers or receive a new versioned profile and adapter rather than an undocumented mapping change.
+
+These network adapters are retained as secondary compatibility paths. The
+primary smart-home evaluation plan uses CASAS smart-home telemetry, TON_IoT
+smart-device telemetry, and controlled simulation. Dedicated CASAS and TON_IoT
+telemetry mappings remain planned and must receive their own versioned profiles,
+adapters, fixtures, and provenance rules before they are treated as supported
+primary sources.
