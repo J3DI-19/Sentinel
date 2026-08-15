@@ -1,20 +1,21 @@
 import { AppShell, useLocationPath } from "../layouts/RefinedAppShell";
-import { OverviewCommandCenter } from "../pages/OverviewCommandCenter";
-import { CasesPage } from "../pages/CasesPage";
-import { LiveOperationsPage } from "../pages/LiveOperationsPage";
+import { ConnectedOverviewPage } from "../pages/ConnectedOverviewPage";
+import { ConnectedCasesPage } from "../pages/ConnectedCasesPage";
+import { ConnectedLiveOperationsPage } from "../pages/ConnectedLiveOperationsPage";
 import { ImportEvidencePage } from "../pages/ImportEvidencePage";
 import { SystemStatusPage } from "../pages/SystemStatusPage";
 import { SettingsWorkspacePage } from "../pages/SettingsWorkspacePage";
-import { CaseWorkspacePage } from "../pages/CaseWorkspacePage";
-import { GlobalInvestigationAssistantPage } from "../pages/GlobalInvestigationAssistantPage";
+import { ConnectedCaseWorkspaceV3Page } from "../pages/ConnectedCaseWorkspaceV3Page";
+import { ConnectedAssistantPage } from "../pages/ConnectedAssistantPage";
 
 export function Router() {
   const route=useLocationPath(); let page;
-  if(route.path==="/") page=<OverviewCommandCenter navigate={route.navigate}/>;
-  else if(route.path==="/assistant") page=<GlobalInvestigationAssistantPage search={route.search}/>;
-  else if(route.path==="/cases") page=<CasesPage navigate={route.navigate}/>;
-  else if(route.path.startsWith("/cases/")) page=<CaseWorkspacePage path={route.path} navigate={route.navigate}/>;
-  else if(route.path==="/live") page=<LiveOperationsPage navigate={route.navigate}/>;
+  if(route.path==="/") page=<ConnectedOverviewPage navigate={route.navigate}/>;
+  else if(route.path==="/assistant") page=<ConnectedAssistantPage search={route.search}/>;
+  else if(route.path==="/cases") page=<ConnectedCasesPage navigate={route.navigate}/>;
+  else if(/^\/cases\/\d+(?:\/|$)/.test(route.path)) page=<ConnectedCaseWorkspaceV3Page path={route.path} navigate={route.navigate}/>;
+  else if(route.path.startsWith("/cases/")) page=<div className="state-box" role="alert"><strong>Legacy demonstration case unavailable</strong><p>Production routes only display persisted numeric case IDs. Select a connected case from the register.</p><button onClick={()=>route.navigate("/cases")}>Open cases</button></div>;
+  else if(route.path==="/live") page=<ConnectedLiveOperationsPage navigate={route.navigate} search={route.search}/>;
   else if(route.path==="/import") page=<ImportEvidencePage/>;
   else if(route.path==="/status") page=<SystemStatusPage/>;
   else if(route.path==="/settings") page=<SettingsWorkspacePage/>;

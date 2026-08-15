@@ -6,9 +6,9 @@ type ToggleProps = { label: string; description: string; checked: boolean; onCha
 
 const tabs: Array<{ name: Tab; description: string; status: string; icon: string }> = [
   { name: "Preferences", description: "Interface and investigation defaults", status: "Local", icon: "◫" },
-  { name: "Model settings", description: "Optional AI runtime configuration", status: "Mock only", icon: "✦" },
-  { name: "Alert rules", description: "Default triage and escalation behavior", status: "Mock only", icon: "◇" },
-  { name: "Email delivery", description: "Report and alert notification defaults", status: "Unavailable", icon: "↗" },
+  { name: "Model settings", description: "Optional grounded Ollama assistance", status: "Server configured", icon: "✦" },
+  { name: "Alert rules", description: "Browser triage preferences; analysis is server authoritative", status: "Session only", icon: "◇" },
+  { name: "Email delivery", description: "Approval-gated server delivery policy", status: "Environment", icon: "↗" },
 ];
 
 function Section({ title, description, children }: { title: string; description: string; children: ReactNode }) {
@@ -36,12 +36,12 @@ export function SettingsWorkspacePage() {
 
   return <>
     <PageHeader eyebrow="Workspace configuration" title="Settings" description="Configure local investigation preferences and review the boundaries of planned platform integrations." actions={<span className="settings-scope"><i/>This browser session</span>}/>
-    <div className="settings-notice" role="note"><span>i</span><div><b>Frontend settings preview</b><p>Changes affect this interface session only. No account service, secrets store, alert engine, or delivery service is connected.</p></div></div>
+    <div className="settings-notice" role="note"><span>i</span><div><b>Frontend preference boundary</b><p>Display preferences affect this browser session only. Source tokens, Ollama, SMTP credentials, and recipient allow-lists are configured server-side.</p></div></div>
     <div className="settings-layout">
       <aside className="settings-nav" aria-label="Settings sections">
         <div className="settings-nav-label">Configuration</div>
         {tabs.map(item => <button key={item.name} className={tab === item.name ? "active" : ""} aria-current={tab === item.name ? "page" : undefined} onClick={() => { setTab(item.name); setSaved(false); }}><span className="settings-nav-icon">{item.icon}</span><span><b>{item.name}</b><small>{item.description}</small></span><em>›</em></button>)}
-        <div className="settings-nav-foot"><b>Configuration state</b><span><i/>Mock-backed interface</span></div>
+        <div className="settings-nav-foot"><b>Configuration state</b><span><i/>Browser preferences</span></div>
       </aside>
       <main className="settings-panel panel">
         <header className="settings-panel-head"><div><span className="eyebrow">Configuration section</span><h2>{current.name}</h2><p>{current.description}</p></div><StatusBadge status={current.status}/></header>
@@ -62,11 +62,11 @@ export function SettingsWorkspacePage() {
           <Section title="Optional AI runtime" description="Keep generated narrative separate from verified investigation evidence.">
             <div className="settings-runtime-card"><span>AI</span><div><b>Local model runtime</b><p>Optional service · currently disconnected</p></div><StatusBadge status="Optional offline"/></div>
             {toggle("Enable AI-assisted narrative", "Generate clearly labeled summaries from selected evidence.", model.enabled, value => setModel({ ...model, enabled: value }))}
-            {toggle("Require evidence references", "Retain links to supporting mock records in generated responses.", model.references, value => setModel({ ...model, references: value }))}
+            {toggle("Require evidence references", "Retain links to supporting persisted records in generated responses.", model.references, value => setModel({ ...model, references: value }))}
           </Section>
-          <Section title="Runtime connection" description="Illustrative fields; values are not sent outside this browser."><div className="settings-control-grid">
-            <SelectField label="Provider" description="Planned local inference provider." value={model.provider} onChange={value => change(() => setModel({ ...model, provider: value }))}><option>Local Ollama</option></SelectField>
-            <SelectField label="Model" description="Planned model identifier." value={model.name} onChange={value => change(() => setModel({ ...model, name: value }))}><option>llama3.2:3b</option><option>qwen2.5:7b</option></SelectField>
+          <Section title="Runtime connection" description="Display-only runtime information; server environment values remain authoritative."><div className="settings-control-grid">
+            <SelectField label="Provider" description="Implemented local inference provider." value={model.provider} onChange={value => change(() => setModel({ ...model, provider: value }))}><option>Local Ollama</option></SelectField>
+            <SelectField label="Model" description="Configured model identifier." value={model.name} onChange={value => change(() => setModel({ ...model, name: value }))}><option>llama3.2:3b</option><option>qwen2.5:7b</option></SelectField>
           </div><label className="setting-control setting-control-full"><span><b>Endpoint</b><small>Local-only placeholder; connectivity is not tested here.</small></span><input aria-label="Endpoint" value="http://127.0.0.1:11434" readOnly/></label></Section>
         </>}
 
@@ -76,17 +76,17 @@ export function SettingsWorkspacePage() {
             {toggle("High-severity detections", "Surface high-severity detections for review.", alerts.high, value => setAlerts({ ...alerts, high: value }))}
             {toggle("Medium-severity detections", "Include medium-severity detections by default.", alerts.medium, value => setAlerts({ ...alerts, medium: value }))}
           </Section>
-          <Section title="Triage defaults" description="Mock thresholds used to preview intended alert behavior."><div className="settings-control-grid">
+          <Section title="Triage defaults" description="Browser-only triage preferences; detection thresholds remain backend-authoritative."><div className="settings-control-grid">
             <SelectField label="Escalation threshold" description="Minimum score for escalation." value={alerts.threshold} onChange={value => change(() => setAlerts({ ...alerts, threshold: value }))}><option value="70">70 risk</option><option value="80">80 risk</option><option value="90">90 risk</option></SelectField>
             <SelectField label="Grouping window" description="Combine related detections." value={alerts.window} onChange={value => change(() => setAlerts({ ...alerts, window: value }))}><option>5 minutes</option><option>15 minutes</option><option>30 minutes</option></SelectField>
           </div></Section>
         </>}
 
         {tab === "Email delivery" && <>
-          <div className="settings-unavailable"><span>↗</span><div><b>Delivery service unavailable</b><p>Traceveil does not currently send email. These controls preview the intended notification policy only.</p></div></div>
-          <Section title="Notification defaults" description="Requires a future authenticated delivery service.">
-            {toggle("Approved report delivery", "Email a report after investigator approval and sign-off.", false, () => undefined, true)}
-            {toggle("Critical alert notification", "Notify the owner when a critical alert is created.", false, () => undefined, true)}
+          <div className="settings-unavailable"><span>↗</span><div><b>Delivery is server-configured</b><p>Approved report email is implemented, but credentials and recipient domains remain environment-only. Sending is performed from a case report after two explicit approvals.</p></div></div>
+          <Section title="Notification defaults" description="Read-only boundary for the local approval-gated SMTP service.">
+            {toggle("Manual approved report delivery", "Permit a separate confirmed send action after report and email approval.", false, () => undefined, true)}
+            {toggle("Critical alert draft creation", "Optional automatic draft creation remains disabled by default.", false, () => undefined, true)}
             <div className="settings-control-grid"><label className="setting-control is-disabled"><span><b>Default recipient</b><small>Requires user and case ownership data.</small></span><input aria-label="Default recipient" value="investigator@traceveil.local" readOnly disabled/></label><SelectField label="Digest frequency" description="Scheduled investigation summaries." value="Never" onChange={() => undefined} disabled><option>Never</option></SelectField></div>
           </Section>
         </>}

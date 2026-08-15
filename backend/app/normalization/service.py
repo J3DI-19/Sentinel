@@ -18,7 +18,10 @@ from app.normalization.adapters import (
     GenericAdapter,
     LiveTelemetryAdapter,
     SimulatedAdapter,
+    SimulationAdapter,
     TonIotNetworkAdapter,
+    CasasAdapter,
+    TonIotTelemetryAdapter,
 )
 from app.normalization.schemas import (
     CanonicalSourceType,
@@ -32,7 +35,10 @@ from app.normalization.helpers import AmbiguousRecordFields
 
 
 _BATCH_SOURCE_MAP = {
+    EvidenceSource.CASAS: CanonicalSourceType.CASAS,
+    EvidenceSource.TON_IOT_TELEMETRY: CanonicalSourceType.TON_IOT_TELEMETRY,
     EvidenceSource.SIMULATED: CanonicalSourceType.SIMULATED,
+    EvidenceSource.SIMULATION: CanonicalSourceType.SIMULATION,
     EvidenceSource.TON_IOT_NETWORK: CanonicalSourceType.TON_IOT_NETWORK,
     EvidenceSource.CICIOT2023_NETWORK: CanonicalSourceType.CICIOT2023_NETWORK,
     EvidenceSource.GENERIC: CanonicalSourceType.GENERIC,
@@ -42,7 +48,10 @@ _BATCH_SOURCE_MAP = {
 class NormalizationService:
     def __init__(self) -> None:
         adapters: list[CanonicalAdapter] = [
+            CasasAdapter(),
+            TonIotTelemetryAdapter(),
             SimulatedAdapter(),
+            SimulationAdapter(),
             TonIotNetworkAdapter(),
             CicIot2023NetworkAdapter(),
             GenericAdapter(),

@@ -1,5 +1,7 @@
 # Traceveil Roadmap
 
+> Phase 3 software status (August 2026): batch investigation APIs, CASAS and TON_IoT telemetry adapters, authenticated HTTP live collection, durable receipts, SSE replay, connected historical views, grounded optional Ollama assistance, deterministic PDF reports, approval-gated SMTP delivery, audit history, and the controlled simulator are implemented. Physical hardware assembly and MQTT remain optional future work.
+
 ## 1. Initialization
 - [x] Set up React + Vite frontend
 - [x] Set up FastAPI backend
