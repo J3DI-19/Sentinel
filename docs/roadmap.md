@@ -64,7 +64,7 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Map CASAS Milan smart-home sensor data
 - [x] Map TON_IoT fridge device telemetry
 - [x] Retain TON_IoT network data as a secondary compatibility adapter
-- [x] Retain CICIoT2023 data as a secondary compatibility adapter
+- [x] Retain CICIoT2023 network data as a secondary compatibility adapter
 - [x] Standardize timestamps
 - [x] Standardize device and entity fields
 - [x] Preserve source row references

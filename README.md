@@ -29,7 +29,7 @@ Live IoT Events ----/
 
 The platform is organized into these layers:
 
-1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. CASAS smart-home telemetry and TON_IoT device telemetry are the selected primary public datasets; TON_IoT network and CICIoT2023 remain secondary compatibility paths.
+1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. CASAS smart-home telemetry and TON_IoT device telemetry are the selected primary public datasets with dedicated versioned adapters. Existing TON_IoT network and CICIoT2023 adapters are retained as secondary compatibility paths rather than primary evaluation sources.
 2. **Live IoT Collection Layer** — receives controlled device telemetry, validates message structure and source identifiers, and records ingestion metadata. MQTT and/or HTTP will be selected during implementation.
 3. **Canonical Event and Normalization Layer** — maps accepted batch and live inputs into one versioned event model with retained provenance.
 4. **Detection and Risk Engine** — applies deterministic rules, behavioural baselines, and bounded factorized scores.
@@ -54,7 +54,7 @@ No live communication protocol or supporting library has been selected or implem
 
 ## Data sources and evaluation
 
-Traceveil uses CASAS smart-home telemetry and TON_IoT device telemetry as its primary public evaluation sources, supplemented by controlled simulated cases and a small authorized IoT laboratory demonstration. Existing TON_IoT network and CICIoT2023 adapters are retained as secondary compatibility paths. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
+Traceveil's primary batch evaluation sources are CASAS smart-home telemetry, TON_IoT device telemetry, and controlled simulated cases. CASAS supplies real household motion, door, and ambient sensor activity; TON_IoT supplies smart-device telemetry with normal and attack-labelled behaviour; simulation supplies precise golden cases for timestamps, identities, rules, baselines, correlations, and expected alerts. A small authorized IoT laboratory demonstration supplies the live path. Existing TON_IoT network and CICIoT2023 network-flow support are secondary compatibility paths and are not part of the primary smart-home evaluation plan. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
 
 Representative golden cases will preserve expected normalized records, rule matches, risk factors, correlation edges, and ordered timelines. Live evaluation will additionally cover valid and malformed telemetry, device/source identification, evidence persistence, temporary disconnections, reconnect behaviour, delivery latency, and a controlled suspicious-event scenario.
 
@@ -98,11 +98,11 @@ Exact hardware and communication protocols remain implementation decisions.
 
 ## Project status
 
-Steps 1 through 4 and Step 6 are complete. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, local Ollama/Qwen setup, backend evidence validation, the versioned canonical event/normalization pipeline, and the deterministic investigation engine. The frontend includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualization placeholders, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
+Steps 1 through 4 and Step 6 are implemented for the selected evaluation scope, including dedicated CASAS and TON_IoT device-telemetry profiles and adapters. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, local Ollama/Qwen setup, backend evidence validation, the versioned canonical event/normalization pipeline, and the deterministic investigation engine. The frontend includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualization placeholders, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
 
 Step 2 interfaces currently operate on structured mock data. Step 3 supplies deterministic validation, pinned CASAS Milan and TON_IoT fridge telemetry profiles, a shared live-telemetry input contract, and a clean-exit pytest guard used by CI. Step 4 maps CASAS smart-home sensors, TON_IoT device telemetry and network data, simulated data, CICIoT2023, generic uploads, and accepted live inputs into one strict canonical schema with deterministic identifiers and complete source provenance. Step 6 applies versioned filters, stable sorting, rules, behavioural baselines, bounded factorized scoring, correlation, incidents, timelines, graphs, aggregates, and live-trigger alert creation. Live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), and [roadmap](docs/roadmap.md).
 
-Implementation can now proceed with Step 5 live collection, Step 7 real-time delivery, and Step 8 investigation APIs against the finalized validation, canonical-event, and deterministic-analysis contracts.
+Implementation can now proceed with Step 5 live collection, Step 7 real-time delivery, and Step 8 investigation APIs against the versioned validation, canonical-event, and deterministic-analysis contracts.
 
 ## Step 1 setup and run
 
