@@ -24,6 +24,33 @@ def _nonnegative_number(value: str) -> bool:
         return False
 
 
+def _finite_number(value: str) -> bool:
+    try:
+        return math.isfinite(float(value))
+    except (TypeError, ValueError):
+        return False
+
+
+def _ton_iot_date(value: str) -> bool:
+    try:
+        datetime.strptime(value.strip(), "%d-%b-%y")
+        return True
+    except ValueError:
+        return False
+
+
+def _clock_time(value: str) -> bool:
+    try:
+        datetime.strptime(value.strip(), "%H:%M:%S")
+        return True
+    except ValueError:
+        return False
+
+
+def _binary_label(value: str) -> bool:
+    return value.strip() in {"0", "1"}
+
+
 def _timestamp(value: str) -> bool:
     value = value.strip()
     if not value:
@@ -56,6 +83,36 @@ class DatasetProfile:
 
 
 PROFILES: dict[EvidenceSource, DatasetProfile] = {
+    EvidenceSource.CASAS_SMART_HOME: DatasetProfile(
+        name="casas_milan@1.0",
+        source=EvidenceSource.CASAS_SMART_HOME,
+        required_columns=("timestamp", "sensor_id", "sensor_message"),
+        validators={
+            "timestamp": ("INVALID_TIMESTAMP", _timestamp),
+            "sensor_id": ("MISSING_SENSOR_ID", _nonempty),
+            "sensor_message": ("MISSING_SENSOR_MESSAGE", _nonempty),
+        },
+    ),
+    EvidenceSource.TON_IOT_TELEMETRY: DatasetProfile(
+        name="ton_iot_fridge_telemetry@1.0",
+        source=EvidenceSource.TON_IOT_TELEMETRY,
+        required_columns=(
+            "date",
+            "time",
+            "fridge_temperature",
+            "temp_condition",
+            "label",
+            "type",
+        ),
+        validators={
+            "date": ("INVALID_DATE", _ton_iot_date),
+            "time": ("INVALID_TIME", _clock_time),
+            "fridge_temperature": ("INVALID_TEMPERATURE", _finite_number),
+            "temp_condition": ("MISSING_DEVICE_STATE", _nonempty),
+            "label": ("INVALID_BINARY_LABEL", _binary_label),
+            "type": ("MISSING_ATTACK_TYPE", _nonempty),
+        },
+    ),
     EvidenceSource.SIMULATED: DatasetProfile(
         name="simulated@1.0",
         source=EvidenceSource.SIMULATED,

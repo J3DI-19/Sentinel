@@ -54,10 +54,15 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Reject malformed live telemetry
 - [x] Record live ingestion timestamps
 - [x] Preserve source/device provenance for live evidence
+- [x] Validate the pinned CASAS Milan native text subset
+- [x] Validate the pinned TON_IoT fridge telemetry subset
+- [x] Require pytest to terminate cleanly in CI
 
 ## 4. Canonical Event Model and Normalization
 - [x] Create the common canonical event schema
 - [x] Map simulated data
+- [x] Map CASAS Milan smart-home sensor data
+- [x] Map TON_IoT fridge device telemetry
 - [x] Map TON_IoT data
 - [x] Map CICIoT2023 data
 - [x] Standardize timestamps

@@ -224,6 +224,69 @@ def test_batch_findings_do_not_create_live_alerts():
     assert result.alerts == []
 
 
+def test_default_label_risk_has_a_versioned_repetition_reference():
+    event = canonical_event(
+        104,
+        seconds=0,
+        event_type="network_flow",
+        source_label="malicious",
+    )
+
+    finding = AnalysisService().analyze(case_id=1, events=[event]).findings[0]
+    repetition = next(factor for factor in finding.risk.factors if factor.name == "repetition")
+
+    assert repetition.score == 25
+    assert repetition.explanation == "1 occurrence(s) against configured reference 4"
+    assert finding.risk.score == 59
+
+
+def test_authentication_rule_requires_verified_actor_and_target_identities():
+    missing_actors = [
+        canonical_event(
+            400 + index,
+            seconds=index,
+            event_type="authentication_failure",
+            actor_ip=None,
+            action="authenticate",
+            outcome="denied",
+        )
+        for index in range(10)
+    ]
+    missing_targets = [
+        canonical_event(
+            500 + index,
+            seconds=index,
+            event_type="authentication_failure",
+            action="authenticate",
+            outcome="denied",
+        ).model_copy(update={"device": None, "target": None})
+        for index in range(10)
+    ]
+
+    for events in (missing_actors, missing_targets):
+        result = AnalysisService().analyze(case_id=1, events=events)
+        assert not any(finding.rule_id == "AUTH-001" for finding in result.findings)
+        assert result.alerts == []
+
+
+def test_authentication_rule_does_not_combine_distinct_known_actors():
+    events = [
+        canonical_event(
+            600 + index,
+            seconds=index,
+            event_type="authentication_failure",
+            actor_ip="185.77.12.44" if index < 5 else "203.0.113.9",
+            action="authenticate",
+            outcome="denied",
+        )
+        for index in range(10)
+    ]
+
+    result = AnalysisService().analyze(case_id=1, events=events)
+
+    assert not any(finding.rule_id == "AUTH-001" for finding in result.findings)
+
+
 def test_ciciot_dataset_labels_use_the_versioned_benign_set():
     attack = canonical_event(
         102,
@@ -245,6 +308,31 @@ def test_ciciot_dataset_labels_use_the_versioned_benign_set():
     label_findings = [finding for finding in result.findings if finding.rule_id == "LABEL-001"]
     assert len(label_findings) == 1
     assert label_findings[0].trigger_event_ids == [UUID(int=102)]
+
+
+def test_ton_iot_telemetry_uses_the_binary_dataset_label_rule():
+    attack = canonical_event(
+        105,
+        seconds=0,
+        event_type="telemetry",
+        source_label="1",
+        source_type=CanonicalSourceType.TON_IOT_TELEMETRY,
+        attributes={"fridge_temperature": 21.4},
+    )
+    benign = canonical_event(
+        106,
+        seconds=1,
+        event_type="telemetry",
+        source_label="0",
+        source_type=CanonicalSourceType.TON_IOT_TELEMETRY,
+        attributes={"fridge_temperature": 13.1},
+    )
+
+    result = AnalysisService().analyze(case_id=1, events=[attack, benign])
+
+    label_findings = [finding for finding in result.findings if finding.rule_id == "LABEL-001"]
+    assert len(label_findings) == 1
+    assert label_findings[0].trigger_event_ids == [UUID(int=105)]
 
 
 def test_live_baseline_support_does_not_turn_a_batch_spike_into_a_live_alert():

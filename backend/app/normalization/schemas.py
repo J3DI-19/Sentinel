@@ -15,6 +15,8 @@ CanonicalScalar = str | int | float | bool | None
 
 
 class CanonicalSourceType(str, Enum):
+    CASAS_SMART_HOME = "casas_smart_home"
+    TON_IOT_TELEMETRY = "ton_iot_telemetry"
     SIMULATED = "simulated"
     TON_IOT_NETWORK = "ton_iot_network"
     CICIOT2023_NETWORK = "ciciot2023_network"

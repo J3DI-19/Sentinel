@@ -24,7 +24,7 @@ class DetectionCandidate:
     condition_trace: tuple[ConditionTrace, ...]
     entity_id: str | None
     repetition_count: int
-    repetition_threshold: int
+    repetition_reference: int
     live_detected: bool
 
 
@@ -62,8 +62,8 @@ def _candidate(
     trigger_events: list[CanonicalEvent] | None = None,
     trace: list[ConditionTrace],
     entity_id: str | None,
+    repetition_reference: int,
     repetition_count: int = 1,
-    repetition_threshold: int = 4,
 ) -> DetectionCandidate:
     ordered = sorted(events, key=lambda event: str(event.event_id))
     triggers = sorted(trigger_events or events, key=lambda event: str(event.event_id))
@@ -83,7 +83,7 @@ def _candidate(
         condition_trace=tuple(trace),
         entity_id=entity_id,
         repetition_count=repetition_count,
-        repetition_threshold=repetition_threshold,
+        repetition_reference=repetition_reference,
         live_detected=any(event.provenance.origin == EventOrigin.LIVE for event in triggers),
     )
 
@@ -96,7 +96,10 @@ def _detect_malicious_labels(
     findings: list[DetectionCandidate] = []
     for event in events:
         label = (event.source_label or "").strip().casefold()
-        if event.provenance.source_type == CanonicalSourceType.TON_IOT_NETWORK:
+        if event.provenance.source_type in {
+            CanonicalSourceType.TON_IOT_NETWORK,
+            CanonicalSourceType.TON_IOT_TELEMETRY,
+        }:
             matched = label == "1"
             expected = "TON_IoT network label equals 1"
         elif event.provenance.source_type == CanonicalSourceType.CICIOT2023_NETWORK:
@@ -129,7 +132,10 @@ def _detect_malicious_labels(
                             == CanonicalSourceType.CICIOT2023_NETWORK
                             else "1"
                             if event.provenance.source_type
-                            == CanonicalSourceType.TON_IOT_NETWORK
+                            in {
+                                CanonicalSourceType.TON_IOT_NETWORK,
+                                CanonicalSourceType.TON_IOT_TELEMETRY,
+                            }
                             else ",".join(sorted(labels))
                         ),
                         actual=label,
@@ -137,6 +143,7 @@ def _detect_malicious_labels(
                     )
                 ],
                 entity_id=primary_entity_id(event),
+                repetition_reference=config.label_repetition_reference,
             )
         )
     return findings
@@ -176,6 +183,7 @@ def _detect_request_rate(
                     )
                 ],
                 entity_id=primary_entity_id(event),
+                repetition_reference=config.request_rate_repetition_reference,
             )
         )
     return findings
@@ -184,17 +192,21 @@ def _detect_request_rate(
 def _detect_authentication_failures(
     events: list[CanonicalEvent], config: AnalysisConfig
 ) -> list[DetectionCandidate]:
-    groups: dict[tuple[str, str], list[CanonicalEvent]] = {}
+    groups: dict[tuple[str, str, str, str], list[CanonicalEvent]] = {}
     for event in events:
         if event.observed_at is None or not _is_authentication_failure(event):
             continue
-        entity_id = primary_entity_id(event) or "unknown-entity"
-        actor_id = event.actor.id if event.actor else "unknown-actor"
-        groups.setdefault((entity_id, actor_id), []).append(event)
+        entity = event.device or event.target
+        actor = event.actor
+        if entity is None or actor is None:
+            continue
+        groups.setdefault(
+            (entity.kind.value, entity.id, actor.kind.value, actor.id), []
+        ).append(event)
 
     findings: list[DetectionCandidate] = []
     window = timedelta(seconds=config.authentication_window_seconds)
-    for (entity_id, actor_id), group in sorted(groups.items()):
+    for (_, entity_id, _, actor_id), group in sorted(groups.items()):
         group.sort(key=lambda event: (event.observed_at, str(event.event_id)))
         active: list[CanonicalEvent] = []
         last_trigger = None
@@ -251,7 +263,7 @@ def _detect_authentication_failures(
                     ],
                     entity_id=entity_id,
                     repetition_count=len(contributing),
-                    repetition_threshold=config.authentication_failure_threshold,
+                    repetition_reference=config.authentication_failure_threshold,
                 )
             )
             last_trigger = event.observed_at
@@ -339,7 +351,7 @@ def _detect_baseline_spikes(
                     ],
                     entity_id=entity_id,
                     repetition_count=1,
-                    repetition_threshold=3,
+                    repetition_reference=config.baseline_repetition_reference,
                 )
             )
     baselines.sort(key=lambda baseline: str(baseline.baseline_id))

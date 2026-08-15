@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import datetime
+import re
 from typing import Any
 from uuid import UUID, uuid5
 
@@ -13,6 +15,7 @@ from app.normalization.helpers import (
     parse_timestamp,
     record_hash,
     scalar_attributes,
+    infer_scalar,
 )
 from app.normalization.schemas import (
     CanonicalEntity,
@@ -146,6 +149,8 @@ class SimulatedAdapter(CanonicalAdapter):
             ip=device_ip,
             mac=normalize_mac(view.get("mac", "device_mac"), field="mac", warnings=warnings),
         )
+
+
         source_ip = parse_ip(view.get("source_ip", "src_ip"), field="source_ip", warnings=warnings)
         destination_ip = parse_ip(
             view.get("destination_ip", "dst_ip"), field="destination_ip", warnings=warnings
@@ -179,6 +184,133 @@ class SimulatedAdapter(CanonicalAdapter):
             action=normalized_token(view.get("action")),
             outcome=normalized_token(view.get("outcome")),
             attributes=scalar_attributes(record, excluded_keys=excluded, warnings=warnings),
+        )
+
+
+class CasasSmartHomeAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.CASAS_SMART_HOME
+    name = "casas_milan"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record)
+        warnings: list[NormalizationIssue] = []
+        try:
+            observed_at = parse_timestamp(
+                view.get("timestamp"),
+                field="timestamp",
+                warnings=warnings,
+                required=True,
+            )
+        except ValueError as exc:
+            raise AdapterRejection(
+                NormalizationIssue(code="INVALID_TIMESTAMP", message=str(exc), field="timestamp")
+            ) from exc
+        sensor_id = _required_text(view.get("sensor_id"), "sensor_id")
+        sensor_message = _required_text(view.get("sensor_message"), "sensor_message")
+        activity = _optional_text(view.get("activity"))
+        prefix_match = re.match(r"[A-Za-z]+", sensor_id)
+        sensor_prefix = prefix_match.group(0).casefold() if prefix_match else "sensor"
+        sensor_type = {
+            "m": "motion_sensor",
+            "d": "door_sensor",
+            "t": "temperature_sensor",
+            "ls": "light_switch",
+            "l": "light_sensor",
+            "i": "item_sensor",
+        }.get(sensor_prefix, "smart_home_sensor")
+        value = infer_scalar(sensor_message)
+        event_type = "telemetry" if isinstance(value, (int, float)) else "device_state"
+        device = CanonicalEntity(
+            id=sensor_id,
+            kind=EntityKind.DEVICE,
+            device_type=sensor_type,
+        )
+        attributes: dict[str, Any] = {"value": value}
+        if activity is not None:
+            attributes["activity"] = activity
+        source_line = view.get("source_line")
+        if isinstance(source_line, int) and source_line >= 1:
+            attributes["source_line"] = source_line
+        return self._build_event(
+            record=record,
+            context=context,
+            observed_at=observed_at,
+            event_type=event_type,
+            source_event_type="casas_sensor_reading",
+            source_label=None,
+            warnings=warnings,
+            device=device,
+            target=device,
+            action="report_state",
+            attributes=attributes,
+        )
+
+
+class TonIotTelemetryAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.TON_IOT_TELEMETRY
+    name = "ton_iot_fridge_telemetry"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record)
+        warnings: list[NormalizationIssue] = []
+        date = _required_text(view.get("date"), "date")
+        time = _required_text(view.get("time"), "time")
+        try:
+            source_timestamp = datetime.strptime(
+                f"{date} {time}", "%d-%b-%y %H:%M:%S"
+            ).isoformat()
+            observed_at = parse_timestamp(
+                source_timestamp,
+                field="date,time",
+                warnings=warnings,
+                required=True,
+            )
+        except ValueError as exc:
+            raise AdapterRejection(
+                NormalizationIssue(
+                    code="INVALID_TIMESTAMP",
+                    message="date and time do not match the pinned TON_IoT fridge format",
+                    field="date,time",
+                )
+            ) from exc
+        temperature_text = _required_text(
+            view.get("fridge_temperature"), "fridge_temperature"
+        )
+        try:
+            temperature = float(temperature_text)
+        except ValueError as exc:
+            raise AdapterRejection(
+                NormalizationIssue(
+                    code="INVALID_TEMPERATURE",
+                    message="fridge_temperature must be numeric",
+                    field="fridge_temperature",
+                )
+            ) from exc
+        condition = _required_text(view.get("temp_condition"), "temp_condition")
+        source_label = _required_text(view.get("label"), "label")
+        attack_type = _required_text(view.get("type"), "type")
+        device = CanonicalEntity(
+            id="ton-iot-fridge",
+            kind=EntityKind.DEVICE,
+            name="TON_IoT Fridge",
+            device_type="smart_refrigerator",
+        )
+        return self._build_event(
+            record=record,
+            context=context,
+            observed_at=observed_at,
+            event_type="telemetry",
+            source_event_type=attack_type,
+            source_label=source_label,
+            warnings=warnings,
+            device=device,
+            target=device,
+            action="report_temperature",
+            attributes={
+                "fridge_temperature": temperature,
+                "temperature_condition": condition,
+                "attack_type": attack_type,
+            },
         )
 
 

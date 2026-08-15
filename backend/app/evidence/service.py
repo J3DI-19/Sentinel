@@ -5,9 +5,10 @@ import io
 import json
 from datetime import datetime, timezone
 from pathlib import PurePosixPath, PureWindowsPath
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 from uuid import uuid4
 
+from app.evidence.authorization import DEFAULT_VALIDATION_AUTHORITY, ValidationAuthority
 from app.evidence.hashing import sha256_bytes, sha256_record
 from app.evidence.profiles import DatasetProfile, get_profile
 from app.evidence.schemas import (
@@ -17,8 +18,10 @@ from app.evidence.schemas import (
     EvidenceValidationIssue,
     EvidenceValidationReport,
     IssueLevel,
+    LiveTelemetryInput,
     ValidationStatus,
     ValidatedBatchRecord,
+    ValidatedLiveTelemetry,
 )
 
 if TYPE_CHECKING:
@@ -34,12 +37,14 @@ class EvidenceValidationService:
         self,
         repository: SQLiteRepository | None = None,
         *,
+        validation_authority: ValidationAuthority | None = None,
         max_file_size_bytes: int = 50 * 1024 * 1024,
         max_issues: int = 100,
     ) -> None:
         if max_file_size_bytes <= 0 or max_issues <= 0:
             raise ValueError("validation limits must be positive")
         self.repository = repository
+        self.validation_authority = validation_authority or DEFAULT_VALIDATION_AUTHORITY
         self.max_file_size_bytes = max_file_size_bytes
         self.max_issues = max_issues
 
@@ -89,8 +94,16 @@ class EvidenceValidationService:
         if filename_issue:
             issues.append(filename_issue)
         extension = PureWindowsPath(sanitized_filename).suffix.lower()
-        if extension not in SUPPORTED_EXTENSIONS:
-            issues.append(self._issue("UNSUPPORTED_FILE_TYPE", "Only CSV and JSON evidence files are supported"))
+        casas_text = (
+            source_type == EvidenceSource.CASAS_SMART_HOME and extension == ".txt"
+        )
+        if extension not in SUPPORTED_EXTENSIONS and not casas_text:
+            issues.append(
+                self._issue(
+                    "UNSUPPORTED_FILE_TYPE",
+                    "Only CSV and JSON evidence files are supported, plus TXT for the pinned CASAS profile",
+                )
+            )
         if not content:
             issues.append(self._issue("EMPTY_FILE", "Evidence file is empty"))
         if len(content) > self.max_file_size_bytes:
@@ -103,7 +116,7 @@ class EvidenceValidationService:
 
         records: list[dict[str, Any]] = []
         if not self._has_errors(issues):
-            records, parse_issues = self._parse(extension, content)
+            records, parse_issues = self._parse(extension, content, source_type)
             issues.extend(parse_issues)
 
         accepted = 0
@@ -143,31 +156,91 @@ class EvidenceValidationService:
         )
         if self.repository is not None:
             self.repository.store_evidence_validation(report)
-        validated_records = [
-            ValidatedBatchRecord(
-                evidence_id=metadata.evidence_id,
-                source_type=metadata.source_type,
-                dataset_profile=metadata.dataset_profile,
-                validator_version=metadata.validator_version,
-                row_number=row_number,
-                record=records[row_number - 1],
-                raw_record_hash=sha256_record(records[row_number - 1]),
+        validated_records: list[ValidatedBatchRecord] = []
+        for row_number in accepted_row_numbers:
+            record = records[row_number - 1]
+            raw_record_hash = sha256_record(record)
+            validated_records.append(
+                ValidatedBatchRecord(
+                    evidence_id=metadata.evidence_id,
+                    source_type=metadata.source_type,
+                    dataset_profile=metadata.dataset_profile,
+                    validator_version=metadata.validator_version,
+                    row_number=row_number,
+                    record=record,
+                    raw_record_hash=raw_record_hash,
+                    validation_seal=self.validation_authority.seal(
+                        evidence_id=metadata.evidence_id,
+                        source_type=metadata.source_type,
+                        dataset_profile=metadata.dataset_profile,
+                        validator_version=metadata.validator_version,
+                        source_hash=metadata.sha256,
+                        row_number=row_number,
+                        raw_record_hash=raw_record_hash,
+                    ),
+                )
             )
-            for row_number in accepted_row_numbers
-        ]
         return EvidenceValidationOutcome(
             report=report,
             accepted_records=validated_records,
         )
 
-    def _parse(self, extension: str, content: bytes) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
+    def _parse(
+        self,
+        extension: str,
+        content: bytes,
+        source_type: EvidenceSource,
+    ) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:
             text = content.decode("utf-8-sig", errors="strict")
         except UnicodeDecodeError:
             return [], [self._issue("INVALID_ENCODING", "Evidence must use UTF-8 encoding")]
         if extension == ".csv":
             return self._parse_csv(text)
+        if extension == ".txt" and source_type == EvidenceSource.CASAS_SMART_HOME:
+            return self._parse_casas_text(text)
         return self._parse_json(text)
+
+    def _parse_casas_text(
+        self, text: str
+    ) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
+        records: list[dict[str, Any]] = []
+        issues: list[EvidenceValidationIssue] = []
+        for source_line, line in enumerate(text.splitlines(), start=1):
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            parts = line.split(maxsplit=4)
+            if len(parts) < 4:
+                issues.append(
+                    self._issue(
+                        "MALFORMED_CASAS_RECORD",
+                        "CASAS records require date, time, sensor identifier, and message",
+                        row_number=len(records) + 1,
+                        rejected_value=self._preview(line),
+                    )
+                )
+                records.append(
+                    {
+                        "timestamp": "",
+                        "sensor_id": "",
+                        "sensor_message": "",
+                        "source_line": source_line,
+                    }
+                )
+                continue
+            date, time, sensor_id, message = parts[:4]
+            record: dict[str, Any] = {
+                "timestamp": f"{date}T{time}",
+                "sensor_id": sensor_id,
+                "sensor_message": message,
+                "source_line": source_line,
+            }
+            if len(parts) == 5:
+                record["activity"] = parts[4]
+            records.append(record)
+        if not records:
+            return [], [self._issue("NO_RECORDS", "Evidence contains no data records")]
+        return records, issues
 
     def _parse_csv(self, text: str) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:
@@ -308,3 +381,19 @@ class EvidenceValidationService:
         if rejected or issues:
             return ValidationStatus.ACCEPTED_WITH_WARNINGS
         return ValidationStatus.ACCEPTED
+
+
+class LiveTelemetryAcceptanceService:
+    """Marks validated telemetry with a server-controlled UTC ingestion time."""
+
+    def __init__(self, clock: Callable[[], datetime] | None = None) -> None:
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
+
+    def accept(self, telemetry: LiveTelemetryInput) -> ValidatedLiveTelemetry:
+        ingested_at = self._clock()
+        if ingested_at.tzinfo is None or ingested_at.utcoffset() is None:
+            raise ValueError("the backend ingestion clock must return a timezone-aware value")
+        return ValidatedLiveTelemetry.model_construct(
+            telemetry=telemetry,
+            ingested_at=ingested_at.astimezone(timezone.utc),
+        )

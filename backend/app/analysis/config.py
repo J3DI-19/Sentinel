@@ -31,6 +31,9 @@ class AnalysisConfig(BaseModel):
     correlation_version: Literal["1.0"] = "1.0"
     authentication_failure_threshold: int = Field(default=10, ge=2, le=1000)
     authentication_window_seconds: int = Field(default=60, ge=1, le=86400)
+    label_repetition_reference: int = Field(default=4, ge=1, le=1000)
+    request_rate_repetition_reference: int = Field(default=4, ge=1, le=1000)
+    baseline_repetition_reference: int = Field(default=3, ge=1, le=1000)
     request_rate_multiplier: float = Field(default=3.0, ge=1.0, le=1000)
     baseline_min_samples: int = Field(default=3, ge=2, le=1000)
     baseline_max_samples: int = Field(default=20, ge=2, le=10000)

@@ -100,7 +100,7 @@ Exact hardware and communication protocols remain implementation decisions.
 
 Steps 1 through 4 and Step 6 are complete. The repository contains the React/Vite application shell, FastAPI health endpoints, SQLite initialization, frontend/backend connectivity, dependency manifests, tests, local Ollama/Qwen setup, backend evidence validation, the versioned canonical event/normalization pipeline, and the deterministic investigation engine. The frontend includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualization placeholders, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
 
-Step 2 interfaces currently operate on structured mock data. Step 3 supplies deterministic validation and the shared live-telemetry input contract. Step 4 maps simulated, TON_IoT, CICIoT2023, generic, and accepted live inputs into one strict canonical schema with deterministic identifiers and complete source provenance. Step 6 applies versioned filters, stable sorting, rules, behavioural baselines, bounded factorized scoring, correlation, incidents, timelines, graphs, aggregates, and live-trigger alert creation. Live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), and [roadmap](docs/roadmap.md).
+Step 2 interfaces currently operate on structured mock data. Step 3 supplies deterministic validation, pinned CASAS Milan and TON_IoT fridge telemetry profiles, a shared live-telemetry input contract, and a clean-exit pytest guard used by CI. Step 4 maps CASAS smart-home sensors, TON_IoT device telemetry and network data, simulated data, CICIoT2023, generic uploads, and accepted live inputs into one strict canonical schema with deterministic identifiers and complete source provenance. Step 6 applies versioned filters, stable sorting, rules, behavioural baselines, bounded factorized scoring, correlation, incidents, timelines, graphs, aggregates, and live-trigger alert creation. Live collection, real-time delivery, investigation APIs, production AI integration, automation, and the physical demonstration remain planned work. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), and [roadmap](docs/roadmap.md).
 
 Implementation can now proceed with Step 5 live collection, Step 7 real-time delivery, and Step 8 investigation APIs against the finalized validation, canonical-event, and deterministic-analysis contracts.
 
@@ -127,8 +127,11 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts\run_pytest_cleanly.py --timeout 120 -- -q
 ```
+
+The wrapper returns pytest's normal status, reports leaked non-daemon threads,
+and returns `124` if the test process does not terminate before the deadline.
 
 Start the backend from `backend/`:
 
