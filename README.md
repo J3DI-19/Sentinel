@@ -29,7 +29,7 @@ Live IoT Events ----/
 
 The platform is organized into these layers:
 
-1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts simulated data, TON_IoT, and CICIoT2023 records.
+1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. CASAS smart-home telemetry and TON_IoT device telemetry are the selected primary public datasets; TON_IoT network and CICIoT2023 remain secondary compatibility paths.
 2. **Live IoT Collection Layer** — receives controlled device telemetry, validates message structure and source identifiers, and records ingestion metadata. MQTT and/or HTTP will be selected during implementation.
 3. **Canonical Event and Normalization Layer** — maps accepted batch and live inputs into one versioned event model with retained provenance.
 4. **Detection and Risk Engine** — applies deterministic rules, behavioural baselines, and bounded factorized scores.
@@ -54,7 +54,7 @@ No live communication protocol or supporting library has been selected or implem
 
 ## Data sources and evaluation
 
-Traceveil uses TON_IoT and CICIoT2023 as public benchmark sources, supplemented by controlled simulated cases and a small authorized IoT laboratory demonstration. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
+Traceveil uses CASAS smart-home telemetry and TON_IoT device telemetry as its primary public evaluation sources, supplemented by controlled simulated cases and a small authorized IoT laboratory demonstration. Existing TON_IoT network and CICIoT2023 adapters are retained as secondary compatibility paths. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
 
 Representative golden cases will preserve expected normalized records, rule matches, risk factors, correlation edges, and ordered timelines. Live evaluation will additionally cover valid and malformed telemetry, device/source identification, evidence persistence, temporary disconnections, reconnect behaviour, delivery latency, and a controlled suspicious-event scenario.
 

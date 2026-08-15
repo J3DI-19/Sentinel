@@ -54,7 +54,7 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Reject malformed live telemetry
 - [x] Record live ingestion timestamps
 - [x] Preserve source/device provenance for live evidence
-- [x] Validate the pinned CASAS Milan native text subset
+- [x] Validate the pinned CASAS Milan CSV projection
 - [x] Validate the pinned TON_IoT fridge telemetry subset
 - [x] Require pytest to terminate cleanly in CI
 
@@ -63,8 +63,8 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Map simulated data
 - [x] Map CASAS Milan smart-home sensor data
 - [x] Map TON_IoT fridge device telemetry
-- [x] Map TON_IoT data
-- [x] Map CICIoT2023 data
+- [x] Retain TON_IoT network data as a secondary compatibility adapter
+- [x] Retain CICIoT2023 data as a secondary compatibility adapter
 - [x] Standardize timestamps
 - [x] Standardize device and entity fields
 - [x] Preserve source row references
@@ -74,6 +74,11 @@ backend evidence ingestion and analytical integration begin in Step 3.
 
 **Convergence point:** Uploaded/batch evidence and accepted live telemetry both
 become canonical events and enter the same deterministic investigation pipeline.
+
+**Selected evaluation sources:** CASAS smart-home telemetry and TON_IoT device
+telemetry are the primary public datasets, supplemented by controlled simulation.
+The existing TON_IoT network and CICIoT2023 adapters remain secondary
+compatibility paths.
 
 ## 5. Live IoT Integration
 - [ ] Select the Arduino-compatible microcontroller

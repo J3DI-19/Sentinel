@@ -94,14 +94,11 @@ class EvidenceValidationService:
         if filename_issue:
             issues.append(filename_issue)
         extension = PureWindowsPath(sanitized_filename).suffix.lower()
-        casas_text = (
-            source_type == EvidenceSource.CASAS_SMART_HOME and extension == ".txt"
-        )
-        if extension not in SUPPORTED_EXTENSIONS and not casas_text:
+        if extension not in SUPPORTED_EXTENSIONS:
             issues.append(
                 self._issue(
                     "UNSUPPORTED_FILE_TYPE",
-                    "Only CSV and JSON evidence files are supported, plus TXT for the pinned CASAS profile",
+                    "Only CSV and JSON evidence files are supported",
                 )
             )
         if not content:
@@ -116,7 +113,7 @@ class EvidenceValidationService:
 
         records: list[dict[str, Any]] = []
         if not self._has_errors(issues):
-            records, parse_issues = self._parse(extension, content, source_type)
+            records, parse_issues = self._parse(extension, content)
             issues.extend(parse_issues)
 
         accepted = 0
@@ -189,7 +186,6 @@ class EvidenceValidationService:
         self,
         extension: str,
         content: bytes,
-        source_type: EvidenceSource,
     ) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:
             text = content.decode("utf-8-sig", errors="strict")
@@ -197,50 +193,7 @@ class EvidenceValidationService:
             return [], [self._issue("INVALID_ENCODING", "Evidence must use UTF-8 encoding")]
         if extension == ".csv":
             return self._parse_csv(text)
-        if extension == ".txt" and source_type == EvidenceSource.CASAS_SMART_HOME:
-            return self._parse_casas_text(text)
         return self._parse_json(text)
-
-    def _parse_casas_text(
-        self, text: str
-    ) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
-        records: list[dict[str, Any]] = []
-        issues: list[EvidenceValidationIssue] = []
-        for source_line, line in enumerate(text.splitlines(), start=1):
-            if not line.strip() or line.lstrip().startswith("#"):
-                continue
-            parts = line.split(maxsplit=4)
-            if len(parts) < 4:
-                issues.append(
-                    self._issue(
-                        "MALFORMED_CASAS_RECORD",
-                        "CASAS records require date, time, sensor identifier, and message",
-                        row_number=len(records) + 1,
-                        rejected_value=self._preview(line),
-                    )
-                )
-                records.append(
-                    {
-                        "timestamp": "",
-                        "sensor_id": "",
-                        "sensor_message": "",
-                        "source_line": source_line,
-                    }
-                )
-                continue
-            date, time, sensor_id, message = parts[:4]
-            record: dict[str, Any] = {
-                "timestamp": f"{date}T{time}",
-                "sensor_id": sensor_id,
-                "sensor_message": message,
-                "source_line": source_line,
-            }
-            if len(parts) == 5:
-                record["activity"] = parts[4]
-            records.append(record)
-        if not records:
-            return [], [self._issue("NO_RECORDS", "Evidence contains no data records")]
-        return records, issues
 
     def _parse_csv(self, text: str) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:

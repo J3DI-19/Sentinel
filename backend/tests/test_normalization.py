@@ -197,7 +197,6 @@ def test_casas_milan_adapter_maps_sensor_state_identity_activity_and_provenance(
         "sensor_id": "D003",
         "sensor_message": "OPEN",
         "activity": "Cook begin",
-        "source_line": 17,
     }
 
     result = NormalizationService().normalize_batch_record(
@@ -217,7 +216,6 @@ def test_casas_milan_adapter_maps_sensor_state_identity_activity_and_provenance(
     assert event.attributes == {
         "value": "OPEN",
         "activity": "Cook begin",
-        "source_line": 17,
     }
     assert event.provenance.source_type.value == "casas_smart_home"
     assert "ASSUMED_UTC" in warning_codes(event)
@@ -467,7 +465,7 @@ def test_step3_accepted_row_is_the_step4_batch_input():
 @pytest.mark.parametrize(
     ("fixture_name", "source"),
     [
-        ("casas_milan_valid.txt", EvidenceSource.CASAS_SMART_HOME),
+        ("casas_milan_valid.csv", EvidenceSource.CASAS_SMART_HOME),
         (
             "ton_iot_fridge_telemetry_valid.csv",
             EvidenceSource.TON_IOT_TELEMETRY,

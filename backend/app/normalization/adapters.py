@@ -228,9 +228,6 @@ class CasasSmartHomeAdapter(CanonicalAdapter):
         attributes: dict[str, Any] = {"value": value}
         if activity is not None:
             attributes["activity"] = activity
-        source_line = view.get("source_line")
-        if isinstance(source_line, int) and source_line >= 1:
-            attributes["source_line"] = source_line
         return self._build_event(
             record=record,
             context=context,

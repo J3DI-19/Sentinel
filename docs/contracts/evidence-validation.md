@@ -4,7 +4,7 @@ Step 3 validates evidence before canonical normalization or deterministic analys
 
 ## Batch evidence
 
-The backend accepts original evidence bytes together with a filename, source profile, optional case identifier, and optional media type. CSV and JSON are supported. The pinned CASAS Milan profile additionally accepts its native whitespace-delimited TXT records. JSON must be either a list of record objects or an object with a `records` list.
+The backend accepts original evidence bytes together with a filename, source profile, optional case identifier, and optional media type. CSV and JSON are supported. JSON must be either a list of record objects or an object with a `records` list.
 
 Every attempt produces an `EvidenceValidationReport` containing:
 
@@ -24,16 +24,16 @@ Invalid data is never silently repaired. A mixed file may be accepted with warni
 
 | Profile | Minimal required columns |
 | --- | --- |
-| `casas_milan@1.0` | Native text fields: date, time, `sensor_id`, `sensor_message`; optional activity annotation |
+| `casas_milan@1.0` | `timestamp`, `sensor_id`, `sensor_message`; optional `activity` annotation |
 | `ton_iot_fridge_telemetry@1.0` | `date`, `time`, `fridge_temperature`, `temp_condition`, `label`, `type` |
 | `simulated@1.0` | `timestamp`, `device_id`, `event_type` |
 | `ton_iot_network@1.0` | `ts`, `src_ip`, `dst_ip`, `label` |
 | `ciciot2023_network@1.0` | `flow_duration`, `Protocol Type`, `label` |
 | `generic@1.0` | No dataset-specific columns; structural checks still apply |
 
-The two primary profiles are pinned to the [CASAS Milan public smart-home dataset](https://casas.wsu.edu/datasets/index) catalog snapshot updated 2018-09-07 and the [2020 TON_IoT telemetry release](https://research.unsw.edu.au/projects/toniot-datasets)'s `Train_Test_IoT_Fridge.csv` subset. CASAS text records preserve their original timestamp, sensor identity, message, source line, and optional activity annotation. The fridge profile validates its release-specific date/time format, finite temperature, device state, binary label, and attack type.
+The two primary profiles are pinned to a CSV projection of the [CASAS Milan public smart-home dataset](https://casas.wsu.edu/datasets/index) catalog snapshot updated 2018-09-07 and the [2020 TON_IoT telemetry release](https://research.unsw.edu.au/projects/toniot-datasets)'s `Train_Test_IoT_Fridge.csv` subset. CASAS CSV records preserve the observed timestamp, sensor identity, message, and optional activity annotation. The fridge profile validates its release-specific date/time format, finite temperature, device state, binary label, and attack type.
 
-The TON_IoT network profile intentionally names a separate network subset because TON_IoT contains heterogeneous sources. Additional CASAS testbeds or TON_IoT devices must receive separate versioned profiles instead of weakening these contracts. Small synthetic contract fixtures preserve the expected layouts without redistributing dataset records.
+CASAS smart-home telemetry and TON_IoT device telemetry are the primary public evaluation sources, supplemented by controlled simulation. The TON_IoT network and CICIoT2023 profiles remain secondary compatibility paths. The TON_IoT network profile intentionally names a separate network subset because TON_IoT contains heterogeneous sources. Additional CASAS testbeds or TON_IoT devices must receive separate versioned profiles instead of weakening these contracts. Small synthetic contract fixtures preserve the expected layouts without redistributing dataset records.
 
 ## Test-process completion guard
 
