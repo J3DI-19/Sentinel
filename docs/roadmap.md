@@ -130,19 +130,27 @@ real-time delivery, and persistence of derived artifacts remain later steps.
 - [ ] Ensure real-time delivery does not alter forensic calculations
 
 ## 8. Dashboard Results and Investigation APIs
-- [ ] Create APIs for cases
-- [ ] Create APIs for events
-- [ ] Create APIs for alerts
-- [ ] Create APIs for incidents
-- [ ] Create APIs for timelines
-- [ ] Create APIs for graphs and chart data
+- [x] Create APIs for cases
+- [x] Create APIs for evidence validation and retrieval
+- [x] Create APIs for events
+- [x] Create APIs for alerts
+- [x] Create APIs for incidents
+- [x] Create APIs for timelines
+- [x] Create APIs for graphs and chart data
 - [ ] Connect real analytical results to the dashboard
-- [ ] Show risk breakdowns
-- [ ] Show supporting evidence
-- [ ] Show provenance/source references
-- [ ] Add refresh controls
-- [ ] Add reanalysis controls
-- [ ] Allow historical review of previously captured live incidents
+- [x] Expose risk breakdowns through investigation APIs
+- [x] Expose supporting evidence identifiers through investigation APIs
+- [x] Expose provenance/source references through event APIs
+- [x] Add refresh controls
+- [x] Add reanalysis controls
+- [x] Allow historical review of persisted analysis snapshots and live incidents
+
+**Current result:** The Step 8 backend API is complete. Case-scoped endpoints
+ingest and retrieve evidence, persist and filter canonical events, execute the
+deterministic analysis engine, and return findings, alerts, incidents, timelines,
+graphs, charts, provenance, risk factors, and historical analysis snapshots.
+The existing frontend still uses mocks until its adapters are connected to these
+contracts.
 
 ## 9. Visualization Engine + Qwen
 - [ ] Create allowed visualization components
