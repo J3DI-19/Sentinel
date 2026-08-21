@@ -182,7 +182,7 @@ def test_rejects_short_csv_rows_nonstandard_json_numbers_and_infinity():
         ("casas_milan_valid.csv", EvidenceSource.CASAS_SMART_HOME),
         (
             "ton_iot_fridge_telemetry_valid.csv",
-            EvidenceSource.TON_IOT_TELEMETRY,
+            EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
         ),
         ("ton_iot_network_valid.csv", EvidenceSource.TON_IOT_NETWORK),
         ("ciciot2023_network_valid.csv", EvidenceSource.CICIOT2023_NETWORK),
@@ -234,7 +234,7 @@ def test_ton_iot_fridge_profile_rejects_bad_time_label_and_missing_state():
     report = EvidenceValidationService().validate(
         filename="Train_Test_IoT_Fridge.csv",
         content=content,
-        source_type=EvidenceSource.TON_IOT_TELEMETRY,
+        source_type=EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
     )
 
     assert report.status == ValidationStatus.REJECTED

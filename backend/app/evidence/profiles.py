@@ -83,6 +83,16 @@ class DatasetProfile:
 
 
 PROFILES: dict[EvidenceSource, DatasetProfile] = {
+    EvidenceSource.CASAS: DatasetProfile(
+        name="casas_canonical@1.0",
+        source=EvidenceSource.CASAS,
+        required_columns=("timestamp", "sensor_id", "message"),
+        validators={
+            "timestamp": ("INVALID_TIMESTAMP", _timestamp),
+            "sensor_id": ("MISSING_VALUE", _nonempty),
+            "message": ("MISSING_VALUE", _nonempty),
+        },
+    ),
     EvidenceSource.CASAS_SMART_HOME: DatasetProfile(
         name="casas_milan@1.0",
         source=EvidenceSource.CASAS_SMART_HOME,
@@ -93,9 +103,9 @@ PROFILES: dict[EvidenceSource, DatasetProfile] = {
             "sensor_message": ("MISSING_SENSOR_MESSAGE", _nonempty),
         },
     ),
-    EvidenceSource.TON_IOT_TELEMETRY: DatasetProfile(
+    EvidenceSource.TON_IOT_FRIDGE_TELEMETRY: DatasetProfile(
         name="ton_iot_fridge_telemetry@1.0",
-        source=EvidenceSource.TON_IOT_TELEMETRY,
+        source=EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
         required_columns=(
             "date",
             "time",
@@ -113,9 +123,29 @@ PROFILES: dict[EvidenceSource, DatasetProfile] = {
             "type": ("MISSING_ATTACK_TYPE", _nonempty),
         },
     ),
+    EvidenceSource.TON_IOT_TELEMETRY: DatasetProfile(
+        name="ton_iot_telemetry@1.0",
+        source=EvidenceSource.TON_IOT_TELEMETRY,
+        required_columns=("ts", "label", "type"),
+        validators={
+            "ts": ("INVALID_TIMESTAMP", _timestamp),
+            "label": ("MISSING_VALUE", _nonempty),
+            "type": ("MISSING_VALUE", _nonempty),
+        },
+    ),
     EvidenceSource.SIMULATED: DatasetProfile(
         name="simulated@1.0",
         source=EvidenceSource.SIMULATED,
+        required_columns=("timestamp", "device_id", "event_type"),
+        validators={
+            "timestamp": ("INVALID_TIMESTAMP", _timestamp),
+            "device_id": ("MISSING_VALUE", _nonempty),
+            "event_type": ("MISSING_VALUE", _nonempty),
+        },
+    ),
+    EvidenceSource.SIMULATION: DatasetProfile(
+        name="simulation@1.0",
+        source=EvidenceSource.SIMULATION,
         required_columns=("timestamp", "device_id", "event_type"),
         validators={
             "timestamp": ("INVALID_TIMESTAMP", _timestamp),

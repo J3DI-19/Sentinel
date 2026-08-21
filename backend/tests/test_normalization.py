@@ -241,9 +241,9 @@ def test_ton_iot_fridge_adapter_maps_benign_and_anomalous_telemetry():
 
     events = [
         NormalizationService().normalize_batch_record(
-            metadata=metadata(EvidenceSource.TON_IOT_TELEMETRY),
+            metadata=metadata(EvidenceSource.TON_IOT_FRIDGE_TELEMETRY),
             validated_record=validated_record(
-                EvidenceSource.TON_IOT_TELEMETRY, index, record
+                EvidenceSource.TON_IOT_FRIDGE_TELEMETRY, index, record
             ),
         ).event
         for index, record in enumerate((benign, anomalous), start=1)
@@ -468,7 +468,7 @@ def test_step3_accepted_row_is_the_step4_batch_input():
         ("casas_milan_valid.csv", EvidenceSource.CASAS_SMART_HOME),
         (
             "ton_iot_fridge_telemetry_valid.csv",
-            EvidenceSource.TON_IOT_TELEMETRY,
+            EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
         ),
     ],
 )

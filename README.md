@@ -29,13 +29,13 @@ Live IoT Events ----/
 
 The platform is organized into these layers:
 
-1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. CASAS smart-home telemetry and TON_IoT device telemetry are the selected primary public datasets with dedicated versioned adapters. Existing TON_IoT network and CICIoT2023 adapters are retained as secondary compatibility paths rather than primary evaluation sources.
-2. **Live IoT Collection Layer** — receives controlled device telemetry, validates message structure and source identifiers, and records ingestion metadata. MQTT and/or HTTP will be selected during implementation.
+1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. Versioned CASAS smart-home and TON_IoT device-telemetry adapters support the primary public datasets; TON_IoT network and CICIoT2023 adapters remain secondary compatibility paths.
+2. **Live IoT Collection Layer** — receives token-authenticated HTTP telemetry, persists receipts and malformed-input issues, normalizes accepted records, and publishes replayable SSE updates. MQTT remains a future transport adapter.
 3. **Canonical Event and Normalization Layer** — maps accepted batch and live inputs into one versioned event model with retained provenance.
 4. **Detection and Risk Engine** — applies deterministic rules, behavioural baselines, and bounded factorized scores.
 5. **Correlation and Timeline Engine** — links events through declared entity keys and time windows and produces stable, reproducible chronologies.
 6. **Graph and Query Engine** — calculates device/entity relationships, filters, aggregates, and chart-ready values.
-7. **API, Storage and Real-Time Event Delivery** — provides FastAPI/Pydantic contracts, SQLite persistence, audit history, exports, approved SMTP delivery, and planned SSE or WebSocket updates.
+7. **API, Storage and Real-Time Event Delivery** — provides FastAPI/Pydantic contracts, SQLite persistence, audit history, deterministic PDF exports, approved SMTP delivery, and SSE replay.
 8. **Visualization and AI Layer** — renders allow-listed React components and provides bounded local assistance over validated evidence.
 9. **React Investigation Dashboard** — presents cases, evidence, metrics, live status, event and alert feeds, timelines, graphs, charts, findings, chat, and reports.
 
@@ -47,14 +47,14 @@ The live path is not a separate analytics system. Accepted live telemetry passes
 - **Backend:** Python, FastAPI, Pandas, NetworkX, Pydantic
 - **Storage:** SQLite, with a repository boundary for future PostgreSQL support
 - **Local AI:** Ollama with Qwen 9B Q4_K_M
-- **Planned live communication:** MQTT and/or HTTP for device telemetry; SSE or WebSockets for server-driven frontend updates
+- **Live communication:** authenticated HTTP for device telemetry and SSE for one-way browser delivery
 - **Testing and tooling:** Pytest, Vitest, Git, GitHub, SMTP, and a modern browser
 
-No live communication protocol or supporting library has been selected or implemented yet.
+Physical hardware and MQTT are optional future integrations behind the implemented transport-neutral collector boundary.
 
 ## Data sources and evaluation
 
-Traceveil's primary batch evaluation sources are CASAS smart-home telemetry, TON_IoT device telemetry, and controlled simulated cases. CASAS supplies real household motion, door, and ambient sensor activity; TON_IoT supplies smart-device telemetry with normal and attack-labelled behaviour; simulation supplies precise golden cases for timestamps, identities, rules, baselines, correlations, and expected alerts. A small authorized IoT laboratory demonstration supplies the live path. Existing TON_IoT network and CICIoT2023 network-flow support are secondary compatibility paths and are not part of the primary smart-home evaluation plan. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
+Traceveil's primary batch evaluation sources are CASAS smart-home telemetry, TON_IoT device telemetry, and controlled simulated cases. CASAS supplies real household motion, door, and ambient sensor activity; TON_IoT supplies smart-device telemetry with normal and attack-labelled behaviour; simulation supplies precise golden cases for timestamps, identities, rules, baselines, correlations, and expected alerts. A small authorized IoT laboratory demonstration supplies the live path. Existing CICIoT2023 network-flow support is a secondary compatibility path and is not part of the primary smart-home evaluation plan. Evaluation will cover normalization correctness, reproducibility, detection and correlation quality, visualization safety, usability, live ingestion and delivery behaviour, and performance under declared hardware and network conditions.
 
 Representative golden cases will preserve expected normalized records, rule matches, risk factors, correlation edges, and ordered timelines. Live evaluation will additionally cover valid and malformed telemetry, device/source identification, evidence persistence, temporary disconnections, reconnect behaviour, delivery latency, and a controlled suspicious-event scenario.
 
@@ -88,6 +88,7 @@ Exact hardware and communication protocols remain implementation decisions.
 - [Full project synopsis (DOCX)](docs/synopsis/Traceveil_Full_Synopsis.docx)
 - [Full project synopsis (PDF)](docs/synopsis/Traceveil_Full_Synopsis.pdf)
 - [Implementation roadmap](docs/roadmap.md)
+- [Investigation API contract](docs/contracts/investigation-api.md)
 
 ## Team
 
@@ -98,15 +99,17 @@ Exact hardware and communication protocols remain implementation decisions.
 
 ## Project status
 
-Steps 1 through 4, Step 6, and the Step 8 backend APIs are implemented for the selected evaluation scope, including dedicated CASAS and TON_IoT device-telemetry profiles and adapters. The repository contains the React/Vite application shell, FastAPI health and investigation endpoints, SQLite initialization and investigation persistence, frontend/backend connectivity, dependency manifests, tests, local Ollama/Qwen setup, backend evidence validation, the versioned canonical event/normalization pipeline, and the deterministic investigation engine. The frontend includes navigation, case workspaces, evidence import, investigation dashboards, deterministic visualization placeholders, timelines, entity graphs, findings, live-monitoring views, the Investigation Assistant, and report review flows.
+Phase 3 software is implemented: connected batch investigation views, authenticated live HTTP collection, durable receipts and device state, bounded micro-batching, replayable SSE, optional grounded Ollama assistance, deterministic PDF reports, approval-gated SMTP delivery, audit history, and a controlled telemetry simulator. Physical hardware assembly is optional and MQTT remains future work. See [the Phase 3 demonstration guide](docs/phase3-live-demo.md).
 
-Step 2 interfaces currently operate on structured mock data. Step 3 supplies deterministic validation, pinned CASAS Milan and TON_IoT fridge telemetry profiles, a shared live-telemetry input contract, and a clean-exit pytest guard used by CI. Step 4 maps CASAS smart-home sensors, TON_IoT device telemetry and network data, simulated data, CICIoT2023, generic uploads, and accepted live inputs into one strict canonical schema with deterministic identifiers and complete source provenance. Step 6 applies versioned filters, stable sorting, rules, behavioural baselines, bounded factorized scoring, correlation, incidents, timelines, graphs, aggregates, and live-trigger alert creation. Step 8 exposes case-scoped evidence ingestion, canonical events, analysis controls, findings, alerts, incidents, timelines, graphs, charts, and historical snapshots through FastAPI. Live collection, real-time delivery, frontend API integration, production AI integration, automation, and the physical demonstration remain planned work. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), [investigation API contract](docs/contracts/investigation-api.md), and [roadmap](docs/roadmap.md).
+The repository contains the React/Vite connected investigation interface, versioned FastAPI APIs, SQLite persistence and recovery, CASAS and TON_IoT telemetry adapters, the canonical normalization pipeline, deterministic analysis, and generated OpenAPI TypeScript DTOs. Production routes query persisted records; mock adapters remain explicit test/demo configuration only.
 
-Implementation can now proceed with Step 5 live collection, Step 7 real-time delivery, and frontend integration against the versioned validation, canonical-event, deterministic-analysis, and investigation-API contracts.
+Batch and live sources now converge into immutable evidence and canonical events before deterministic rules, risk scoring, correlation, incidents, timelines, graphs, and aggregates. Ollama narration is optional and citation-validated; reports and email delivery use separate content-hash approvals. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), [investigation API contract](docs/contracts/investigation-api.md), and [roadmap](docs/roadmap.md).
 
-## Step 1 setup and run
+The next expansion points are optional physical hardware, MQTT behind the collector interface, multi-user authentication/authorization, and external job/storage infrastructure if the local single-user architecture is outgrown.
 
-Step 1 provides the initialization foundation only: FastAPI health APIs, minimal SQLite initialization, a React/Vite status shell, and optional Ollama availability detection. Evidence ingestion, analytics, authentication, investigation features, and live IoT monitoring are not included yet.
+## Local setup and run
+
+This setup runs the connected batch and live platform locally. Ollama, SMTP, and physical hardware are optional; core investigation remains available without them.
 
 ### Prerequisites
 
@@ -127,11 +130,8 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-.\.venv\Scripts\python.exe scripts\run_pytest_cleanly.py --timeout 120 -- -q
+.\.venv\Scripts\python.exe -m pytest
 ```
-
-The wrapper returns pytest's normal status, reports leaked non-daemon threads,
-and returns `124` if the test process does not terminate before the deadline.
 
 Start the backend from `backend/`:
 

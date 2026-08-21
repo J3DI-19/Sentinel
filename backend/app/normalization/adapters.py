@@ -114,6 +114,41 @@ class CanonicalAdapter(ABC):
         )
 
 
+class CasasAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.CASAS
+    name = "casas_canonical"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record); warnings: list[NormalizationIssue] = []
+        try: observed_at = parse_timestamp(view.get("timestamp"), field="timestamp", warnings=warnings, required=True)
+        except ValueError as exc: raise AdapterRejection(NormalizationIssue(code="INVALID_TIMESTAMP", message=str(exc), field="timestamp")) from exc
+        sensor_id = _required_text(view.get("sensor_id"), "sensor_id"); message = _required_text(view.get("message"), "message")
+        device = CanonicalEntity(id=sensor_id, kind=EntityKind.DEVICE, name=sensor_id, device_type=_optional_text(view.get("sensor_type")))
+        excluded = RecordView.keys("timestamp", "sensor_id", "sensor_type", "message", "activity", "resident")
+        attributes = scalar_attributes(record, excluded_keys=excluded, warnings=warnings)
+        if view.get("resident") is not None: attributes["resident"] = str(view.get("resident"))
+        return self._build_event(record=record, context=context, observed_at=observed_at, event_type="sensor_state",
+            source_event_type=message, source_label=_optional_text(view.get("activity")), warnings=warnings,
+            device=device, target=device, action=normalized_token(message), attributes=attributes)
+
+
+class TonIotTelemetryAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.TON_IOT_TELEMETRY
+    name = "ton_iot_telemetry"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record); warnings: list[NormalizationIssue] = []
+        try: observed_at = parse_timestamp(view.get("ts"), field="ts", warnings=warnings, required=True)
+        except ValueError as exc: raise AdapterRejection(NormalizationIssue(code="INVALID_TIMESTAMP", message=str(exc), field="ts")) from exc
+        source_type = _required_text(view.get("type"), "type")
+        device_id = _optional_text(view.get("device_id", "sensor_id")) or f"ton:{normalized_token(source_type) or 'telemetry'}"
+        device = CanonicalEntity(id=device_id, kind=EntityKind.DEVICE, name=device_id, device_type=normalized_token(source_type))
+        excluded = RecordView.keys("ts", "label", "type", "device_id", "sensor_id")
+        return self._build_event(record=record, context=context, observed_at=observed_at, event_type="telemetry",
+            source_event_type=source_type, source_label=_optional_text(view.get("label")), warnings=warnings,
+            device=device, target=device, attributes=scalar_attributes(record, excluded_keys=excluded, warnings=warnings))
+
+
 class SimulatedAdapter(CanonicalAdapter):
     source_type = CanonicalSourceType.SIMULATED
     name = "simulated"
@@ -243,8 +278,8 @@ class CasasSmartHomeAdapter(CanonicalAdapter):
         )
 
 
-class TonIotTelemetryAdapter(CanonicalAdapter):
-    source_type = CanonicalSourceType.TON_IOT_TELEMETRY
+class TonIotFridgeTelemetryAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY
     name = "ton_iot_fridge_telemetry"
 
     def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
@@ -309,6 +344,9 @@ class TonIotTelemetryAdapter(CanonicalAdapter):
                 "attack_type": attack_type,
             },
         )
+class SimulationAdapter(SimulatedAdapter):
+    source_type = CanonicalSourceType.SIMULATION
+    name = "simulation"
 
 
 class TonIotNetworkAdapter(CanonicalAdapter):
@@ -541,10 +579,19 @@ class LiveTelemetryAdapter(CanonicalAdapter):
             )
         metrics = record.get("metrics", {})
         attributes = dict(metrics) if isinstance(metrics, dict) else {}
+        action = normalized_token(metrics.get("action")) if isinstance(metrics, dict) else None
+        outcome = normalized_token(metrics.get("outcome")) if isinstance(metrics, dict) else None
+        if event_type == "authentication" and outcome in {"denied", "failure", "failed"}:
+            event_type = "authentication_failure"
         sequence = view.get("sequence")
         if sequence is not None:
             attributes["sequence"] = sequence
         device = CanonicalEntity(id=device_id, kind=EntityKind.DEVICE)
+        actor = (
+            CanonicalEntity(id=context.source_id, kind=EntityKind.SOURCE)
+            if source_event_type == "authentication" and context.source_id
+            else None
+        )
         return self._build_event(
             record=record,
             context=context,
@@ -554,7 +601,10 @@ class LiveTelemetryAdapter(CanonicalAdapter):
             source_label=None,
             warnings=warnings,
             device=device,
+            actor=actor,
             target=device,
+            action=action,
+            outcome=outcome,
             attributes=attributes,
         )
 

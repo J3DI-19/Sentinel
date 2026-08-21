@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { cases, devices, evidence, findings } from "../mocks/data";
 
 interface RouteState { path: string; search: string; navigate: (path: string) => void; }
 
@@ -34,7 +33,7 @@ function NavIcon({ name }: { name: IconName }) {
 }
 
 function canonicalLocation(path: string, search: string) {
-  const legacyAssistant = path.match(/^\/cases\/([^/]+)\/assistant$/);
+  const legacyAssistant = path.match(/^\/cases\/(\d+)\/assistant$/);
   if (!legacyAssistant) return { path, search };
   const params = new URLSearchParams(search);
   params.set("case", decodeURIComponent(legacyAssistant[1]));
@@ -67,9 +66,8 @@ export function useLocationPath() {
 function Breadcrumbs({ path, navigate }: { path: string; navigate: (path: string) => void }) {
   const parts = path.split("/").filter(Boolean);
   if (parts[0] === "cases" && parts[1]) {
-    const item = cases.find(entry => entry.id === parts[1]);
     const section = parts[2] ? parts[2].charAt(0).toUpperCase() + parts[2].slice(1) : "Overview";
-    return <div className="breadcrumbs"><button onClick={() => navigate("/cases")}>Cases</button><span>/</span><button onClick={() => navigate(`/cases/${parts[1]}/overview`)}>{item?.reference || parts[1]}</button><span>/</span><b>{section}</b></div>;
+    return <div className="breadcrumbs"><button onClick={() => navigate("/cases")}>Cases</button><span>/</span><button onClick={() => navigate(`/cases/${parts[1]}/overview`)}>CASE-{parts[1].padStart(4, "0")}</button><span>/</span><b>{section}</b></div>;
   }
   const labels: Record<string, string> = { "/": "Overview", "/assistant": "Investigation Assistant", "/cases": "Cases", "/live": "Live Monitor", "/import": "Import Evidence", "/status": "System Status", "/settings": "Settings" };
   return <div className="breadcrumbs breadcrumbs-single"><b>{labels[path] || "Traceveil"}</b></div>;
@@ -88,10 +86,6 @@ export function AppShell({ children, route }: { children: ReactNode; route: Rout
     { label: "Live Monitor", detail: "Current controlled activity", path: "/live", kind: "Workspace" },
     { label: "Import Evidence", detail: "Historical and batch evidence", path: "/import", kind: "Workspace" },
     { label: "System Status", detail: "Platform health", path: "/status", kind: "Platform" },
-    ...cases.map(item => ({ label: item.name, detail: item.reference, path: `/cases/${item.id}/overview`, kind: "Case" })),
-    ...evidence.map(item => ({ label: item.id, detail: `${item.device} · ${item.eventType}`, path: `/assistant?case=${cases[0].reference}&evidence=${item.id}`, kind: "Evidence" })),
-    ...findings.map(item => ({ label: item.id, detail: item.title, path: `/assistant?case=${cases[0].reference}&finding=${item.id}`, kind: "Finding" })),
-    ...devices.map(item => ({ label: item.name, detail: item.ip, path: `/assistant?case=${cases[0].reference}&device=${item.id}`, kind: "Device" })),
   ], []);
   const results = targets.filter(item => `${item.label} ${item.detail} ${item.kind}`.toLowerCase().includes(search.toLowerCase())).slice(0, 7);
   const selectTarget = (path: string) => { route.navigate(path); setSearch(""); setSearchOpen(false); };

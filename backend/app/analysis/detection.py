@@ -98,10 +98,10 @@ def _detect_malicious_labels(
         label = (event.source_label or "").strip().casefold()
         if event.provenance.source_type in {
             CanonicalSourceType.TON_IOT_NETWORK,
-            CanonicalSourceType.TON_IOT_TELEMETRY,
+            CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
         }:
             matched = label == "1"
-            expected = "TON_IoT network label equals 1"
+            expected = "TON_IoT binary label equals 1"
         elif event.provenance.source_type == CanonicalSourceType.CICIOT2023_NETWORK:
             matched = bool(label) and label not in benign_labels
             expected = "CICIoT2023 label is not in the configured benign-label set"
@@ -134,7 +134,7 @@ def _detect_malicious_labels(
                             if event.provenance.source_type
                             in {
                                 CanonicalSourceType.TON_IOT_NETWORK,
-                                CanonicalSourceType.TON_IOT_TELEMETRY,
+                                CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
                             }
                             else ",".join(sorted(labels))
                         ),

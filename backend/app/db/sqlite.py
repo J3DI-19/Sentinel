@@ -1,25 +1,16 @@
 import sqlite3
-from datetime import datetime, timezone
+from threading import RLock
 from pathlib import Path
 from uuid import UUID
 
-from app.analysis.schemas import AnalysisResult
-from app.evidence.schemas import (
-    EvidenceMetadata,
-    EvidenceSource,
-    EvidenceValidationIssue,
-    EvidenceValidationReport,
-    IssueLevel,
-    ValidationStatus,
-)
-from app.investigation.schemas import AnalysisRunSummary, CaseCreate, CaseRecord
-from app.normalization.schemas import CanonicalEvent
+from app.evidence.schemas import EvidenceValidationReport
 
 
 class SQLiteRepository:
     def __init__(self, database_url: str):
         self.database_url = database_url
         self.connection: sqlite3.Connection | None = None
+        self.write_lock = RLock()
 
     def _database_path(self) -> str:
         if self.database_url == "sqlite:///:memory:":
@@ -35,7 +26,7 @@ class SQLiteRepository:
 
     def initialize(self) -> None:
         if self.connection is None:
-            self.connection = sqlite3.connect(self._database_path())
+            self.connection = sqlite3.connect(self._database_path(), check_same_thread=False)
             self.connection.row_factory = sqlite3.Row
             self.connection.execute("PRAGMA foreign_keys = ON")
         self.connection.executescript(
@@ -43,8 +34,6 @@ class SQLiteRepository:
             CREATE TABLE IF NOT EXISTS cases (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                description TEXT,
-                status TEXT NOT NULL DEFAULT 'open',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -88,54 +77,129 @@ class SQLiteRepository:
                 value TEXT NOT NULL,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
-
+            CREATE TABLE IF NOT EXISTS import_jobs (
+                import_id TEXT PRIMARY KEY, case_id INTEGER NOT NULL, evidence_id TEXT,
+                filename TEXT NOT NULL, file_path TEXT NOT NULL, source_type TEXT NOT NULL,
+                configuration_json TEXT NOT NULL, status TEXT NOT NULL,
+                validation_json TEXT, error_json TEXT, created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL, FOREIGN KEY (case_id) REFERENCES cases(id)
+            );
             CREATE TABLE IF NOT EXISTS canonical_events (
-                event_id TEXT PRIMARY KEY,
-                case_id INTEGER NOT NULL,
-                evidence_id TEXT NOT NULL,
-                observed_at TEXT,
-                ingested_at TEXT NOT NULL,
-                event_type TEXT NOT NULL,
-                origin TEXT NOT NULL,
-                payload_json TEXT NOT NULL,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                event_id TEXT PRIMARY KEY, case_id INTEGER NOT NULL, evidence_id TEXT NOT NULL,
+                observed_at TEXT, ingested_at TEXT NOT NULL, origin TEXT NOT NULL,
+                event_type TEXT NOT NULL, entity_id TEXT, source_label TEXT,
+                raw_record_json TEXT NOT NULL, canonical_json TEXT NOT NULL,
                 FOREIGN KEY (case_id) REFERENCES cases(id)
             );
-
-            CREATE INDEX IF NOT EXISTS idx_canonical_events_case
-            ON canonical_events(case_id, observed_at, ingested_at, event_id);
-
-            CREATE INDEX IF NOT EXISTS idx_canonical_events_evidence
-            ON canonical_events(evidence_id);
-
+            CREATE INDEX IF NOT EXISTS idx_events_case_time ON canonical_events(case_id, observed_at, event_id);
             CREATE TABLE IF NOT EXISTS analysis_runs (
-                analysis_id TEXT PRIMARY KEY,
-                case_id INTEGER NOT NULL,
-                result_json TEXT NOT NULL,
-                created_at TEXT NOT NULL,
+                analysis_id TEXT PRIMARY KEY, case_id INTEGER NOT NULL, status TEXT NOT NULL,
+                result_json TEXT NOT NULL, created_at TEXT NOT NULL,
                 FOREIGN KEY (case_id) REFERENCES cases(id)
             );
-
-            CREATE INDEX IF NOT EXISTS idx_analysis_runs_case
-            ON analysis_runs(case_id, created_at DESC, analysis_id);
+            CREATE TABLE IF NOT EXISTS analysis_artifacts (
+                analysis_id TEXT NOT NULL, case_id INTEGER NOT NULL, kind TEXT NOT NULL,
+                item_id TEXT NOT NULL, occurred_at TEXT, severity TEXT, risk INTEGER,
+                payload_json TEXT NOT NULL, PRIMARY KEY (analysis_id, kind, item_id),
+                FOREIGN KEY (analysis_id) REFERENCES analysis_runs(analysis_id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_artifacts_case_kind ON analysis_artifacts(case_id, kind, occurred_at, item_id);
+            CREATE TABLE IF NOT EXISTS live_sessions (
+                session_id TEXT PRIMARY KEY, case_id INTEGER NOT NULL, label TEXT NOT NULL,
+                source_ids_json TEXT NOT NULL, status TEXT NOT NULL, stale_after_seconds INTEGER NOT NULL,
+                accepted_count INTEGER NOT NULL DEFAULT 0, malformed_count INTEGER NOT NULL DEFAULT 0,
+                started_at TEXT NOT NULL, stopped_at TEXT, updated_at TEXT NOT NULL,
+                FOREIGN KEY (case_id) REFERENCES cases(id)
+            );
+            CREATE TABLE IF NOT EXISTS live_receipts (
+                receipt_id TEXT PRIMARY KEY, session_id TEXT NOT NULL, case_id INTEGER NOT NULL,
+                evidence_id TEXT NOT NULL, source_id TEXT NOT NULL, device_id TEXT NOT NULL,
+                sequence INTEGER, dedupe_key TEXT NOT NULL, payload_hash TEXT NOT NULL,
+                raw_json TEXT NOT NULL, status TEXT NOT NULL, event_id TEXT, error_json TEXT,
+                received_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+                UNIQUE(session_id, dedupe_key), FOREIGN KEY (session_id) REFERENCES live_sessions(session_id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_live_receipts_status ON live_receipts(status, received_at);
+            CREATE TABLE IF NOT EXISTS live_evidence_records (
+                evidence_id TEXT PRIMARY KEY, receipt_id TEXT NOT NULL UNIQUE, case_id INTEGER NOT NULL,
+                session_id TEXT NOT NULL, source_id TEXT NOT NULL, payload_hash TEXT NOT NULL,
+                raw_json TEXT NOT NULL, received_at TEXT NOT NULL,
+                FOREIGN KEY (receipt_id) REFERENCES live_receipts(receipt_id)
+            );
+            CREATE TABLE IF NOT EXISTS live_ingest_issues (
+                issue_id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, case_id INTEGER,
+                source_id TEXT, code TEXT NOT NULL, message TEXT NOT NULL, raw_json TEXT,
+                occurred_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS device_states (
+                case_id INTEGER NOT NULL, session_id TEXT NOT NULL, device_id TEXT NOT NULL,
+                source_id TEXT NOT NULL, last_seen_at TEXT NOT NULL, last_observed_at TEXT NOT NULL,
+                latest_metrics_json TEXT NOT NULL, event_count INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY (session_id, device_id)
+            );
+            CREATE TABLE IF NOT EXISTS stream_messages (
+                stream_id INTEGER PRIMARY KEY AUTOINCREMENT, case_id INTEGER NOT NULL,
+                session_id TEXT, topic TEXT NOT NULL, occurred_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_stream_case_id ON stream_messages(case_id, stream_id);
+            CREATE TABLE IF NOT EXISTS live_alert_first_seen (
+                case_id INTEGER NOT NULL, alert_id TEXT NOT NULL, first_seen_at TEXT NOT NULL,
+                PRIMARY KEY (case_id, alert_id)
+            );
+            CREATE TABLE IF NOT EXISTS audit_events (
+                audit_id TEXT PRIMARY KEY, case_id INTEGER, action TEXT NOT NULL, subject_type TEXT NOT NULL,
+                subject_id TEXT, actor TEXT NOT NULL, request_id TEXT, details_json TEXT NOT NULL,
+                occurred_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_audit_case_time ON audit_events(case_id, occurred_at, audit_id);
+            CREATE TABLE IF NOT EXISTS assistant_sessions (
+                session_id TEXT PRIMARY KEY, scope TEXT NOT NULL, case_ids_json TEXT NOT NULL,
+                reference_ids_json TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS assistant_messages (
+                message_id TEXT PRIMARY KEY, session_id TEXT NOT NULL, role TEXT NOT NULL, kind TEXT NOT NULL,
+                text TEXT NOT NULL, citations_json TEXT NOT NULL, caveats_json TEXT NOT NULL,
+                visualization_json TEXT, model TEXT, created_at TEXT NOT NULL,
+                FOREIGN KEY (session_id) REFERENCES assistant_sessions(session_id)
+            );
+            CREATE TABLE IF NOT EXISTS assistant_jobs (
+                job_id TEXT PRIMARY KEY, session_id TEXT NOT NULL, user_message_id TEXT NOT NULL,
+                status TEXT NOT NULL, context_json TEXT, result_message_id TEXT, error_json TEXT,
+                created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS reports (
+                report_id TEXT PRIMARY KEY, case_id INTEGER NOT NULL, title TEXT NOT NULL,
+                sections_json TEXT NOT NULL, status TEXT NOT NULL, narrative TEXT,
+                file_path TEXT, content_hash TEXT, approved_by TEXT, approved_at TEXT,
+                created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS report_versions (
+                version_id TEXT PRIMARY KEY, report_id TEXT NOT NULL, version_number INTEGER NOT NULL,
+                file_path TEXT NOT NULL, content_hash TEXT NOT NULL, approved_by TEXT, approved_at TEXT,
+                created_at TEXT NOT NULL, UNIQUE(report_id, version_number),
+                FOREIGN KEY (report_id) REFERENCES reports(report_id)
+            );
+            CREATE TABLE IF NOT EXISTS approval_records (
+                approval_id TEXT PRIMARY KEY, subject_type TEXT NOT NULL, subject_id TEXT NOT NULL,
+                content_hash TEXT NOT NULL, approver TEXT NOT NULL, approved_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS email_drafts (
+                draft_id TEXT PRIMARY KEY, report_id TEXT NOT NULL, recipient TEXT NOT NULL,
+                subject TEXT NOT NULL, body TEXT NOT NULL, content_hash TEXT NOT NULL,
+                status TEXT NOT NULL, approved_by TEXT, approved_at TEXT, sent_at TEXT,
+                smtp_message_id TEXT, delivery_error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+                FOREIGN KEY (report_id) REFERENCES reports(report_id)
+            );
+            CREATE TABLE IF NOT EXISTS delivery_attempts (
+                attempt_id TEXT PRIMARY KEY, draft_id TEXT NOT NULL, request_id TEXT,
+                status TEXT NOT NULL, message_id TEXT, error TEXT, attempted_at TEXT NOT NULL
+            );
             """
         )
-        self._migrate_cases()
         self._migrate_evidence_metadata()
+        self._migrate_cases()
         self.connection.commit()
-
-    def _migrate_cases(self) -> None:
-        if self.connection is None:
-            raise RuntimeError("repository is not initialized")
-        existing = {
-            row["name"] for row in self.connection.execute("PRAGMA table_info(cases)")
-        }
-        additions = {"description": "TEXT", "status": "TEXT NOT NULL DEFAULT 'open'"}
-        for name, definition in additions.items():
-            if name not in existing:
-                self.connection.execute(
-                    f"ALTER TABLE cases ADD COLUMN {name} {definition}"
-                )
 
     def _migrate_evidence_metadata(self) -> None:
         """Add Step 3 columns when opening a database created by Step 1."""
@@ -160,6 +224,8 @@ class SQLiteRepository:
             "accepted_records": "INTEGER",
             "rejected_records": "INTEGER",
             "received_at": "TEXT",
+            "file_path": "TEXT",
+            "committed_at": "TEXT",
         }
         for name, definition in columns.items():
             if name not in existing:
@@ -175,45 +241,18 @@ class SQLiteRepository:
             """
         )
 
+    def _migrate_cases(self) -> None:
+        if self.connection is None: raise RuntimeError("repository is not initialized")
+        existing = {row["name"] for row in self.connection.execute("PRAGMA table_info(cases)").fetchall()}
+        columns = {"description": "TEXT NOT NULL DEFAULT ''", "case_type": "TEXT NOT NULL DEFAULT 'batch'", "status": "TEXT NOT NULL DEFAULT 'active'", "owner": "TEXT NOT NULL DEFAULT 'Investigator'", "updated_at": "TEXT"}
+        for name, definition in columns.items():
+            if name not in existing: self.connection.execute(f"ALTER TABLE cases ADD COLUMN {name} {definition}")
+
     def is_available(self) -> bool:
         if self.connection is None:
             return False
         self.connection.execute("SELECT 1").fetchone()
         return True
-
-    def create_case(self, case: CaseCreate) -> CaseRecord:
-        connection = self._require_connection()
-        now = datetime.now(timezone.utc).isoformat()
-        with connection:
-            cursor = connection.execute(
-                """
-                INSERT INTO cases (name, description, status, created_at)
-                VALUES (?, ?, 'open', ?)
-                """,
-                (case.name, case.description, now),
-            )
-        created = self.get_case(cursor.lastrowid)
-        if created is None:
-            raise RuntimeError("created case could not be read back")
-        return created
-
-    def list_cases(self) -> list[CaseRecord]:
-        connection = self._require_connection()
-        rows = connection.execute(
-            "SELECT id, name, description, status, created_at FROM cases ORDER BY id"
-        ).fetchall()
-        return [self._case_from_row(row) for row in rows]
-
-    def get_case(self, case_id: int) -> CaseRecord | None:
-        connection = self._require_connection()
-        row = connection.execute(
-            """
-            SELECT id, name, description, status, created_at
-            FROM cases WHERE id = ?
-            """,
-            (case_id,),
-        ).fetchone()
-        return self._case_from_row(row) if row is not None else None
 
     def find_evidence_by_hash(self, case_id: int, source_hash: str) -> UUID | None:
         if self.connection is None:
@@ -234,7 +273,7 @@ class SQLiteRepository:
         if self.connection is None:
             raise RuntimeError("repository is not initialized")
         metadata = report.metadata
-        with self.connection:
+        with self.write_lock, self.connection:
             cursor = self.connection.execute(
                 """
                 INSERT INTO evidence_metadata (
@@ -286,223 +325,6 @@ class SQLiteRepository:
                     for issue in report.issues
                 ],
             )
-
-    def list_evidence(self, case_id: int) -> list[EvidenceValidationReport]:
-        connection = self._require_connection()
-        rows = connection.execute(
-            """
-            SELECT * FROM evidence_metadata
-            WHERE case_id = ? AND evidence_id IS NOT NULL
-            ORDER BY id
-            """,
-            (case_id,),
-        ).fetchall()
-        return [self._evidence_report_from_row(row) for row in rows]
-
-    def get_evidence(
-        self, case_id: int, evidence_id: UUID
-    ) -> EvidenceValidationReport | None:
-        connection = self._require_connection()
-        row = connection.execute(
-            """
-            SELECT * FROM evidence_metadata
-            WHERE case_id = ? AND evidence_id = ?
-            """,
-            (case_id, str(evidence_id)),
-        ).fetchone()
-        return self._evidence_report_from_row(row) if row is not None else None
-
-    def store_canonical_events(self, events: list[CanonicalEvent]) -> None:
-        if not events:
-            return
-        connection = self._require_connection()
-        with connection:
-            for event in events:
-                payload = event.model_dump_json()
-                existing = connection.execute(
-                    "SELECT payload_json FROM canonical_events WHERE event_id = ?",
-                    (str(event.event_id),),
-                ).fetchone()
-                if existing is not None:
-                    if existing["payload_json"] != payload:
-                        raise ValueError(
-                            "a canonical event ID cannot be reused for different content"
-                        )
-                    continue
-                connection.execute(
-                    """
-                    INSERT INTO canonical_events (
-                        event_id, case_id, evidence_id, observed_at, ingested_at,
-                        event_type, origin, payload_json
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        str(event.event_id),
-                        event.case_id,
-                        str(event.provenance.evidence_id),
-                        event.observed_at.isoformat() if event.observed_at else None,
-                        event.ingested_at.isoformat(),
-                        event.event_type,
-                        event.provenance.origin.value,
-                        payload,
-                    ),
-                )
-
-    def list_canonical_events(self, case_id: int) -> list[CanonicalEvent]:
-        connection = self._require_connection()
-        rows = connection.execute(
-            """
-            SELECT payload_json FROM canonical_events
-            WHERE case_id = ?
-            ORDER BY observed_at IS NULL, observed_at, ingested_at, event_id
-            """,
-            (case_id,),
-        ).fetchall()
-        return [CanonicalEvent.model_validate_json(row["payload_json"]) for row in rows]
-
-    def get_canonical_event(
-        self, case_id: int, event_id: UUID
-    ) -> CanonicalEvent | None:
-        connection = self._require_connection()
-        row = connection.execute(
-            """
-            SELECT payload_json FROM canonical_events
-            WHERE case_id = ? AND event_id = ?
-            """,
-            (case_id, str(event_id)),
-        ).fetchone()
-        return CanonicalEvent.model_validate_json(row["payload_json"]) if row else None
-
-    def store_analysis(self, result: AnalysisResult) -> None:
-        connection = self._require_connection()
-        now = datetime.now(timezone.utc).isoformat()
-        with connection:
-            payload = result.model_dump_json()
-            existing = connection.execute(
-                "SELECT result_json FROM analysis_runs WHERE analysis_id = ?",
-                (str(result.analysis_id),),
-            ).fetchone()
-            if existing is not None:
-                if existing["result_json"] != payload:
-                    raise ValueError(
-                        "an analysis ID cannot be reused for different content"
-                    )
-                return
-            connection.execute(
-                """
-                INSERT INTO analysis_runs (analysis_id, case_id, result_json, created_at)
-                VALUES (?, ?, ?, ?)
-                """,
-                (str(result.analysis_id), result.case_id, payload, now),
-            )
-
-    def get_analysis(
-        self, case_id: int, analysis_id: UUID
-    ) -> AnalysisResult | None:
-        connection = self._require_connection()
-        row = connection.execute(
-            """
-            SELECT result_json FROM analysis_runs
-            WHERE case_id = ? AND analysis_id = ?
-            """,
-            (case_id, str(analysis_id)),
-        ).fetchone()
-        return AnalysisResult.model_validate_json(row["result_json"]) if row else None
-
-    def get_latest_analysis(self, case_id: int) -> AnalysisResult | None:
-        connection = self._require_connection()
-        row = connection.execute(
-            """
-            SELECT result_json FROM analysis_runs
-            WHERE case_id = ?
-            ORDER BY created_at DESC, analysis_id DESC LIMIT 1
-            """,
-            (case_id,),
-        ).fetchone()
-        return AnalysisResult.model_validate_json(row["result_json"]) if row else None
-
-    def list_analysis_runs(self, case_id: int) -> list[AnalysisRunSummary]:
-        connection = self._require_connection()
-        rows = connection.execute(
-            """
-            SELECT result_json, created_at FROM analysis_runs
-            WHERE case_id = ? ORDER BY created_at DESC, analysis_id DESC
-            """,
-            (case_id,),
-        ).fetchall()
-        summaries = []
-        for row in rows:
-            result = AnalysisResult.model_validate_json(row["result_json"])
-            summaries.append(
-                AnalysisRunSummary(
-                    analysis_id=result.analysis_id,
-                    case_id=result.case_id,
-                    analyzed_event_count=result.analyzed_event_count,
-                    finding_count=len(result.findings),
-                    alert_count=len(result.alerts),
-                    incident_count=len(result.incidents),
-                    filter=result.filter,
-                    created_at=row["created_at"],
-                )
-            )
-        return summaries
-
-    def _evidence_report_from_row(self, row: sqlite3.Row) -> EvidenceValidationReport:
-        connection = self._require_connection()
-        issue_rows = connection.execute(
-            """
-            SELECT level, error_code, message, row_number, field_name, rejected_value
-            FROM evidence_validation_issues
-            WHERE evidence_metadata_id = ? ORDER BY id
-            """,
-            (row["id"],),
-        ).fetchall()
-        metadata = EvidenceMetadata(
-            evidence_id=row["evidence_id"],
-            case_id=row["case_id"],
-            original_filename=row["original_filename"],
-            sanitized_filename=row["sanitized_filename"],
-            media_type=row["media_type"],
-            byte_size=row["byte_size"],
-            sha256=row["source_hash"],
-            source_type=EvidenceSource(row["source_type"]),
-            dataset_profile=row["dataset_profile"],
-            validator_version=row["validator_version"],
-            received_at=row["received_at"],
-        )
-        return EvidenceValidationReport(
-            metadata=metadata,
-            status=ValidationStatus(row["validation_status"]),
-            total_records=row["total_records"],
-            accepted_records=row["accepted_records"],
-            rejected_records=row["rejected_records"],
-            issues=[
-                EvidenceValidationIssue(
-                    level=IssueLevel(issue["level"]),
-                    code=issue["error_code"],
-                    message=issue["message"],
-                    row_number=issue["row_number"],
-                    field=issue["field_name"],
-                    rejected_value=issue["rejected_value"],
-                )
-                for issue in issue_rows
-            ],
-        )
-
-    @staticmethod
-    def _case_from_row(row: sqlite3.Row) -> CaseRecord:
-        return CaseRecord(
-            case_id=row["id"],
-            name=row["name"],
-            description=row["description"],
-            status=row["status"],
-            created_at=row["created_at"],
-        )
-
-    def _require_connection(self) -> sqlite3.Connection:
-        if self.connection is None:
-            raise RuntimeError("repository is not initialized")
-        return self.connection
 
     def close(self) -> None:
         if self.connection is not None:

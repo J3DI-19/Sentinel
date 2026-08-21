@@ -1,5 +1,7 @@
 # Traceveil Roadmap
 
+> Phase 3 software status (August 2026): batch investigation APIs, CASAS and TON_IoT telemetry adapters, authenticated HTTP live collection, durable receipts, SSE replay, connected historical views, grounded optional Ollama assistance, deterministic PDF reports, approval-gated SMTP delivery, audit history, and the controlled simulator are implemented. Physical hardware assembly and MQTT remain optional future work.
+
 ## 1. Initialization
 - [x] Set up React + Vite frontend
 - [x] Set up FastAPI backend
@@ -137,7 +139,7 @@ real-time delivery, and persistence of derived artifacts remain later steps.
 - [x] Create APIs for incidents
 - [x] Create APIs for timelines
 - [x] Create APIs for graphs and chart data
-- [ ] Connect real analytical results to the dashboard
+- [x] Connect real analytical results to the dashboard
 - [x] Expose risk breakdowns through investigation APIs
 - [x] Expose supporting evidence identifiers through investigation APIs
 - [x] Expose provenance/source references through event APIs
@@ -145,12 +147,12 @@ real-time delivery, and persistence of derived artifacts remain later steps.
 - [x] Add reanalysis controls
 - [x] Allow historical review of persisted analysis snapshots and live incidents
 
-**Current result:** The Step 8 backend API is complete. Case-scoped endpoints
+**Current result:** Step 8 is complete. Case-scoped endpoints
 ingest and retrieve evidence, persist and filter canonical events, execute the
 deterministic analysis engine, and return findings, alerts, incidents, timelines,
 graphs, charts, provenance, risk factors, and historical analysis snapshots.
-The existing frontend still uses mocks until its adapters are connected to these
-contracts.
+The React investigation views consume these persisted APIs through generated
+OpenAPI types; mock adapters remain explicit test/demo configuration only.
 
 ## 9. Visualization Engine + Qwen
 - [ ] Create allowed visualization components

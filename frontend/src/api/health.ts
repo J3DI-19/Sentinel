@@ -7,10 +7,7 @@ export type ServiceStatus = {
 };
 
 async function getHealth(path: string): Promise<ServiceStatus> {
-  const endpoint = path ? `/api/v1/health/${path}` : "/api/v1/health";
-  const response = await fetch(endpoint);
-  if (!response.ok) throw new Error(`Health request failed: ${response.status}`);
-  return response.json() as Promise<ServiceStatus>;
+  return apiClient.request<ServiceStatus>(path ? `/health/${path}` : "/health");
 }
 
 export async function getSystemStatus(): Promise<ServiceStatus[]> {
@@ -21,3 +18,4 @@ export async function getSystemStatus(): Promise<ServiceStatus[]> {
       : { service: ["api", "database", "ollama"][index], status: "unavailable" },
   );
 }
+import { apiClient } from "./batch";
