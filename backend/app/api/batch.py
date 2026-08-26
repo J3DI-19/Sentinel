@@ -5,7 +5,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, File, Form, Query, Request, UploadFile
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.evidence.schemas import EvidenceSource
 
@@ -14,6 +14,8 @@ router=APIRouter(tags=["batch-investigation"])
 class CaseCreate(BaseModel):
     name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",max_length=120)
 class CommitRequest(BaseModel): allow_partial:bool=False
+class ReanalysisRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 class CasePublic(BaseModel):
     id:int; name:str; description:str; case_type:str; status:str; owner:str; created_at:str; updated_at:str|None=None
 class PageResponse(BaseModel):
@@ -122,7 +124,8 @@ def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int
     return page([json.loads(r[0]) for r in rows],total,page_number,page_size)
 
 @router.post("/cases/{case_id}/analyses",status_code=202)
-def reanalyze(case_id:int,request:Request): return service(request).reanalyze(case_id)
+def reanalyze(case_id:int,request:Request,body:ReanalysisRequest|None=None):
+    return service(request).reanalyze(case_id)
 
 @router.get("/cases/{case_id}/analyses")
 def analyses(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100)) -> PageResponse:
