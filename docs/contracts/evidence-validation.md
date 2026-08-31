@@ -39,13 +39,6 @@ CASAS smart-home telemetry and TON_IoT device telemetry are the primary public e
 
 The test configuration reports leaked non-daemon threads at session shutdown. `backend/scripts/run_pytest_cleanly.py` also runs pytest as a child process with a configurable deadline, terminates the complete child process tree on expiry, and returns status `124`. CI invokes this wrapper and therefore requires both passing tests and a clean zero-code pytest process exit.
 
-The project evaluation scope selects CASAS smart-home telemetry, TON_IoT
-smart-device telemetry, and controlled simulation as its primary batch sources.
-Dedicated, versioned CASAS and TON_IoT telemetry profiles are not yet defined in
-this contract. The existing TON_IoT network and CICIoT2023 network profiles are
-secondary compatibility paths and do not substitute for those planned telemetry
-profiles.
-
 Generic validation has no dataset-specific required columns, but Step 4 still rejects a row that cannot produce any meaningful canonical time, type, identity, label, or attribute.
 
 ## Live telemetry handoff

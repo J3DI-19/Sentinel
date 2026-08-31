@@ -408,6 +408,12 @@
         "title": "PageResponse",
         "type": "object"
       },
+      "ReanalysisRequest": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "ReanalysisRequest",
+        "type": "object"
+      },
       "ReportCreate": {
         "properties": {
           "narrative": {
@@ -1141,6 +1147,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ReanalysisRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "202": {
             "content": {

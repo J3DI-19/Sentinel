@@ -75,4 +75,12 @@ Alerts are created only for findings whose declared triggering event is live. Hi
 
 ## Current boundary
 
-Step 6 is an in-process analytical service. It does not yet expose investigation endpoints, store canonical or derived artifacts, stream frontend updates, send email, generate reports, or connect the structured results to the mock dashboard. Those responsibilities remain Steps 7, 8, and 11.
+Step 6 remains the deterministic authority for filtering, detection, risk,
+correlation, incidents, timelines, graphs, and aggregates. Step 8 now persists
+complete analysis runs and queryable derived artifacts, exposes case-scoped and
+historical investigation endpoints, and supplies generated response contracts
+to the React client. Reanalysis over unchanged canonical events is idempotent.
+
+Streaming, notification delivery, report generation, and AI narration remain
+separate consumers of persisted results. They may present or deliver Step 6
+outputs, but they must not recalculate or alter the forensic result.

@@ -42,6 +42,11 @@ cross-case navigation. Case-scoped routes additionally verify ownership.
 `analysis_id` can be supplied to findings, alerts, incidents, timeline, graph,
 aggregates, and charts endpoints. Without it, the latest analysis is returned.
 
+Explicit analysis-configuration selection is not supported in this release.
+`POST /cases/{case_id}/analyses` uses the backend's versioned default
+`AnalysisConfig`; request bodies containing configuration fields are rejected
+with `422` rather than silently ignored.
+
 ## Import workflow
 
 Evidence is uploaded as multipart form data with a required `file` and
@@ -51,8 +56,12 @@ returns `202`; clients poll the import resource until it reaches
 `awaiting_commit`, `rejected`, `failed`, or another terminal state.
 
 Rows accepted by Step 3 carry an authenticated validation seal. On commit, the
-backend binds those rows to the persisted evidence identity, verifies the seal,
-normalizes them through Step 4, persists canonical events, and runs Step 6.
+backend recalculates the stored file's SHA-256 and compares it with the original
+persisted validation report before revalidation. A mismatch fails with
+`evidence_content_hash_mismatch` and creates no canonical events or analysis
+artifacts. For unchanged evidence, the backend preserves the original validation
+receipt timestamp, revalidates and reseals the rows against the persisted evidence
+identity, normalizes them through Step 4, persists canonical events, and runs Step 6.
 When validation rejects individual rows, `allow_partial: true` is required to
 confirm that only accepted rows should be committed. Exact duplicate evidence
 hashes do not create duplicate canonical events.

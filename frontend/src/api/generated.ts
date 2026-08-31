@@ -1038,6 +1038,8 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** ReanalysisRequest */
+        ReanalysisRequest: Record<string, never>;
         /** ReportCreate */
         ReportCreate: {
             /** Narrative */
@@ -1471,7 +1473,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReanalysisRequest"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             202: {

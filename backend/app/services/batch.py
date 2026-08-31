@@ -11,7 +11,7 @@ from app.analysis.service import AnalysisService
 from app.db.sqlite import SQLiteRepository
 from app.evidence.authorization import ValidationAuthority
 from app.evidence.hashing import sha256_bytes
-from app.evidence.schemas import EvidenceSource, ValidationStatus
+from app.evidence.schemas import EvidenceSource, EvidenceValidationReport, ValidationStatus
 from app.evidence.service import EvidenceValidationService
 from app.normalization.schemas import CanonicalEvent
 from app.normalization.service import NormalizationService
@@ -81,7 +81,12 @@ class BatchInvestigationService:
                 if operation == "validate": self.validate_import(import_id, argument if isinstance(argument, str) else None)
                 else: self.commit_import(import_id, bool(argument))
             except Exception as exc:
-                try: self._job(import_id, "failed", {"code": f"{operation}_failed", "message": str(exc), "retryable": False})
+                code = (
+                    "evidence_content_hash_mismatch"
+                    if str(exc) == "evidence_content_hash_mismatch"
+                    else f"{operation}_failed"
+                )
+                try: self._job(import_id, "failed", {"code": code, "message": str(exc), "retryable": False})
                 except Exception: pass
             finally: self.queue.task_done()
 
@@ -127,8 +132,17 @@ class BatchInvestigationService:
         report = json.loads(job["validation_json"])
         if report["rejected_records"] and not allow_partial: raise ValueError("partial_confirmation_required")
         self._job(import_id, "normalizing")
-        outcome = self.validator.validate_with_records(filename=job["filename"], content=Path(job["file_path"]).read_bytes(), source_type=EvidenceSource(job["source_type"]), case_id=job["case_id"])
-        fixed_metadata = outcome.report.metadata.model_copy(update={"evidence_id": UUID(job["evidence_id"])})
+        original_report = EvidenceValidationReport.model_validate_json(job["validation_json"])
+        stored_content = Path(job["file_path"]).read_bytes()
+        if sha256_bytes(stored_content) != original_report.metadata.sha256:
+            raise ValueError("evidence_content_hash_mismatch")
+        outcome = self.validator.validate_with_records(filename=job["filename"], content=stored_content, source_type=EvidenceSource(job["source_type"]), case_id=job["case_id"])
+        fixed_metadata = outcome.report.metadata.model_copy(
+            update={
+                "evidence_id": UUID(job["evidence_id"]),
+                "received_at": original_report.metadata.received_at,
+            }
+        )
         accepted_records = []
         for record in outcome.accepted_records:
             evidence_id = UUID(job["evidence_id"])
