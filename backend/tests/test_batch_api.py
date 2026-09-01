@@ -10,6 +10,26 @@ def create_case(client):
     return response.json()["id"]
 
 
+def test_case_creation_trims_fields_and_rejects_blank_names(client):
+    response = client.post(
+        "/api/v1/cases",
+        json={"name": "  Batch review  ", "description": "  Showcase case  ", "owner": "  Reviewer  "},
+    )
+    assert response.status_code == 201
+    assert response.json()["name"] == "Batch review"
+    assert response.json()["description"] == "Showcase case"
+    assert response.json()["owner"] == "Reviewer"
+    listed = client.get("/api/v1/cases?page=1&page_size=100").json()
+    assert listed["items"][0]["id"] == response.json()["id"]
+
+    blank = client.post("/api/v1/cases", json={"name": "   "})
+    assert blank.status_code == 422
+    assert blank.json()["code"] == "request_validation_error"
+
+    oversized = client.post("/api/v1/cases", json={"name": "x" * 201})
+    assert oversized.status_code == 422
+
+
 def upload(client, case_id, content, *, source="simulation", filename="events.csv"):
     return client.post(
         f"/api/v1/cases/{case_id}/imports",

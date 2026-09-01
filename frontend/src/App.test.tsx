@@ -109,7 +109,7 @@ describe("Traceveil investigation interface", () => {
     window.history.replaceState({}, "", "/cases/1/findings");
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Findings" })).toBeInTheDocument();
-    expect(screen.getByText("No findings")).toBeInTheDocument();
+    expect(screen.getByText("No analysis has run")).toBeInTheDocument();
     expect(screen.queryByText("Risk model")).not.toBeInTheDocument();
   });
 

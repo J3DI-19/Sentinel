@@ -81,7 +81,7 @@ export class HttpImportDataSource implements ImportDataSource {
       acceptedRecords: job.validation.accepted_records, rejectedRecords: job.validation.rejected_records,
       duplicateRecords: 0,
       warnings: job.validation.issues.filter(issue => issue.level === "warning").map(issue => issue.message),
-      problems: job.validation.issues.filter(issue => issue.level === "error").map(issue => ({ scope: issue.row_number ? "row" : issue.field ? "column" : "file", code: issue.code, message: issue.message, row: issue.row_number ?? undefined, column: issue.field ?? undefined })),
+      problems: job.validation.issues.filter(issue => issue.level === "error").map(issue => ({ scope: issue.row_number ? "row" : issue.field ? "column" : "file", code: issue.code, message: issue.message, row: issue.row_number ?? undefined, column: issue.field ?? undefined, correction: issue.field ? `Provide a valid ${issue.field} value required by ${job.validation?.metadata.dataset_profile}.` : undefined })),
     };
   }
 

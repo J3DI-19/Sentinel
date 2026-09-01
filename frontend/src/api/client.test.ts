@@ -16,6 +16,13 @@ describe("API client foundation", () => {
     await expect(new ApiClient("/api", 100).request("/future")).rejects.toMatchObject({ code: "invalid_response" });
     expect(normalizeApiError(new DOMException("Aborted", "AbortError"))).toMatchObject({ code: "request_cancelled", retryable: true });
   });
+  it("normalizes browser network failures into an actionable backend message", () => {
+    expect(normalizeApiError(new TypeError("Failed to fetch"))).toMatchObject({
+      code: "network_error",
+      message: "The backend API could not be reached. Check that the backend is running, then try again.",
+      retryable: true,
+    });
+  });
   it("sends a request ID for backend audit correlation", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response("{}", { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);

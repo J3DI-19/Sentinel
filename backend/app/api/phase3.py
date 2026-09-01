@@ -11,13 +11,17 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field, ValidationError
 
 from app.evidence.schemas import LiveTelemetryInput
+from app.core.errors import DatabaseUnavailableError
 
 
 router = APIRouter(tags=["phase3"])
 
 
 def service(request: Request):
-    return request.app.state.phase3_service
+    value = request.app.state.phase3_service
+    if value is None:
+        raise DatabaseUnavailableError()
+    return value
 
 
 class LiveSessionCreate(BaseModel):

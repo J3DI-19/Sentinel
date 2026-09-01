@@ -15,6 +15,7 @@ def issue_codes(report):
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
+PUBLIC_EXAMPLES = Path(__file__).parents[2] / "frontend" / "public" / "examples"
 
 
 def test_accepts_valid_simulated_csv_and_hashes_original_bytes():
@@ -35,6 +36,23 @@ def test_accepts_valid_simulated_csv_and_hashes_original_bytes():
     assert report.accepted_records == 1
     assert report.rejected_records == 0
     assert report.metadata.sha256 == sha256_bytes(content)
+    assert report.metadata.dataset_profile == "simulated@1.0"
+
+
+def test_public_simulation_example_matches_the_versioned_profile():
+    example = PUBLIC_EXAMPLES / "simulated-evidence.csv"
+
+    report = EvidenceValidationService().validate(
+        filename=example.name,
+        content=example.read_bytes(),
+        source_type=EvidenceSource.SIMULATED,
+        media_type="text/csv",
+    )
+
+    assert report.status == ValidationStatus.ACCEPTED
+    assert report.total_records == 3
+    assert report.accepted_records == 3
+    assert report.rejected_records == 0
     assert report.metadata.dataset_profile == "simulated@1.0"
 
 

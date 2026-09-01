@@ -8,11 +8,13 @@ from fastapi import APIRouter, File, Form, Query, Request, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.evidence.schemas import EvidenceSource
+from app.core.errors import DatabaseUnavailableError
 
 router=APIRouter(tags=["batch-investigation"])
 
 class CaseCreate(BaseModel):
-    name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",max_length=120)
+    model_config = ConfigDict(str_strip_whitespace=True)
+    name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",min_length=1,max_length=120)
 class CommitRequest(BaseModel): allow_partial:bool=False
 class ReanalysisRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -26,7 +28,10 @@ class ImportPublic(BaseModel):
 class ErrorPublic(BaseModel):
     code:str; message:str; retryable:bool; request_id:str; details:Any|None=None
 
-def service(request:Request): return request.app.state.batch_service
+def service(request:Request):
+    value = request.app.state.batch_service
+    if value is None: raise DatabaseUnavailableError()
+    return value
 def page(items:list[dict], total:int, page_number:int, page_size:int): return {"items":items,"page":page_number,"page_size":page_size,"total":total}
 def public_import(job:dict)->dict:
     return {"import_id":job["import_id"],"case_id":job["case_id"],"evidence_id":job["evidence_id"],"filename":job["filename"],"source_type":job["source_type"],"state":job["status"],"progress":{"mode":"indeterminate"},"validation":json.loads(job["validation_json"]) if job["validation_json"] else None,"error":json.loads(job["error_json"]) if job["error_json"] else None,"created_at":job["created_at"],"updated_at":job["updated_at"]}

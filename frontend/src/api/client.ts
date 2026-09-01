@@ -18,6 +18,7 @@ export function normalizeApiError(error: unknown): ApiClientError {
   if (error instanceof ApiClientError) return error;
   if (error instanceof DOMException && error.name === "AbortError") return new ApiClientError({ code: "request_cancelled", message: "The request was cancelled.", retryable: true });
   if (error instanceof SyntaxError) return new ApiClientError({ code: "invalid_response", message: "The service returned an unreadable response.", retryable: true });
+  if (error instanceof TypeError) return new ApiClientError({ code: "network_error", message: "The backend API could not be reached. Check that the backend is running, then try again.", retryable: true });
   return new ApiClientError({ code: "network_error", message: error instanceof Error ? error.message : "The service could not be reached.", retryable: true });
 }
 

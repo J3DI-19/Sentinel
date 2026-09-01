@@ -1,4 +1,4 @@
-export type EvidenceSource = "casas" | "ton_iot_telemetry" | "simulation" | "generic";
+export type EvidenceSource = "casas_smart_home" | "ton_iot_fridge_telemetry" | "simulated" | "generic";
 
 export type LocalFileValidation =
   | { status: "valid" }

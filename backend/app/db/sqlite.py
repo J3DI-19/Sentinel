@@ -251,8 +251,11 @@ class SQLiteRepository:
     def is_available(self) -> bool:
         if self.connection is None:
             return False
-        self.connection.execute("SELECT 1").fetchone()
-        return True
+        try:
+            self.connection.execute("SELECT 1").fetchone()
+            return True
+        except sqlite3.Error:
+            return False
 
     def find_evidence_by_hash(self, case_id: int, source_hash: str) -> UUID | None:
         if self.connection is None:
