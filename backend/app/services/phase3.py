@@ -22,7 +22,8 @@ from reportlab.pdfgen.canvas import Canvas
 
 from app.core.config import Settings
 from app.db.sqlite import SQLiteRepository
-from app.evidence.schemas import LiveTelemetryInput, ValidatedLiveTelemetry
+from app.evidence.schemas import LiveTelemetryInput
+from app.evidence.service import LiveTelemetryAcceptanceService
 from app.normalization.schemas import CanonicalEvent
 from app.normalization.service import NormalizationService
 
@@ -48,6 +49,7 @@ class Phase3Service:
         self.batch = batch_service
         self.settings = settings
         self.normalizer = NormalizationService()
+        self.live_acceptance = LiveTelemetryAcceptanceService()
         self.queue: Queue[tuple[str, str]] = Queue(maxsize=settings.live_queue_size)
         self.stop_event = Event()
         self.rate_windows: dict[str, deque[float]] = defaultdict(deque)
@@ -242,7 +244,7 @@ class Phase3Service:
         with self.repository.write_lock, self.db:
             self.db.execute("UPDATE live_receipts SET status='processing',updated_at=? WHERE receipt_id=?", (utcnow(), receipt_id))
         telemetry = LiveTelemetryInput.model_validate_json(row["raw_json"])
-        accepted = ValidatedLiveTelemetry(telemetry=telemetry, ingested_at=datetime.fromisoformat(row["received_at"]))
+        accepted = self.live_acceptance.accept(telemetry)
         normalized = self.normalizer.normalize_live_telemetry(accepted=accepted, evidence_id=UUID(row["evidence_id"]), source_hash=row["payload_hash"], source_name=telemetry.source_id)
         if normalized.event is None:
             raise ValueError("live_normalization_rejected")

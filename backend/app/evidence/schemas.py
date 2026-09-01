@@ -7,12 +7,20 @@ from enum import Enum
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 
 class EvidenceSource(str, Enum):
     CASAS = "casas"
+    CASAS_SMART_HOME = "casas_smart_home"
     TON_IOT_TELEMETRY = "ton_iot_telemetry"
+    TON_IOT_FRIDGE_TELEMETRY = "ton_iot_fridge_telemetry"
     SIMULATION = "simulation"
     TON_IOT_NETWORK = "ton_iot_network"
     CICIOT2023_NETWORK = "ciciot2023_network"
@@ -83,6 +91,7 @@ class ValidatedBatchRecord(BaseModel):
     row_number: int = Field(ge=1)
     record: dict[str, Any]
     raw_record_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    validation_seal: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class EvidenceValidationOutcome(BaseModel):
@@ -150,5 +159,14 @@ class LiveTelemetryInput(BaseModel):
 
 
 class ValidatedLiveTelemetry(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     telemetry: LiveTelemetryInput
-    ingested_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    ingested_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def protect_ingestion_timestamp(cls, value: Any) -> Any:
+        if isinstance(value, dict) and "ingested_at" in value:
+            raise ValueError("ingested_at is assigned by the backend acceptance boundary")
+        return value

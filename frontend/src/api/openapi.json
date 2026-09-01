@@ -232,7 +232,9 @@
       "EvidenceSource": {
         "enum": [
           "casas",
+          "casas_smart_home",
           "ton_iot_telemetry",
+          "ton_iot_fridge_telemetry",
           "simulation",
           "ton_iot_network",
           "ciciot2023_network",
@@ -404,6 +406,12 @@
           "total"
         ],
         "title": "PageResponse",
+        "type": "object"
+      },
+      "ReanalysisRequest": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "ReanalysisRequest",
         "type": "object"
       },
       "ReportCreate": {
@@ -889,6 +897,23 @@
               "title": "Case Id",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
           }
         ],
         "responses": {
@@ -1000,6 +1025,23 @@
               ],
               "title": "End Time"
             }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
           }
         ],
         "responses": {
@@ -1029,6 +1071,69 @@
       }
     },
     "/api/v1/cases/{case_id}/analyses": {
+      "get": {
+        "operationId": "analyses_api_v1_cases__case_id__analyses_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analyses",
+        "tags": [
+          "batch-investigation"
+        ]
+      },
       "post": {
         "operationId": "reanalyze_api_v1_cases__case_id__analyses_post",
         "parameters": [
@@ -1042,6 +1147,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ReanalysisRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "202": {
             "content": {
@@ -1063,6 +1185,96 @@
           }
         },
         "summary": "Reanalyze",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/analyses/latest": {
+      "get": {
+        "operationId": "latest_analysis_api_v1_cases__case_id__analyses_latest_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Latest Analysis",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/analyses/{analysis_id}": {
+      "get": {
+        "operationId": "case_analysis_api_v1_cases__case_id__analyses__analysis_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Case Analysis",
         "tags": [
           "batch-investigation"
         ]
@@ -1128,6 +1340,63 @@
         "summary": "Audit",
         "tags": [
           "phase3"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/charts": {
+      "get": {
+        "operationId": "charts_api_v1_cases__case_id__charts_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Charts",
+        "tags": [
+          "batch-investigation"
         ]
       }
     },
@@ -1292,6 +1561,56 @@
         ]
       }
     },
+    "/api/v1/cases/{case_id}/events/{event_id}": {
+      "get": {
+        "operationId": "case_event_api_v1_cases__case_id__events__event_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Case Event",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
     "/api/v1/cases/{case_id}/evidence": {
       "get": {
         "operationId": "evidence_api_v1_cases__case_id__evidence_get",
@@ -1368,6 +1687,56 @@
           }
         },
         "summary": "Evidence",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/evidence/{evidence_id}": {
+      "get": {
+        "operationId": "case_evidence_detail_api_v1_cases__case_id__evidence__evidence_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "evidence_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Evidence Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Case Evidence Detail",
         "tags": [
           "batch-investigation"
         ]
@@ -1456,6 +1825,23 @@
               ],
               "title": "End Time"
             }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
           }
         ],
         "responses": {
@@ -1519,6 +1905,23 @@
               "minimum": 1,
               "title": "Edge Limit",
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
             }
           }
         ],
@@ -1682,6 +2085,23 @@
                 }
               ],
               "title": "End Time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
             }
           }
         ],
@@ -2123,6 +2543,23 @@
                 }
               ],
               "title": "End Time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
             }
           }
         ],

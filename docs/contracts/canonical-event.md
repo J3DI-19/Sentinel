@@ -62,6 +62,8 @@ Risk, severity, alerts, correlation conclusions, and AI narrative are deliberate
 
 | Source | Observed time | Event type | Identity policy | Source label |
 | --- | --- | --- | --- | --- |
+| CASAS Milan smart home | CSV `timestamp` | numeric readings become `telemetry`; categorical messages become `device_state` | original sensor identifier becomes the device/target; prefix maps to a conservative sensor type | activity remains an attribute, not a security label |
+| TON_IoT fridge telemetry | release `date` + `time` | `telemetry` | pinned device identity `ton-iot-fridge`, type `smart_refrigerator` | required original binary `label`; original `type` remains the source event type and an attribute |
 | Simulated | `timestamp` | normalized source `event_type` | required `device_id`; optional device/IP/MAC fields | `label` or `type` when present |
 | TON_IoT network | `ts` | `network_flow` | source/destination IP entities; device exists only when the source supplies a trusted `device_id` | required original `label`; original `type` is retained separately |
 | CICIoT2023 network | optional `timestamp`, `ts`, or `time` | `network_flow` | destination IP remains a network target; device remains absent unless the source supplies an identity | required original `label` |
@@ -80,13 +82,6 @@ All canonical timestamps are UTC. Numeric source timestamps are interpreted as U
 
 Flat source fields not mapped into common fields remain in `attributes`. CSV strings are conservatively typed as booleans, integers, or finite floating-point values only when unambiguous; padded identifiers such as `001` remain strings. Unsupported nested or non-finite values are omitted with warnings.
 
-Every event retains evidence ID, original evidence hash, logical row/sequence reference, deterministic raw-record hash, source type/name/ID, batch/live origin, adapter version, and normalization version. Batch normalization accepts only a `ValidatedBatchRecord` issued by Step 3, verifies its metadata, and recomputes its row hash before mapping. Source fields that collapse to the same normalized name, such as `src-ip` and `src_ip`, are rejected as ambiguous instead of selecting one value. The original evidence remains the authority for full raw-record review.
+Every event retains evidence ID, original evidence hash, logical row/sequence reference, deterministic raw-record hash, source type/name/ID, batch/live origin, adapter version, and normalization version. Batch normalization accepts only a `ValidatedBatchRecord` issued by Step 3, verifies its metadata, recomputes its row hash, and checks its Step 3 HMAC authorization seal before mapping. Source fields that collapse to the same normalized name, such as `src-ip` and `src_ip`, are rejected as ambiguous instead of selecting one value. The original evidence remains the authority for full raw-record review.
 
-The current TON_IoT and CICIoT2023 adapters are pinned to the versioned Step 3 profile fixtures. The exact selected dataset release must match those headers or receive a new versioned profile and adapter rather than an undocumented mapping change.
-
-These network adapters are retained as secondary compatibility paths. The
-primary smart-home evaluation plan uses CASAS smart-home telemetry, TON_IoT
-smart-device telemetry, and controlled simulation. Dedicated CASAS and TON_IoT
-telemetry mappings remain planned and must receive their own versioned profiles,
-adapters, fixtures, and provenance rules before they are treated as supported
-primary sources.
+The primary smart-home evaluation plan uses CASAS smart-home telemetry, TON_IoT smart-device telemetry, and controlled simulation. Dedicated CASAS Milan and TON_IoT fridge telemetry profiles, adapters, fixtures, and provenance rules implement those public-dataset mappings. TON_IoT network and CICIoT2023 are retained as secondary compatibility paths. All four public-dataset adapters are pinned to versioned Step 3 profile fixtures; a different testbed, device subset, or release must receive a new versioned profile and adapter rather than an undocumented mapping change.

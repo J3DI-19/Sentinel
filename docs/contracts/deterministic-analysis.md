@@ -27,12 +27,12 @@ Observed-time filtering never substitutes ingestion time. Events without `observ
 
 | Rule | Deterministic condition | Default output |
 | --- | --- | --- |
-| `LABEL-001` | TON_IoT label is `1`; CICIoT2023 label is outside the versioned benign set; other source labels use the versioned malicious allow-list | High severity, 95 confidence |
+| `LABEL-001` | TON_IoT network or telemetry label is `1`; CICIoT2023 label is outside the versioned benign set; other source labels use the versioned malicious allow-list | High severity, 95 confidence |
 | `RATE-001` | Numeric `attributes.requests` is at least three times positive numeric `attributes.baseline` | High severity, 90 confidence |
-| `AUTH-001` | Ten authentication failures for the same entity and actor occur within 60 observed seconds | Critical severity, 98 confidence |
+| `AUTH-001` | Ten authentication failures for the same known target entity and known actor occur within 60 observed seconds | Critical severity, 98 confidence |
 | `BASELINE-001` | A telemetry metric exceeds its previous-sample mean plus the greater of three population standard deviations or the minimum delta | High severity, 80 confidence |
 
-Every finding exposes its rule/version, condition trace, supporting event IDs, triggering event IDs, evidence IDs, confidence, and whether the actual trigger was live. A source label is evidence supplied by a selected dataset or adapter; matching it is a transparent rule result, not an independent claim about intent.
+Every finding exposes its rule/version, condition trace, supporting event IDs, triggering event IDs, evidence IDs, confidence, and whether the actual trigger was live. Authentication failures with a missing actor or missing target identity are not grouped under a shared placeholder and therefore cannot trigger `AUTH-001`. A source label is evidence supplied by a selected dataset or adapter; matching it is a transparent rule result, not an independent claim about intent.
 
 The default behavioural baseline requires three prior samples and retains at most twenty. It is calculated independently per primary entity and scalar telemetry metric. Boolean values and the transport `sequence` field are not treated as measurements. Each evaluated baseline stores its sample IDs, window, mean, population standard deviation, threshold, and evaluated event ID.
 
@@ -44,9 +44,11 @@ Risk is an integer from 0 to 100. The five stored factor scores and default weig
 | --- | ---: | --- |
 | Severity | 30% | Versioned rule severity mapping |
 | Confidence | 25% | Versioned rule confidence |
-| Repetition | 20% | Observed count relative to the rule threshold |
+| Repetition | 20% | Observed count relative to a rule-specific configured reference |
 | Device criticality | 15% | Case configuration, default 50 |
 | Corroboration | 10% | Declared correlation edges or multiple evidence objects |
+
+The versioned default repetition references are `4` for `LABEL-001`, `4` for `RATE-001`, the configured authentication failure threshold (default `10`) for `AUTH-001`, and `3` for `BASELINE-001`. These values are explicit `AnalysisConfig` fields rather than hidden scoring constants. For example, one default `LABEL-001` occurrence produces a repetition factor of `25` and an overall default risk score of `59`.
 
 Weighted integer points use deterministic largest-remainder allocation and always sum to the published score. Bands are low `0-24`, medium `25-49`, high `50-74`, and critical `75-100`. Risk expresses deterministic triage priority; it does not prove compromise, attribution, intent, or causation.
 
@@ -73,4 +75,12 @@ Alerts are created only for findings whose declared triggering event is live. Hi
 
 ## Current boundary
 
-Step 6 is an in-process analytical service. It does not yet expose investigation endpoints, store canonical or derived artifacts, stream frontend updates, send email, generate reports, or connect the structured results to the mock dashboard. Those responsibilities remain Steps 7, 8, and 11.
+Step 6 remains the deterministic authority for filtering, detection, risk,
+correlation, incidents, timelines, graphs, and aggregates. Step 8 now persists
+complete analysis runs and queryable derived artifacts, exposes case-scoped and
+historical investigation endpoints, and supplies generated response contracts
+to the React client. Reanalysis over unchanged canonical events is idempotent.
+
+Streaming, notification delivery, report generation, and AI narration remain
+separate consumers of persisted results. They may present or deliver Step 6
+outputs, but they must not recalculate or alter the forensic result.

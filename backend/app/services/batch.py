@@ -9,8 +9,9 @@ from uuid import UUID, uuid4
 
 from app.analysis.service import AnalysisService
 from app.db.sqlite import SQLiteRepository
+from app.evidence.authorization import ValidationAuthority
 from app.evidence.hashing import sha256_bytes
-from app.evidence.schemas import EvidenceSource, ValidationStatus
+from app.evidence.schemas import EvidenceSource, EvidenceValidationReport, ValidationStatus
 from app.evidence.service import EvidenceValidationService
 from app.normalization.schemas import CanonicalEvent
 from app.normalization.service import NormalizationService
@@ -23,8 +24,14 @@ class BatchInvestigationService:
     def __init__(self, repository: SQLiteRepository, storage_path: str, max_file_size: int, max_issues: int):
         self.repository = repository; self.storage = Path(storage_path).resolve()
         self.storage.mkdir(parents=True, exist_ok=True)
-        self.validator = EvidenceValidationService(None, max_file_size_bytes=max_file_size, max_issues=max_issues)
-        self.normalizer = NormalizationService(); self.analyzer = AnalysisService()
+        self.validation_authority = ValidationAuthority()
+        self.validator = EvidenceValidationService(
+            None,
+            max_file_size_bytes=max_file_size,
+            max_issues=max_issues,
+            validation_authority=self.validation_authority,
+        )
+        self.normalizer = NormalizationService(self.validation_authority); self.analyzer = AnalysisService()
         self.queue: Queue[tuple[str, str, object | None]] = Queue(maxsize=8)
         self.stop_event = Event()
         self.worker = Thread(target=self._run_worker, name="traceveil-batch-worker", daemon=True)
@@ -74,7 +81,12 @@ class BatchInvestigationService:
                 if operation == "validate": self.validate_import(import_id, argument if isinstance(argument, str) else None)
                 else: self.commit_import(import_id, bool(argument))
             except Exception as exc:
-                try: self._job(import_id, "failed", {"code": f"{operation}_failed", "message": str(exc), "retryable": False})
+                code = (
+                    "evidence_content_hash_mismatch"
+                    if str(exc) == "evidence_content_hash_mismatch"
+                    else f"{operation}_failed"
+                )
+                try: self._job(import_id, "failed", {"code": code, "message": str(exc), "retryable": False})
                 except Exception: pass
             finally: self.queue.task_done()
 
@@ -120,9 +132,42 @@ class BatchInvestigationService:
         report = json.loads(job["validation_json"])
         if report["rejected_records"] and not allow_partial: raise ValueError("partial_confirmation_required")
         self._job(import_id, "normalizing")
-        outcome = self.validator.validate_with_records(filename=job["filename"], content=Path(job["file_path"]).read_bytes(), source_type=EvidenceSource(job["source_type"]), case_id=job["case_id"])
-        fixed_metadata = outcome.report.metadata.model_copy(update={"evidence_id": UUID(job["evidence_id"])})
-        outcome = outcome.model_copy(update={"report": outcome.report.model_copy(update={"metadata": fixed_metadata}), "accepted_records": [record.model_copy(update={"evidence_id": UUID(job["evidence_id"])}) for record in outcome.accepted_records]})
+        original_report = EvidenceValidationReport.model_validate_json(job["validation_json"])
+        stored_content = Path(job["file_path"]).read_bytes()
+        if sha256_bytes(stored_content) != original_report.metadata.sha256:
+            raise ValueError("evidence_content_hash_mismatch")
+        outcome = self.validator.validate_with_records(filename=job["filename"], content=stored_content, source_type=EvidenceSource(job["source_type"]), case_id=job["case_id"])
+        fixed_metadata = outcome.report.metadata.model_copy(
+            update={
+                "evidence_id": UUID(job["evidence_id"]),
+                "received_at": original_report.metadata.received_at,
+            }
+        )
+        accepted_records = []
+        for record in outcome.accepted_records:
+            evidence_id = UUID(job["evidence_id"])
+            accepted_records.append(
+                record.model_copy(
+                    update={
+                        "evidence_id": evidence_id,
+                        "validation_seal": self.validation_authority.seal(
+                            evidence_id=evidence_id,
+                            source_type=record.source_type,
+                            dataset_profile=record.dataset_profile,
+                            validator_version=record.validator_version,
+                            source_hash=fixed_metadata.sha256,
+                            row_number=record.row_number,
+                            raw_record_hash=record.raw_record_hash,
+                        ),
+                    }
+                )
+            )
+        outcome = outcome.model_copy(
+            update={
+                "report": outcome.report.model_copy(update={"metadata": fixed_metadata}),
+                "accepted_records": accepted_records,
+            }
+        )
         events: list[tuple[CanonicalEvent, dict]] = []
         for record in outcome.accepted_records:
             result = self.normalizer.normalize_batch_record(metadata=outcome.report.metadata, validated_record=record)
@@ -136,8 +181,7 @@ class BatchInvestigationService:
             for event, raw in events:
                 entity = event.device or event.target or event.actor
                 self.db.execute("INSERT OR IGNORE INTO canonical_events VALUES(?,?,?,?,?,?,?,?,?,?,?)", (str(event.event_id),event.case_id,str(event.provenance.evidence_id),event.observed_at.isoformat() if event.observed_at else None,event.ingested_at.isoformat(),event.provenance.origin.value,event.event_type,entity.id if entity else None,event.source_label,json.dumps(raw,sort_keys=True),event.model_dump_json()))
-            self.db.execute("INSERT INTO analysis_runs VALUES(?,?,?,?,?)", (str(result.analysis_id),job["case_id"],"completed",result.model_dump_json(),now))
-            self._store_artifacts(result)
+            self._persist_analysis(result, now)
             self.db.execute("UPDATE evidence_metadata SET committed_at=? WHERE evidence_id=?", (now,job["evidence_id"]))
             self.db.execute("UPDATE import_jobs SET status=?,updated_at=? WHERE import_id=?", (final_status,now,import_id))
             self.db.execute("UPDATE cases SET updated_at=? WHERE id=?", (now,job["case_id"]))
@@ -150,6 +194,26 @@ class BatchInvestigationService:
                 data=item.model_dump(mode="json"); item_id=str(data.get(f"{kind}_id") or data.get("entry_id") or data.get("node_id") or data.get("edge_id") or f"{kind}:{index}")
                 occurred=data.get("occurred_at") or data.get("triggered_at") or data.get("started_at"); severity=data.get("severity"); risk=data.get("risk_score") or data.get("maximum_risk") or (data.get("risk") or {}).get("score")
                 self.db.execute("INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)", (str(result.analysis_id),result.case_id,kind,item_id,occurred,severity,risk,json.dumps(data,sort_keys=True)))
+
+    def _persist_analysis(self, result, created_at: str) -> str:
+        """Persist a deterministic result once and reject identifier reuse."""
+
+        analysis_id = str(result.analysis_id)
+        payload = result.model_dump_json()
+        existing = self.db.execute(
+            "SELECT result_json, created_at FROM analysis_runs WHERE analysis_id=?",
+            (analysis_id,),
+        ).fetchone()
+        if existing is not None:
+            if existing["result_json"] != payload:
+                raise ValueError("analysis_id_content_mismatch")
+            return existing["created_at"]
+        self.db.execute(
+            "INSERT INTO analysis_runs VALUES(?,?,?,?,?)",
+            (analysis_id, result.case_id, "completed", payload, created_at),
+        )
+        self._store_artifacts(result)
+        return created_at
 
     def get_import(self, import_id: str) -> dict:
         with self.repository.write_lock:
@@ -169,5 +233,5 @@ class BatchInvestigationService:
         self.get_case(case_id); events=[CanonicalEvent.model_validate_json(row[0]) for row in self.db.execute("SELECT canonical_json FROM canonical_events WHERE case_id=? ORDER BY COALESCE(observed_at,ingested_at),event_id",(case_id,)).fetchall()]
         result=self.analyzer.analyze(case_id=case_id,events=events); now=utcnow()
         with self.repository.write_lock, self.db:
-            self.db.execute("INSERT INTO analysis_runs VALUES(?,?,?,?,?)",(str(result.analysis_id),case_id,"completed",result.model_dump_json(),now)); self._store_artifacts(result)
-        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":now}
+            created_at = self._persist_analysis(result, now)
+        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at}

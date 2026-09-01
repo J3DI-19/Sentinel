@@ -5,9 +5,10 @@ import io
 import json
 from datetime import datetime, timezone
 from pathlib import PurePosixPath, PureWindowsPath
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 from uuid import uuid4
 
+from app.evidence.authorization import DEFAULT_VALIDATION_AUTHORITY, ValidationAuthority
 from app.evidence.hashing import sha256_bytes, sha256_record
 from app.evidence.profiles import DatasetProfile, get_profile
 from app.evidence.schemas import (
@@ -17,8 +18,10 @@ from app.evidence.schemas import (
     EvidenceValidationIssue,
     EvidenceValidationReport,
     IssueLevel,
+    LiveTelemetryInput,
     ValidationStatus,
     ValidatedBatchRecord,
+    ValidatedLiveTelemetry,
 )
 
 if TYPE_CHECKING:
@@ -34,12 +37,14 @@ class EvidenceValidationService:
         self,
         repository: SQLiteRepository | None = None,
         *,
+        validation_authority: ValidationAuthority | None = None,
         max_file_size_bytes: int = 50 * 1024 * 1024,
         max_issues: int = 100,
     ) -> None:
         if max_file_size_bytes <= 0 or max_issues <= 0:
             raise ValueError("validation limits must be positive")
         self.repository = repository
+        self.validation_authority = validation_authority or DEFAULT_VALIDATION_AUTHORITY
         self.max_file_size_bytes = max_file_size_bytes
         self.max_issues = max_issues
 
@@ -90,7 +95,12 @@ class EvidenceValidationService:
             issues.append(filename_issue)
         extension = PureWindowsPath(sanitized_filename).suffix.lower()
         if extension not in SUPPORTED_EXTENSIONS:
-            issues.append(self._issue("UNSUPPORTED_FILE_TYPE", "Only CSV and JSON evidence files are supported"))
+            issues.append(
+                self._issue(
+                    "UNSUPPORTED_FILE_TYPE",
+                    "Only CSV and JSON evidence files are supported",
+                )
+            )
         if not content:
             issues.append(self._issue("EMPTY_FILE", "Evidence file is empty"))
         if len(content) > self.max_file_size_bytes:
@@ -143,24 +153,40 @@ class EvidenceValidationService:
         )
         if self.repository is not None:
             self.repository.store_evidence_validation(report)
-        validated_records = [
-            ValidatedBatchRecord(
-                evidence_id=metadata.evidence_id,
-                source_type=metadata.source_type,
-                dataset_profile=metadata.dataset_profile,
-                validator_version=metadata.validator_version,
-                row_number=row_number,
-                record=records[row_number - 1],
-                raw_record_hash=sha256_record(records[row_number - 1]),
+        validated_records: list[ValidatedBatchRecord] = []
+        for row_number in accepted_row_numbers:
+            record = records[row_number - 1]
+            raw_record_hash = sha256_record(record)
+            validated_records.append(
+                ValidatedBatchRecord(
+                    evidence_id=metadata.evidence_id,
+                    source_type=metadata.source_type,
+                    dataset_profile=metadata.dataset_profile,
+                    validator_version=metadata.validator_version,
+                    row_number=row_number,
+                    record=record,
+                    raw_record_hash=raw_record_hash,
+                    validation_seal=self.validation_authority.seal(
+                        evidence_id=metadata.evidence_id,
+                        source_type=metadata.source_type,
+                        dataset_profile=metadata.dataset_profile,
+                        validator_version=metadata.validator_version,
+                        source_hash=metadata.sha256,
+                        row_number=row_number,
+                        raw_record_hash=raw_record_hash,
+                    ),
+                )
             )
-            for row_number in accepted_row_numbers
-        ]
         return EvidenceValidationOutcome(
             report=report,
             accepted_records=validated_records,
         )
 
-    def _parse(self, extension: str, content: bytes) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
+    def _parse(
+        self,
+        extension: str,
+        content: bytes,
+    ) -> tuple[list[dict[str, Any]], list[EvidenceValidationIssue]]:
         try:
             text = content.decode("utf-8-sig", errors="strict")
         except UnicodeDecodeError:
@@ -308,3 +334,19 @@ class EvidenceValidationService:
         if rejected or issues:
             return ValidationStatus.ACCEPTED_WITH_WARNINGS
         return ValidationStatus.ACCEPTED
+
+
+class LiveTelemetryAcceptanceService:
+    """Marks validated telemetry with a server-controlled UTC ingestion time."""
+
+    def __init__(self, clock: Callable[[], datetime] | None = None) -> None:
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
+
+    def accept(self, telemetry: LiveTelemetryInput) -> ValidatedLiveTelemetry:
+        ingested_at = self._clock()
+        if ingested_at.tzinfo is None or ingested_at.utcoffset() is None:
+            raise ValueError("the backend ingestion clock must return a timezone-aware value")
+        return ValidatedLiveTelemetry.model_construct(
+            telemetry=telemetry,
+            ingested_at=ingested_at.astimezone(timezone.utc),
+        )

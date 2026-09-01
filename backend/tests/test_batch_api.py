@@ -1,5 +1,7 @@
-from app.evidence.schemas import EvidenceSource
+from pathlib import Path
 from time import sleep
+
+from app.evidence.schemas import EvidenceSource
 
 
 def create_case(client):
@@ -47,6 +49,7 @@ def test_valid_import_is_persisted_and_queryable(client):
     assert evidence["total"] == 1
     assert events["total"] == 1
     assert events["items"][0]["provenance"]["source_type"] == "simulation"
+    assert events["items"][0]["ingested_at"] == job["validation"]["metadata"]["received_at"]
 
 
 def test_partial_import_requires_explicit_approval(client):
@@ -119,3 +122,109 @@ def test_pagination_is_bounded_and_errors_have_request_ids(client):
     missing = client.get("/api/v1/cases/99999")
     assert missing.status_code == 404
     assert missing.headers["x-request-id"] == missing.json()["request_id"]
+
+
+def test_public_upload_reports_malformed_and_oversized_evidence(small_upload_client):
+    case_id = create_case(small_upload_client)
+    malformed = upload(
+        small_upload_client,
+        case_id,
+        b"\xff\xfe\x00",
+        filename="malformed.csv",
+    ).json()
+    malformed_job = wait_for(
+        small_upload_client, malformed["import_id"], {"rejected"}
+    )
+    assert malformed_job["error"] is None
+    assert "INVALID_ENCODING" in {
+        issue["code"] for issue in malformed_job["validation"]["issues"]
+    }
+
+    oversized = upload(
+        small_upload_client,
+        case_id,
+        b"x" * 129,
+        filename="oversized.csv",
+    ).json()
+    oversized_job = wait_for(
+        small_upload_client, oversized["import_id"], {"rejected"}
+    )
+    assert "FILE_TOO_LARGE" in {
+        issue["code"] for issue in oversized_job["validation"]["issues"]
+    }
+
+
+def test_commit_rejects_evidence_changed_after_validation(client):
+    case_id = create_case(client)
+    uploaded = upload(
+        client,
+        case_id,
+        b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-1,motion\n",
+    ).json()
+    job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
+    stored_job = client.app.state.batch_service.get_import(job["import_id"])
+    Path(stored_job["file_path"]).write_bytes(
+        b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-9,command\n"
+    )
+
+    response = client.post(
+        f"/api/v1/imports/{job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    assert response.status_code == 202
+    failed = wait_for(client, job["import_id"], {"failed"})
+    assert failed["error"]["code"] == "evidence_content_hash_mismatch"
+    assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 0
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 0
+
+
+def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
+    case_id = create_case(client)
+    uploaded = upload(
+        client,
+        case_id,
+        b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-1,motion\n",
+    ).json()
+    job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
+    client.post(
+        f"/api/v1/imports/{job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    wait_for(client, job["import_id"], {"completed"})
+
+    evidence = client.get(f"/api/v1/cases/{case_id}/evidence").json()["items"][0]
+    event = client.get(f"/api/v1/cases/{case_id}/events").json()["items"][0]
+    assert client.get(
+        f"/api/v1/cases/{case_id}/evidence/{evidence['evidence_id']}"
+    ).status_code == 200
+    assert client.get(
+        f"/api/v1/cases/{case_id}/events/{event['event_id']}"
+    ).status_code == 200
+
+    history = client.get(f"/api/v1/cases/{case_id}/analyses").json()
+    assert history["total"] == 1
+    analysis_id = history["items"][0]["analysis_id"]
+    latest = client.get(f"/api/v1/cases/{case_id}/analyses/latest")
+    historical = client.get(
+        f"/api/v1/cases/{case_id}/analyses/{analysis_id}"
+    )
+    charts = client.get(
+        f"/api/v1/cases/{case_id}/charts", params={"analysis_id": analysis_id}
+    )
+    assert latest.status_code == historical.status_code == charts.status_code == 200
+    assert latest.json()["analysis_id"] == historical.json()["analysis_id"] == analysis_id
+
+    first = client.post(f"/api/v1/cases/{case_id}/analyses").json()
+    second = client.post(f"/api/v1/cases/{case_id}/analyses").json()
+    assert first["analysis_id"] == second["analysis_id"] == analysis_id
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
+
+
+def test_custom_analysis_configuration_is_explicitly_rejected(client):
+    case_id = create_case(client)
+    response = client.post(
+        f"/api/v1/cases/{case_id}/analyses",
+        json={"authentication_failure_threshold": 3},
+    )
+    assert response.status_code == 422
+    assert response.json()["code"] == "request_validation_error"

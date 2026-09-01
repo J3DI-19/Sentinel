@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import ValidationError
 
+from app.evidence.authorization import DEFAULT_VALIDATION_AUTHORITY, ValidationAuthority
 from app.evidence.hashing import sha256_record
 from app.evidence.schemas import (
     EvidenceMetadata,
@@ -13,6 +14,7 @@ from app.evidence.schemas import (
 )
 from app.normalization.adapters import (
     AdapterRejection,
+    CasasSmartHomeAdapter,
     CanonicalAdapter,
     CicIot2023NetworkAdapter,
     GenericAdapter,
@@ -21,6 +23,7 @@ from app.normalization.adapters import (
     SimulationAdapter,
     TonIotNetworkAdapter,
     CasasAdapter,
+    TonIotFridgeTelemetryAdapter,
     TonIotTelemetryAdapter,
 )
 from app.normalization.schemas import (
@@ -36,7 +39,9 @@ from app.normalization.helpers import AmbiguousRecordFields
 
 _BATCH_SOURCE_MAP = {
     EvidenceSource.CASAS: CanonicalSourceType.CASAS,
+    EvidenceSource.CASAS_SMART_HOME: CanonicalSourceType.CASAS_SMART_HOME,
     EvidenceSource.TON_IOT_TELEMETRY: CanonicalSourceType.TON_IOT_TELEMETRY,
+    EvidenceSource.TON_IOT_FRIDGE_TELEMETRY: CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
     EvidenceSource.SIMULATED: CanonicalSourceType.SIMULATED,
     EvidenceSource.SIMULATION: CanonicalSourceType.SIMULATION,
     EvidenceSource.TON_IOT_NETWORK: CanonicalSourceType.TON_IOT_NETWORK,
@@ -46,10 +51,12 @@ _BATCH_SOURCE_MAP = {
 
 
 class NormalizationService:
-    def __init__(self) -> None:
+    def __init__(self, validation_authority: ValidationAuthority | None = None) -> None:
         adapters: list[CanonicalAdapter] = [
             CasasAdapter(),
+            CasasSmartHomeAdapter(),
             TonIotTelemetryAdapter(),
+            TonIotFridgeTelemetryAdapter(),
             SimulatedAdapter(),
             SimulationAdapter(),
             TonIotNetworkAdapter(),
@@ -58,6 +65,7 @@ class NormalizationService:
             LiveTelemetryAdapter(),
         ]
         self.adapters = {adapter.source_type: adapter for adapter in adapters}
+        self.validation_authority = validation_authority or DEFAULT_VALIDATION_AUTHORITY
 
     def normalize_batch_record(
         self,
@@ -91,6 +99,22 @@ class NormalizationService:
                 "VALIDATED_RECORD_HASH_MISMATCH",
                 "The validated row changed after Step 3 accepted it",
                 "raw_record_hash",
+            )
+        if not self.validation_authority.verify(
+            validation_seal=validated_record.validation_seal,
+            evidence_id=validated_record.evidence_id,
+            source_type=validated_record.source_type,
+            dataset_profile=validated_record.dataset_profile,
+            validator_version=validated_record.validator_version,
+            source_hash=metadata.sha256,
+            row_number=validated_record.row_number,
+            raw_record_hash=validated_record.raw_record_hash,
+        ):
+            return self._rejected(
+                source_reference,
+                "VALIDATION_SEAL_INVALID",
+                "The validated row was not authorized by this Step 3 validation boundary",
+                "validation_seal",
             )
         source_type = _BATCH_SOURCE_MAP[metadata.source_type]
         try:

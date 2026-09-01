@@ -29,7 +29,7 @@ Live IoT Events ----/
 
 The platform is organized into these layers:
 
-1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. CASAS smart-home telemetry and TON_IoT device telemetry are the selected primary public datasets; their dedicated adapters remain planned. Existing TON_IoT network and CICIoT2023 adapters are retained as secondary compatibility paths rather than primary evaluation sources.
+1. **Batch Evidence and Adapter Layer** — registers cases, hashes and validates uploaded evidence, and adapts controlled simulation records. Versioned CASAS smart-home and TON_IoT device-telemetry adapters support the primary public datasets; TON_IoT network and CICIoT2023 adapters remain secondary compatibility paths.
 2. **Live IoT Collection Layer** — receives token-authenticated HTTP telemetry, persists receipts and malformed-input issues, normalizes accepted records, and publishes replayable SSE updates. MQTT remains a future transport adapter.
 3. **Canonical Event and Normalization Layer** — maps accepted batch and live inputs into one versioned event model with retained provenance.
 4. **Detection and Risk Engine** — applies deterministic rules, behavioural baselines, and bounded factorized scores.
@@ -88,6 +88,7 @@ Exact hardware and communication protocols remain implementation decisions.
 - [Full project synopsis (DOCX)](docs/synopsis/Traceveil_Full_Synopsis.docx)
 - [Full project synopsis (PDF)](docs/synopsis/Traceveil_Full_Synopsis.pdf)
 - [Implementation roadmap](docs/roadmap.md)
+- [Investigation API contract](docs/contracts/investigation-api.md)
 
 ## Team
 
@@ -102,7 +103,7 @@ Phase 3 software is implemented: connected batch investigation views, authentica
 
 The repository contains the React/Vite connected investigation interface, versioned FastAPI APIs, SQLite persistence and recovery, CASAS and TON_IoT telemetry adapters, the canonical normalization pipeline, deterministic analysis, and generated OpenAPI TypeScript DTOs. Production routes query persisted records; mock adapters remain explicit test/demo configuration only.
 
-Batch and live sources now converge into immutable evidence and canonical events before deterministic rules, risk scoring, correlation, incidents, timelines, graphs, and aggregates. Ollama narration is optional and citation-validated; reports and email delivery use separate content-hash approvals. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), and [roadmap](docs/roadmap.md).
+Batch and live sources now converge into immutable evidence and canonical events before deterministic rules, risk scoring, correlation, incidents, timelines, graphs, and aggregates. Ollama narration is optional and citation-validated; reports and email delivery use separate content-hash approvals. See the [validation contract](docs/contracts/evidence-validation.md), [canonical event contract](docs/contracts/canonical-event.md), [deterministic analysis contract](docs/contracts/deterministic-analysis.md), [investigation API contract](docs/contracts/investigation-api.md), and [roadmap](docs/roadmap.md).
 
 The next expansion points are optional physical hardware, MQTT behind the collector interface, multi-user authentication/authorization, and external job/storage infrastructure if the local single-user architecture is outgrown.
 

@@ -34,10 +34,22 @@ def test_step_one_database_is_migrated_without_losing_existing_metadata(tmp_path
         row["name"]
         for row in repository.connection.execute("PRAGMA table_info(evidence_metadata)")
     }
+    case_columns = {
+        row["name"]
+        for row in repository.connection.execute("PRAGMA table_info(cases)")
+    }
+    tables = {
+        row["name"]
+        for row in repository.connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        )
+    }
     existing = repository.connection.execute(
         "SELECT source_name, source_hash FROM evidence_metadata"
     ).fetchone()
     assert {"evidence_id", "validator_version", "validation_status"} <= columns
+    assert {"description", "status"} <= case_columns
+    assert {"canonical_events", "analysis_runs"} <= tables
     assert dict(existing) == {
         "source_name": "existing.csv",
         "source_hash": "existing-hash",

@@ -5,7 +5,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, File, Form, Query, Request, UploadFile
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.evidence.schemas import EvidenceSource
 
@@ -14,6 +14,8 @@ router=APIRouter(tags=["batch-investigation"])
 class CaseCreate(BaseModel):
     name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",max_length=120)
 class CommitRequest(BaseModel): allow_partial:bool=False
+class ReanalysisRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 class CasePublic(BaseModel):
     id:int; name:str; description:str; case_type:str; status:str; owner:str; created_at:str; updated_at:str|None=None
 class PageResponse(BaseModel):
@@ -66,7 +68,7 @@ def cancel(import_id:UUID,request:Request) -> ImportPublic: return public_import
 
 @router.get("/cases/{case_id}/evidence")
 def evidence(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100),source:EvidenceSource|None=None) -> PageResponse:
-    db=service(request).db; where="case_id=?"; values:list[Any]=[case_id]
+    service(request).get_case(case_id); db=service(request).db; where="case_id=?"; values:list[Any]=[case_id]
     if source: where += " AND source_type=?"; values.append(source.value)
     total=db.execute(f"SELECT COUNT(*) FROM evidence_metadata WHERE {where}",values).fetchone()[0]
     rows=[dict(r) for r in db.execute(f"SELECT * FROM evidence_metadata WHERE {where} ORDER BY received_at DESC,id DESC LIMIT ? OFFSET ?",(*values,page_size,(page_number-1)*page_size)).fetchall()]
@@ -77,9 +79,16 @@ def evidence_detail(evidence_id:UUID,request:Request):
     if not row: raise KeyError("evidence_not_found")
     result=dict(row); result["issues"]=[dict(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
 
+@router.get("/cases/{case_id}/evidence/{evidence_id}")
+def case_evidence_detail(case_id:int,evidence_id:UUID,request:Request):
+    service(request).get_case(case_id); db=service(request).db
+    row=db.execute("SELECT * FROM evidence_metadata WHERE case_id=? AND evidence_id=?",(case_id,str(evidence_id))).fetchone()
+    if not row: raise KeyError("evidence_not_found")
+    result=dict(row); result["issues"]=[dict(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
+
 @router.get("/cases/{case_id}/events")
 def events(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(50,ge=1,le=200),origin:str|None=None,event_type:str|None=None,entity:str|None=None,source:EvidenceSource|None=None,start_time:str|None=None,end_time:str|None=None) -> PageResponse:
-    db=service(request).db; where=["case_id=?"]; values:list[Any]=[case_id]
+    service(request).get_case(case_id); db=service(request).db; where=["case_id=?"]; values:list[Any]=[case_id]
     if origin: where.append("origin=?"); values.append(origin)
     if event_type: where.append("event_type=?"); values.append(event_type)
     if entity: where.append("entity_id=?"); values.append(entity)
@@ -95,8 +104,16 @@ def event(event_id:UUID,request:Request):
     if not row: raise KeyError("event_not_found")
     return {**json.loads(row[0]),"raw_record":json.loads(row[1])}
 
-def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int,severity:str|None=None,start_time:str|None=None,end_time:str|None=None):
-    db=service(request).db; latest=db.execute("SELECT analysis_id FROM analysis_runs WHERE case_id=? ORDER BY created_at DESC LIMIT 1",(case_id,)).fetchone()
+@router.get("/cases/{case_id}/events/{event_id}")
+def case_event(case_id:int,event_id:UUID,request:Request):
+    service(request).get_case(case_id)
+    row=service(request).db.execute("SELECT canonical_json,raw_record_json FROM canonical_events WHERE case_id=? AND event_id=?",(case_id,str(event_id))).fetchone()
+    if not row: raise KeyError("event_not_found")
+    return {**json.loads(row[0]),"raw_record":json.loads(row[1])}
+
+def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int,severity:str|None=None,start_time:str|None=None,end_time:str|None=None,analysis_id:UUID|None=None):
+    service(request).get_case(case_id); db=service(request).db
+    latest=(db.execute("SELECT analysis_id FROM analysis_runs WHERE case_id=? AND analysis_id=?",(case_id,str(analysis_id))).fetchone() if analysis_id else db.execute("SELECT analysis_id FROM analysis_runs WHERE case_id=? ORDER BY created_at DESC LIMIT 1",(case_id,)).fetchone())
     if not latest:return page([],0,page_number,page_size)
     where=["analysis_id=?","kind=?"]; values:list[Any]=[latest[0],kind]
     if severity: where.append("severity=?"); values.append(severity)
@@ -107,7 +124,27 @@ def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int
     return page([json.loads(r[0]) for r in rows],total,page_number,page_size)
 
 @router.post("/cases/{case_id}/analyses",status_code=202)
-def reanalyze(case_id:int,request:Request): return service(request).reanalyze(case_id)
+def reanalyze(case_id:int,request:Request,body:ReanalysisRequest|None=None):
+    return service(request).reanalyze(case_id)
+
+@router.get("/cases/{case_id}/analyses")
+def analyses(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100)) -> PageResponse:
+    service(request).get_case(case_id); db=service(request).db
+    total=db.execute("SELECT COUNT(*) FROM analysis_runs WHERE case_id=?",(case_id,)).fetchone()[0]
+    rows=[dict(r) for r in db.execute("SELECT analysis_id,case_id,status,created_at FROM analysis_runs WHERE case_id=? ORDER BY created_at DESC,analysis_id DESC LIMIT ? OFFSET ?",(case_id,page_size,(page_number-1)*page_size)).fetchall()]
+    return page(rows,total,page_number,page_size)
+
+@router.get("/cases/{case_id}/analyses/latest")
+def latest_analysis(case_id:int,request:Request):
+    service(request).get_case(case_id); row=service(request).db.execute("SELECT result_json FROM analysis_runs WHERE case_id=? ORDER BY created_at DESC,analysis_id DESC LIMIT 1",(case_id,)).fetchone()
+    if not row: raise KeyError("analysis_not_found")
+    return json.loads(row[0])
+
+@router.get("/cases/{case_id}/analyses/{analysis_id}")
+def case_analysis(case_id:int,analysis_id:UUID,request:Request):
+    service(request).get_case(case_id); row=service(request).db.execute("SELECT result_json FROM analysis_runs WHERE case_id=? AND analysis_id=?",(case_id,str(analysis_id))).fetchone()
+    if not row: raise KeyError("analysis_not_found")
+    return json.loads(row[0])
 @router.get("/analyses/{analysis_id}")
 def analysis(analysis_id:UUID,request:Request):
     row=service(request).db.execute("SELECT result_json FROM analysis_runs WHERE analysis_id=?",(str(analysis_id),)).fetchone()
@@ -115,19 +152,21 @@ def analysis(analysis_id:UUID,request:Request):
     return json.loads(row[0])
 
 def artifact_endpoint(kind: str):
-    def endpoint(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(50,ge=1,le=200),severity:str|None=None,start_time:str|None=None,end_time:str|None=None):
-        return artifacts(case_id,kind,request,page_number,page_size,severity,start_time,end_time)
+    def endpoint(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(50,ge=1,le=200),severity:str|None=None,start_time:str|None=None,end_time:str|None=None,analysis_id:UUID|None=None):
+        return artifacts(case_id,kind,request,page_number,page_size,severity,start_time,end_time,analysis_id)
     return endpoint
 
 for path,kind in [("findings","finding"),("alerts","alert"),("incidents","incident"),("timeline","timeline")]:
     router.add_api_route(f"/cases/{{case_id}}/{path}",artifact_endpoint(kind),methods=["GET"],name=f"list_{path}")
 
 @router.get("/cases/{case_id}/graph")
-def graph(case_id:int,request:Request,node_limit:int=Query(500,ge=1,le=1000),edge_limit:int=Query(1000,ge=1,le=2000)):
-    nodes=artifacts(case_id,"graph_node",request,1,node_limit); edges=artifacts(case_id,"graph_edge",request,1,edge_limit)
+def graph(case_id:int,request:Request,node_limit:int=Query(500,ge=1,le=1000),edge_limit:int=Query(1000,ge=1,le=2000),analysis_id:UUID|None=None):
+    nodes=artifacts(case_id,"graph_node",request,1,node_limit,analysis_id=analysis_id); edges=artifacts(case_id,"graph_edge",request,1,edge_limit,analysis_id=analysis_id)
     return {"nodes":nodes["items"],"edges":edges["items"],"truncated":nodes["total"]>node_limit or edges["total"]>edge_limit}
 @router.get("/cases/{case_id}/aggregates")
-def aggregates(case_id:int,request:Request): return artifacts(case_id,"aggregate",request,1,200)
+def aggregates(case_id:int,request:Request,analysis_id:UUID|None=None): return artifacts(case_id,"aggregate",request,1,200,analysis_id=analysis_id)
+@router.get("/cases/{case_id}/charts")
+def charts(case_id:int,request:Request,analysis_id:UUID|None=None): return artifacts(case_id,"aggregate",request,1,200,analysis_id=analysis_id)
 @router.get("/dashboard/summary")
 def dashboard(request:Request):
     db=service(request).db

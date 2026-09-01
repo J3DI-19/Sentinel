@@ -39,7 +39,7 @@ def score_candidates(
             _round_half_up(
                 Decimal(candidate.repetition_count)
                 * Decimal(100)
-                / Decimal(max(1, candidate.repetition_threshold))
+                / Decimal(candidate.repetition_reference)
             ),
         )
         criticality = config.critical_device_scores.get(
@@ -65,7 +65,7 @@ def score_candidates(
                 "repetition",
                 repetition,
                 config.risk_weights.repetition,
-                f"{candidate.repetition_count} occurrence(s) against threshold {candidate.repetition_threshold}",
+                f"{candidate.repetition_count} occurrence(s) against configured reference {candidate.repetition_reference}",
             ),
             (
                 "device_criticality",

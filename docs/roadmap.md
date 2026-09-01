@@ -56,12 +56,15 @@ backend evidence ingestion and analytical integration begin in Step 3.
 - [x] Reject malformed live telemetry
 - [x] Record live ingestion timestamps
 - [x] Preserve source/device provenance for live evidence
+- [x] Validate the pinned CASAS Milan CSV projection
+- [x] Validate the pinned TON_IoT fridge telemetry subset
+- [x] Require pytest to terminate cleanly in CI
 
 ## 4. Canonical Event Model and Normalization
 - [x] Create the common canonical event schema
 - [x] Map simulated data
-- [ ] Map CASAS smart-home telemetry data
-- [ ] Map TON_IoT smart-device telemetry data
+- [x] Map CASAS Milan smart-home sensor data
+- [x] Map TON_IoT fridge device telemetry
 - [x] Retain TON_IoT network data as a secondary compatibility adapter
 - [x] Retain CICIoT2023 network data as a secondary compatibility adapter
 - [x] Standardize timestamps
@@ -74,12 +77,10 @@ backend evidence ingestion and analytical integration begin in Step 3.
 **Convergence point:** Uploaded/batch evidence and accepted live telemetry both
 become canonical events and enter the same deterministic investigation pipeline.
 
-**Selected evaluation sources:** CASAS smart-home telemetry, TON_IoT
-smart-device telemetry, and controlled simulation are the primary batch sources.
-The existing TON_IoT network and CICIoT2023 adapters remain useful compatibility
-paths, but CICIoT2023 is not a primary smart-home evaluation dataset. Step 4 is
-not complete for the selected scope until the CASAS and TON_IoT telemetry
-profiles and adapters are implemented and verified against pinned releases.
+**Selected evaluation sources:** CASAS smart-home telemetry and TON_IoT device
+telemetry are the primary public datasets, supplemented by controlled simulation.
+The existing TON_IoT network and CICIoT2023 adapters remain secondary
+compatibility paths.
 
 ## 5. Live IoT Integration
 - [ ] Select the Arduino-compatible microcontroller
@@ -131,19 +132,27 @@ real-time delivery, and persistence of derived artifacts remain later steps.
 - [ ] Ensure real-time delivery does not alter forensic calculations
 
 ## 8. Dashboard Results and Investigation APIs
-- [ ] Create APIs for cases
-- [ ] Create APIs for events
-- [ ] Create APIs for alerts
-- [ ] Create APIs for incidents
-- [ ] Create APIs for timelines
-- [ ] Create APIs for graphs and chart data
-- [ ] Connect real analytical results to the dashboard
-- [ ] Show risk breakdowns
-- [ ] Show supporting evidence
-- [ ] Show provenance/source references
-- [ ] Add refresh controls
-- [ ] Add reanalysis controls
-- [ ] Allow historical review of previously captured live incidents
+- [x] Create APIs for cases
+- [x] Create APIs for evidence validation and retrieval
+- [x] Create APIs for events
+- [x] Create APIs for alerts
+- [x] Create APIs for incidents
+- [x] Create APIs for timelines
+- [x] Create APIs for graphs and chart data
+- [x] Connect real analytical results to the dashboard
+- [x] Expose risk breakdowns through investigation APIs
+- [x] Expose supporting evidence identifiers through investigation APIs
+- [x] Expose provenance/source references through event APIs
+- [x] Add refresh controls
+- [x] Add reanalysis controls
+- [x] Allow historical review of persisted analysis snapshots and live incidents
+
+**Current result:** Step 8 is complete. Case-scoped endpoints
+ingest and retrieve evidence, persist and filter canonical events, execute the
+deterministic analysis engine, and return findings, alerts, incidents, timelines,
+graphs, charts, provenance, risk factors, and historical analysis snapshots.
+The React investigation views consume these persisted APIs through generated
+OpenAPI types; mock adapters remain explicit test/demo configuration only.
 
 ## 9. Visualization Engine + Qwen
 - [ ] Create allowed visualization components

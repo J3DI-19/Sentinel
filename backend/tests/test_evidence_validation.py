@@ -179,6 +179,11 @@ def test_rejects_short_csv_rows_nonstandard_json_numbers_and_infinity():
     ("fixture_name", "source_type"),
     [
         ("simulated_valid.csv", EvidenceSource.SIMULATED),
+        ("casas_milan_valid.csv", EvidenceSource.CASAS_SMART_HOME),
+        (
+            "ton_iot_fridge_telemetry_valid.csv",
+            EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
+        ),
         ("ton_iot_network_valid.csv", EvidenceSource.TON_IOT_NETWORK),
         ("ciciot2023_network_valid.csv", EvidenceSource.CICIOT2023_NETWORK),
     ],
@@ -194,6 +199,63 @@ def test_versioned_profile_contract_fixtures(fixture_name, source_type):
 
     assert report.status == ValidationStatus.ACCEPTED
     assert report.total_records == 1
+
+
+def test_casas_csv_profile_preserves_activity_and_rejects_invalid_rows():
+    content = (
+        b"timestamp,sensor_id,sensor_message,activity\n"
+        b"2009-10-16T21:06:34.000010,D003,OPEN,Cook begin\n"
+        b"not-a-time,M017,OFF,\n"
+        b"2009-10-16T21:07:00.000010,,ON,\n"
+    )
+
+    outcome = EvidenceValidationService().validate_with_records(
+        filename="milan.csv",
+        content=content,
+        source_type=EvidenceSource.CASAS_SMART_HOME,
+        case_id=1,
+    )
+
+    assert outcome.report.status == ValidationStatus.ACCEPTED_WITH_WARNINGS
+    assert outcome.report.total_records == 3
+    assert outcome.report.accepted_records == 1
+    assert outcome.report.rejected_records == 2
+    assert outcome.accepted_records[0].record["activity"] == "Cook begin"
+    assert {"INVALID_TIMESTAMP", "MISSING_SENSOR_ID"} <= issue_codes(outcome.report)
+
+
+def test_ton_iot_fridge_profile_rejects_bad_time_label_and_missing_state():
+    content = (
+        b"date,time,fridge_temperature,temp_condition,label,type\n"
+        b"31-Mar-19,not-time,13.1,low,0,normal\n"
+        b"31-Mar-19,12:36:52,13.1,,2,backdoor\n"
+    )
+
+    report = EvidenceValidationService().validate(
+        filename="Train_Test_IoT_Fridge.csv",
+        content=content,
+        source_type=EvidenceSource.TON_IOT_FRIDGE_TELEMETRY,
+    )
+
+    assert report.status == ValidationStatus.REJECTED
+    assert report.rejected_records == 2
+    assert {"INVALID_TIME", "MISSING_DEVICE_STATE", "INVALID_BINARY_LABEL"} <= issue_codes(
+        report
+    )
+
+
+@pytest.mark.parametrize(
+    "source_type", [EvidenceSource.GENERIC, EvidenceSource.CASAS_SMART_HOME]
+)
+def test_txt_is_rejected_for_all_profiles(source_type):
+    report = EvidenceValidationService().validate(
+        filename="arbitrary.txt",
+        content=b"untrusted text",
+        source_type=source_type,
+    )
+
+    assert report.status == ValidationStatus.REJECTED
+    assert "UNSUPPORTED_FILE_TYPE" in issue_codes(report)
 
 
 def test_persists_metadata_issues_and_flags_same_case_duplicate(tmp_path):
