@@ -78,6 +78,11 @@ is rejected instead of overwriting forensic history.
 Batch findings never become live alerts. Alerts require a qualifying finding
 triggered by canonical events whose provenance origin is `live`.
 
+Step 8 acceptance covers persisted batch records and controlled, already-persisted
+live-shaped fixtures used to verify these contracts. It does not claim physical
+device ingestion or real-time frontend delivery. End-to-end genuine live incident
+history remains deferred until Steps 5 and 7 are complete.
+
 Errors use a stable body containing `code`, `message`, `retryable`,
 `request_id`, and optional `details`. Request IDs are also returned in the
 `X-Request-ID` header.

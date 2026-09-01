@@ -232,6 +232,7 @@ class BatchInvestigationService:
     def reanalyze(self, case_id: int) -> dict:
         self.get_case(case_id); events=[CanonicalEvent.model_validate_json(row[0]) for row in self.db.execute("SELECT canonical_json FROM canonical_events WHERE case_id=? ORDER BY COALESCE(observed_at,ingested_at),event_id",(case_id,)).fetchall()]
         result=self.analyzer.analyze(case_id=case_id,events=events); now=utcnow()
+        existing=self.db.execute("SELECT 1 FROM analysis_runs WHERE analysis_id=?",(str(result.analysis_id),)).fetchone() is not None
         with self.repository.write_lock, self.db:
             created_at = self._persist_analysis(result, now)
-        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at}
+        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at,"reused_existing":existing}

@@ -107,6 +107,16 @@ def test_controlled_live_authentication_sequence_creates_persisted_alert(client)
             break
         sleep(0.01)
     assert any(item["rule_id"] == "AUTH-001" for item in alerts)
+    history = client.get(f"/api/v1/cases/{cid}/analyses").json()
+    assert history["total"] >= 1
+    analysis_id = history["items"][0]["analysis_id"]
+    persisted_alerts = client.get(
+        f"/api/v1/cases/{cid}/alerts", params={"analysis_id": analysis_id}
+    ).json()
+    assert any(item["rule_id"] == "AUTH-001" for item in persisted_alerts["items"])
+    assert client.get(
+        f"/api/v1/cases/{cid}/timeline", params={"analysis_id": analysis_id}
+    ).json()["total"] >= 1
 
 
 def test_assistant_offline_is_retryable_and_does_not_affect_core(client):

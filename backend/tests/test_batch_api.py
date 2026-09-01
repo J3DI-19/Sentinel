@@ -180,10 +180,18 @@ def test_commit_rejects_evidence_changed_after_validation(client):
 
 def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
     case_id = create_case(client)
+    authentication_rows = "".join(
+        f"2026-01-01T00:00:{second:02d}Z,camera-1,authentication_failure,185.77.12.44,authenticate,denied\n"
+        for second in range(10)
+    )
     uploaded = upload(
         client,
         case_id,
-        b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-1,motion\n",
+        (
+            "timestamp,device_id,event_type,source_ip,action,outcome\n"
+            + authentication_rows
+        ).encode(),
+        filename="authentication.csv",
     ).json()
     job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
     client.post(
@@ -194,6 +202,9 @@ def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
 
     evidence = client.get(f"/api/v1/cases/{case_id}/evidence").json()["items"][0]
     event = client.get(f"/api/v1/cases/{case_id}/events").json()["items"][0]
+    assert event["provenance"]["evidence_id"] == job["evidence_id"]
+    assert event["provenance"]["source_record_reference"]
+    assert event["provenance"]["raw_record_hash"]
     assert client.get(
         f"/api/v1/cases/{case_id}/evidence/{evidence['evidence_id']}"
     ).status_code == 200
@@ -201,23 +212,69 @@ def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
         f"/api/v1/cases/{case_id}/events/{event['event_id']}"
     ).status_code == 200
 
+    first_history = client.get(f"/api/v1/cases/{case_id}/analyses").json()
+    assert first_history["total"] == 1
+    analysis_id = first_history["items"][0]["analysis_id"]
+    assert first_history["items"][0]["is_latest"] is True
+    assert len(first_history["items"][0]["input_fingerprint"]) == 64
+    assert first_history["items"][0]["input_event_count"] == 10
+    assert first_history["items"][0]["finding_count"] >= 1
+    assert first_history["items"][0]["incident_count"] >= 1
+
+    newer_upload = upload(
+        client,
+        case_id,
+        b"timestamp,device_id,event_type\n2026-01-01T00:01:00Z,sensor-2,motion\n",
+        filename="newer.csv",
+    ).json()
+    newer_job = wait_for(client, newer_upload["import_id"], {"awaiting_commit"})
+    client.post(
+        f"/api/v1/imports/{newer_job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    wait_for(client, newer_job["import_id"], {"completed"})
+
     history = client.get(f"/api/v1/cases/{case_id}/analyses").json()
-    assert history["total"] == 1
-    analysis_id = history["items"][0]["analysis_id"]
+    assert history["total"] == 2
+    latest_analysis_id = history["items"][0]["analysis_id"]
+    assert latest_analysis_id != analysis_id
+    assert history["items"][0]["is_latest"] is True
+    assert history["items"][1]["is_latest"] is False
     latest = client.get(f"/api/v1/cases/{case_id}/analyses/latest")
     historical = client.get(
         f"/api/v1/cases/{case_id}/analyses/{analysis_id}"
     )
-    charts = client.get(
-        f"/api/v1/cases/{case_id}/charts", params={"analysis_id": analysis_id}
+    assert latest.status_code == historical.status_code == 200
+    assert latest.json()["analysis_id"] == latest_analysis_id
+    assert historical.json()["analysis_id"] == analysis_id
+    historical_result = historical.json()
+    assert historical_result["incidents"]
+    finding = historical_result["findings"][0]
+    assert len(finding["risk"]["factors"]) == 5
+    assert finding["evidence_ids"] == [job["evidence_id"]]
+    assert finding["event_ids"]
+    assert historical_result["timeline"]
+    assert historical_result["graph"]["nodes"]
+    assert historical_result["chart_points"]
+
+    for resource in ("findings", "alerts", "incidents", "timeline", "aggregates", "charts"):
+        selected = client.get(
+            f"/api/v1/cases/{case_id}/{resource}", params={"analysis_id": analysis_id}
+        )
+        assert selected.status_code == 200
+    selected_graph = client.get(
+        f"/api/v1/cases/{case_id}/graph", params={"analysis_id": analysis_id}
     )
-    assert latest.status_code == historical.status_code == charts.status_code == 200
-    assert latest.json()["analysis_id"] == historical.json()["analysis_id"] == analysis_id
+    assert selected_graph.status_code == 200
+    assert client.get(
+        f"/api/v1/cases/{case_id}/incidents", params={"analysis_id": analysis_id}
+    ).json()["total"] >= 1
 
     first = client.post(f"/api/v1/cases/{case_id}/analyses").json()
     second = client.post(f"/api/v1/cases/{case_id}/analyses").json()
-    assert first["analysis_id"] == second["analysis_id"] == analysis_id
-    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
+    assert first["analysis_id"] == second["analysis_id"] == latest_analysis_id
+    assert first["reused_existing"] is second["reused_existing"] is True
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 2
 
 
 def test_custom_analysis_configuration_is_explicitly_rejected(client):

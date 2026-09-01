@@ -13,7 +13,7 @@ export function Router() {
   if(route.path==="/") page=<ConnectedOverviewPage navigate={route.navigate}/>;
   else if(route.path==="/assistant") page=<ConnectedAssistantPage search={route.search}/>;
   else if(route.path==="/cases") page=<ConnectedCasesPage navigate={route.navigate}/>;
-  else if(/^\/cases\/\d+(?:\/|$)/.test(route.path)) page=<ConnectedCaseWorkspaceV3Page path={route.path} navigate={route.navigate}/>;
+  else if(/^\/cases\/\d+(?:\/|$)/.test(route.path)) page=<ConnectedCaseWorkspaceV3Page path={route.path} search={route.search} navigate={route.navigate}/>;
   else if(route.path.startsWith("/cases/")) page=<div className="state-box" role="alert"><strong>Legacy demonstration case unavailable</strong><p>Production routes only display persisted numeric case IDs. Select a connected case from the register.</p><button onClick={()=>route.navigate("/cases")}>Open cases</button></div>;
   else if(route.path==="/live") page=<ConnectedLiveOperationsPage navigate={route.navigate} search={route.search}/>;
   else if(route.path==="/import") page=<ImportEvidencePage/>;
