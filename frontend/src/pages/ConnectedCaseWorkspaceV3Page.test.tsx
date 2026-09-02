@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectedCaseWorkspaceV3Page } from "./ConnectedCaseWorkspaceV3Page";
 
 const summary = (analysisId: string | null) => ({ case: { id: 7, name: "Case Seven" }, event_count: 2, entity_count: 1, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: analysisId });
 const page = (items: Record<string, unknown>[]) => ({ items, page: 1, page_size: 50, total: items.length });
+const jsonResponse = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 function respond(routes: Record<string, unknown>) {
   vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
     const path = new URL(String(input), "http://traceveil.test").pathname;
@@ -83,5 +84,118 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search="?analysis=invalid" navigate={vi.fn()}/>);
     expect(await screen.findByText("Selected analysis unavailable")).toBeInTheDocument();
     expect(screen.getByText(/selected analysis ID is malformed/i)).toBeInTheDocument();
+  });
+  it("refreshes the exact filtered page and selected snapshot", async () => {
+    const analysisId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"; const requests: string[] = [];
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary(analysisId)));
+      if (url.pathname.endsWith(`/cases/7/analyses/${analysisId}`)) return Promise.resolve(jsonResponse({ analysis_id: analysisId, case_id: 7 }));
+      if (url.pathname.endsWith("/cases/7/findings")) { requests.push(url.toString()); return Promise.resolve(jsonResponse({ items: [{ finding_id: "finding-1", title: "Filtered finding", severity: "high" }], page: Number(url.searchParams.get("page")), page_size: 50, total: 51 })); }
+      return Promise.resolve(jsonResponse({ code: "not_found", message: "Not found", retryable: false }, 404));
+    }));
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search={`?analysis=${analysisId}`} navigate={vi.fn()}/>);
+    expect(await screen.findByText("Filtered finding")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Filter findings"), { target: { value: "high" } });
+    await waitFor(() => expect(requests.at(-1)).toContain("severity=high"));
+    fireEvent.click(await screen.findByRole("button", { name: "Next" }));
+    await waitFor(() => expect(requests.at(-1)).toContain("page=2"));
+    const beforeRefresh = requests.length;
+    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    await waitFor(() => expect(requests.length).toBeGreaterThan(beforeRefresh));
+    expect(requests.at(-1)).toContain("page=2");
+    expect(requests.at(-1)).toContain("severity=high");
+    expect(requests.at(-1)).toContain(`analysis_id=${analysisId}`);
+    expect(screen.getByLabelText("Filter findings")).toHaveValue("high");
+  });
+
+  it("keeps existing results visible when refresh fails and retries the request directly", async () => {
+    const analysisId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"; let failNextFinding = false; let findingRequests = 0;
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary(analysisId)));
+      if (url.pathname.endsWith(`/cases/7/analyses/${analysisId}`)) return Promise.resolve(jsonResponse({ analysis_id: analysisId, case_id: 7 }));
+      if (url.pathname.endsWith("/cases/7/findings")) {
+        findingRequests += 1;
+        if (failNextFinding) { failNextFinding = false; return Promise.resolve(jsonResponse({ code: "temporary_failure", message: "Temporary backend failure.", retryable: true }, 503)); }
+        return Promise.resolve(jsonResponse(page([{ finding_id: "finding-1", title: "Persisted finding", severity: "high" }])));
+      }
+      return Promise.resolve(jsonResponse({}, 404));
+    }));
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search={`?analysis=${analysisId}`} navigate={vi.fn()}/>);
+    expect(await screen.findByText("Persisted finding")).toBeInTheDocument();
+    failNextFinding = true; fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    expect(await screen.findByText("Refresh failed")).toBeInTheDocument();
+    expect(screen.getByText("Persisted finding")).toBeInTheDocument();
+    const beforeRetry = findingRequests;
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    await waitFor(() => expect(findingRequests).toBeGreaterThan(beforeRetry));
+    await waitFor(() => expect(screen.queryByText("Refresh failed")).not.toBeInTheDocument());
+    expect(screen.getByText("Persisted finding")).toBeInTheDocument();
+  });
+
+  it("ignores a superseded response even when the transport does not honor abort", async () => {
+    const analysisId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"; let resolveOld: ((response: Response) => void) | undefined; let unfilteredRequests = 0;
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary(analysisId)));
+      if (url.pathname.endsWith("/cases/7/findings")) {
+        const severity = url.searchParams.get("severity");
+        if (!severity && ++unfilteredRequests === 2) return new Promise<Response>(resolve => { resolveOld = resolve; });
+        const title = severity === "new" ? "Newest result" : "Initial result";
+        return Promise.resolve(jsonResponse(page([{ finding_id: severity ?? "initial", title, severity: severity ?? "low" }])));
+      }
+      return Promise.resolve(jsonResponse({}, 404));
+    }));
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    expect(await screen.findByText("Initial result")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    await waitFor(() => expect(resolveOld).toBeDefined());
+    fireEvent.change(screen.getByLabelText("Filter findings"), { target: { value: "new" } });
+    expect(await screen.findByText("Newest result")).toBeInTheDocument();
+    await act(async () => { resolveOld?.(jsonResponse(page([{ finding_id: "old", title: "Stale result", severity: "old" }]))); await Promise.resolve(); });
+    expect(screen.getByText("Newest result")).toBeInTheDocument();
+    expect(screen.queryByText("Stale result")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["created", "New analysis snapshot created"],
+    ["reused", "Identical analysis snapshot reused"],
+  ] as const)("handles a %s reanalysis on the exact Findings route", async (outcome, notice) => {
+    const analysisId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"; const navigate = vi.fn(); let posts = 0;
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (init?.method === "POST" && url.pathname.endsWith("/cases/7/analyses")) { posts += 1; return Promise.resolve(jsonResponse({ analysis_id: analysisId, case_id: 7, status: "completed", created_at: "2026-09-02T00:00:00Z", outcome }, 202)); }
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary(analysisId)));
+      if (url.pathname.endsWith(`/cases/7/analyses/${analysisId}`)) return Promise.resolve(jsonResponse({ analysis_id: analysisId, case_id: 7 }));
+      if (url.pathname.endsWith("/cases/7/findings")) return Promise.resolve(jsonResponse(page([{ finding_id: "finding-1", title: posts ? "Refreshed finding" : "Existing finding", severity: "high" }])));
+      return Promise.resolve(jsonResponse({}, 404));
+    }));
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search={`?analysis=${analysisId}`} navigate={navigate}/>);
+    expect(await screen.findByText("Existing finding")).toBeInTheDocument();
+    const control = screen.getByRole("button", { name: "Reanalyze" }); fireEvent.click(control); fireEvent.click(control);
+    expect(await screen.findByText(notice)).toBeInTheDocument();
+    expect(posts).toBe(1);
+    expect(await screen.findByText("Refreshed finding")).toBeInTheDocument();
+    expect(navigate).toHaveBeenCalledWith(`/cases/7/findings?analysis=${analysisId}`);
+    expect(screen.getByRole("button", { name: "Reanalyze" })).toBeEnabled();
+  });
+
+  it("recovers from reanalysis failure without hiding current results", async () => {
+    const analysisId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (init?.method === "POST") return Promise.resolve(jsonResponse({ code: "temporary_failure", message: "Analysis service failed.", retryable: true }, 503));
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary(analysisId)));
+      if (url.pathname.endsWith(`/cases/7/analyses/${analysisId}`)) return Promise.resolve(jsonResponse({ analysis_id: analysisId, case_id: 7 }));
+      if (url.pathname.endsWith("/cases/7/findings")) return Promise.resolve(jsonResponse(page([{ finding_id: "finding-1", title: "Existing finding", severity: "high" }])));
+      return Promise.resolve(jsonResponse({}, 404));
+    }));
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search={`?analysis=${analysisId}`} navigate={vi.fn()}/>);
+    expect(await screen.findByText("Existing finding")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Reanalyze" }));
+    expect(await screen.findByText("Reanalysis failed")).toBeInTheDocument();
+    expect(screen.getByText("Existing finding")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reanalyze" })).toBeEnabled();
   });
 });

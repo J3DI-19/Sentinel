@@ -1038,6 +1038,28 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** ReanalysisPublic */
+        ReanalysisPublic: {
+            /**
+             * Analysis Id
+             * Format: uuid
+             */
+            analysis_id: string;
+            /** Case Id */
+            case_id: number;
+            /** Created At */
+            created_at: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "created" | "reused";
+            /**
+             * Status
+             * @constant
+             */
+            status: "completed";
+        };
         /** ReanalysisRequest */
         ReanalysisRequest: Record<string, never>;
         /** ReportCreate */
@@ -1485,7 +1507,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ReanalysisPublic"];
                 };
             };
             /** @description Validation Error */

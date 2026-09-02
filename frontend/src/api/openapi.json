@@ -125,6 +125,7 @@
           "owner": {
             "default": "Investigator",
             "maxLength": 120,
+            "minLength": 1,
             "title": "Owner",
             "type": "string"
           }
@@ -406,6 +407,45 @@
           "total"
         ],
         "title": "PageResponse",
+        "type": "object"
+      },
+      "ReanalysisPublic": {
+        "properties": {
+          "analysis_id": {
+            "format": "uuid",
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "case_id": {
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "created",
+              "reused"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "status": {
+            "const": "completed",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "case_id",
+          "status",
+          "created_at",
+          "outcome"
+        ],
+        "title": "ReanalysisPublic",
         "type": "object"
       },
       "ReanalysisRequest": {
@@ -1168,7 +1208,9 @@
           "202": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReanalysisPublic"
+                }
               }
             },
             "description": "Successful Response"

@@ -111,19 +111,19 @@ before beginning final verification.
 
 ### 6. Refresh and error recovery
 
-- [ ] Add a working refresh control to the connected case workspace.
-- [ ] Make **Retry** execute the failed request directly.
-- [ ] Prevent stale responses from overwriting newer results.
-- [ ] Preserve the current tab, filter, page, and selected snapshot during
+- [x] Add a working refresh control to the connected case workspace.
+- [x] Make **Retry** execute the failed request directly.
+- [x] Prevent stale responses from overwriting newer results.
+- [x] Preserve the current tab, filter, page, and selected snapshot during
   refresh.
 
 ### 7. Reanalysis
 
-- [ ] Fix reanalysis when the user is already on the Findings page.
-- [ ] Prevent the interface from remaining stuck in a loading state.
-- [ ] Disable or safely deduplicate the control while reanalysis is running.
-- [ ] Refresh the case summary and analytical result tabs after completion.
-- [ ] Clearly report whether reanalysis created a new snapshot or reused an
+- [x] Fix reanalysis when the user is already on the Findings page.
+- [x] Prevent the interface from remaining stuck in a loading state.
+- [x] Disable or safely deduplicate the control while reanalysis is running.
+- [x] Refresh the case summary and analytical result tabs after completion.
+- [x] Clearly report whether reanalysis created a new snapshot or reused an
   identical persisted snapshot.
 
 ## Phase 3: Verification and acceptance

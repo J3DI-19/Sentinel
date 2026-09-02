@@ -18,6 +18,8 @@ class CaseCreate(BaseModel):
 class CommitRequest(BaseModel): allow_partial:bool=False
 class ReanalysisRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+class ReanalysisPublic(BaseModel):
+    analysis_id:UUID; case_id:int; status:Literal["completed"]; created_at:str; outcome:Literal["created","reused"]
 class CasePublic(BaseModel):
     id:int; name:str; description:str; case_type:str; status:str; owner:str; created_at:str; updated_at:str|None=None
 class PageResponse(BaseModel):
@@ -128,8 +130,8 @@ def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int
     rows=db.execute(f"SELECT payload_json FROM analysis_artifacts WHERE {clause} ORDER BY COALESCE(occurred_at,''),item_id LIMIT ? OFFSET ?",(*values,page_size,(page_number-1)*page_size)).fetchall()
     return page([json.loads(r[0]) for r in rows],total,page_number,page_size)
 
-@router.post("/cases/{case_id}/analyses",status_code=202)
-def reanalyze(case_id:int,request:Request,body:ReanalysisRequest|None=None):
+@router.post("/cases/{case_id}/analyses",status_code=202,response_model=ReanalysisPublic)
+def reanalyze(case_id:int,request:Request,body:ReanalysisRequest|None=None) -> ReanalysisPublic:
     return service(request).reanalyze(case_id)
 
 @router.get("/cases/{case_id}/analyses")

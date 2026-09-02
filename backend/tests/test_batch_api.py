@@ -237,7 +237,24 @@ def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
     first = client.post(f"/api/v1/cases/{case_id}/analyses").json()
     second = client.post(f"/api/v1/cases/{case_id}/analyses").json()
     assert first["analysis_id"] == second["analysis_id"] == analysis_id
+    assert first["outcome"] == second["outcome"] == "reused"
+    assert first["created_at"] == second["created_at"] == history["items"][0]["created_at"]
     assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
+
+
+def test_reanalysis_reports_created_then_reused_without_duplicate_artifacts(client):
+    case_id = create_case(client)
+
+    created = client.post(f"/api/v1/cases/{case_id}/analyses")
+    reused = client.post(f"/api/v1/cases/{case_id}/analyses")
+
+    assert created.status_code == reused.status_code == 202
+    assert created.json()["outcome"] == "created"
+    assert reused.json()["outcome"] == "reused"
+    assert reused.json()["analysis_id"] == created.json()["analysis_id"]
+    assert reused.json()["created_at"] == created.json()["created_at"]
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/findings").json()["total"] == 0
 
 
 def test_custom_analysis_configuration_is_explicitly_rejected(client):
