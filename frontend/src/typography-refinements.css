@@ -1,0 +1,743 @@
+/*
+ * Readability and overflow guardrails for the connected application.
+ * This loads after the legacy stylesheet so dense operational views retain
+ * their visual language without relying on 7-9px text or rigid no-wrap rules.
+ */
+
+.page-header,
+.panel-head,
+.table-panel,
+.state-box,
+.settings-notice,
+.record-detail-panel,
+.source-format-guide,
+.analysis-snapshot-banner {
+  min-width: 0;
+}
+
+.page-header h1 {
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.page-header p,
+.page-header .page-description {
+  max-width: 72ch;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.eyebrow {
+  font-size: 0.625rem;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+}
+
+.page-actions,
+.panel-actions,
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-actions > *,
+.panel-actions > * {
+  flex: 0 0 auto;
+}
+
+.button,
+button.button {
+  height: auto;
+  min-height: 2.25rem;
+  padding-block: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.panel-head h2,
+.panel-head h3,
+.table-panel > h2,
+.table-panel > h3 {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.panel-head p,
+.table-panel > p {
+  font-size: 0.6875rem;
+  line-height: 1.55;
+}
+
+.table-panel > .panel-head {
+  margin-bottom: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.data-table th {
+  font-size: 0.625rem;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.data-table td {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  vertical-align: middle;
+  white-space: normal;
+}
+
+.data-table td code,
+.case-cell,
+.case-cell strong,
+.case-cell small {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.data-table time {
+  font-family: "DM Mono", monospace;
+  font-size: 0.625rem;
+  white-space: nowrap;
+}
+
+.overview-case-link {
+  max-width: min(42rem, 60vw);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #bdc9d9;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.overview-case-link:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.case-cell strong {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.case-cell small,
+.table-footer,
+.filter-row label,
+.filter-row span {
+  font-size: 0.625rem;
+  line-height: 1.45;
+}
+
+.badge,
+.risk-badge,
+.status-badge,
+.type-chip,
+.origin-chip {
+  min-height: 1.35rem;
+  font-size: 0.5625rem;
+  line-height: 1.3;
+  white-space: normal;
+  text-align: center;
+}
+
+.case-status-summary span {
+  font-size: 0.625rem;
+  line-height: 1.35;
+}
+
+.case-status-summary b,
+.case-status-summary strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.state-box {
+  padding: 1.25rem;
+  gap: 0.625rem;
+}
+
+.state-box strong {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.state-box p {
+  max-width: 58ch;
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.empty-state__content {
+  display: flex;
+  width: min(100%, 28rem);
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.empty-state__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.empty-state .button {
+  margin-top: 0.25rem;
+}
+
+.empty-state--standalone {
+  min-height: 10rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: linear-gradient(145deg, #0a121d, #090e17);
+  box-shadow: 0 0.875rem 2rem rgba(0, 0, 0, 0.18);
+}
+
+.button-leading-icon {
+  display: inline-grid;
+  place-items: center;
+  margin-right: 0.375rem;
+  font-size: 1rem;
+  line-height: 0;
+}
+
+/* Cases register and inline case creation */
+.case-create-panel {
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.case-create-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(110deg, #0b1624, #090e17);
+}
+
+.case-create-header__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  border: 1px solid #24536b;
+  border-radius: 0.5rem;
+  background: #0d2633;
+  color: #60c8e7;
+  font-size: 1.125rem;
+}
+
+.case-create-header > div {
+  min-width: 0;
+}
+
+.case-create-header .eyebrow {
+  margin-bottom: 0.25rem;
+}
+
+.case-create-header h2 {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.case-create-header p {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.case-create-fields {
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+}
+
+.case-create-fields label {
+  gap: 0.4375rem;
+  min-width: 0;
+}
+
+.case-create-fields label > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+.case-create-fields label > span small {
+  color: #56677c;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.case-create-fields input,
+.case-create-fields textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.case-create-fields textarea {
+  min-height: 6.5rem;
+}
+
+.case-create-fields input::placeholder,
+.case-create-fields textarea::placeholder {
+  color: #53647a;
+}
+
+.case-create-fields input:focus,
+.case-create-fields textarea:focus {
+  border-color: #2c718d;
+  background: #0a1420;
+}
+
+.case-create-error {
+  margin: 0 1.25rem 1rem;
+}
+
+.case-create-actions {
+  margin: 0;
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: #080d15;
+}
+
+.cases-register {
+  overflow: hidden;
+}
+
+.cases-register .table-toolbar {
+  min-height: 4rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.cases-search {
+  width: min(100%, 30rem);
+  min-width: 15rem;
+  flex: 1 1 20rem;
+}
+
+.cases-search__icon {
+  position: absolute;
+  z-index: 2;
+  left: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  color: #71869b;
+  font-size: 1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.cases-register .cases-search > .input {
+  width: 100%;
+  min-width: 0;
+  height: 2.5rem;
+  padding: 0 0.875rem 0 2.5rem;
+  font-size: 0.75rem;
+}
+
+.cases-register .cases-search:focus-within .cases-search__icon {
+  color: var(--cyan);
+}
+
+.cases-register .toolbar-spacer {
+  min-width: 0;
+}
+
+.cases-register > .empty-state {
+  min-height: 13rem;
+}
+
+.cases-register .table-footer {
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.settings-notice,
+.source-format-guide,
+.analysis-snapshot-banner,
+.record-detail-panel {
+  overflow-wrap: anywhere;
+}
+
+.settings-notice p,
+.source-format-guide p,
+.source-format-guide li,
+.analysis-snapshot-banner p,
+.record-detail-panel p,
+.record-detail-panel dd,
+.record-detail-panel code,
+.service-card p,
+.service-card footer,
+.system-banner p,
+.system-banner > span {
+  font-size: 0.6875rem;
+  line-height: 1.55;
+}
+
+.source-format-guide h2,
+.source-format-guide h3,
+.record-detail-panel h2,
+.record-detail-panel h3,
+.service-card h2 {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.record-detail-panel dt,
+.source-format-guide th,
+.source-format-guide .label {
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+.record-detail-panel pre,
+.record-detail-panel code {
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Shell and primary navigation */
+.breadcrumbs,
+.breadcrumbs button,
+.breadcrumbs-single b {
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}
+
+.global-search input {
+  font-size: 0.75rem;
+}
+
+.global-search kbd,
+.health-indicator span {
+  font-size: 0.625rem;
+}
+
+.command-results b,
+.sidebar nav button b {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.command-results small,
+.command-results em,
+.command-empty,
+.nav-label {
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+.brand .brand-copy small,
+.investigator-profile small,
+.sidebar-collapsed .sidebar nav button::after {
+  font-size: 0.5625rem;
+  line-height: 1.35;
+}
+
+.investigator-profile b {
+  font-size: 0.6875rem;
+}
+
+/* Connected case workspace and persisted result details */
+.case-context-meta span,
+.assessment-confidence > span,
+.assessment-confidence > small,
+.assessment-classification > span,
+.findings-master-list code,
+.findings-master-list small,
+.finding-detail-meta span,
+.timeline-composition-strip span,
+.analytics-method-note span,
+.case-capture-counters span,
+.case-filtered-label,
+.case-continuity::before,
+.evidence-continuity-label,
+.evidence-table-panel .table-footer > span,
+.record-detail-panel header span,
+.record-detail-panel dt,
+.nested-fields dt,
+.analysis-snapshot-banner span,
+.snapshot-chip {
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+.case-context-meta b,
+.assessment-classification > span,
+.finding-detail-meta b,
+.timeline-composition-strip b,
+.record-inspect,
+.reference-links button,
+.analysis-snapshot-banner b,
+.analysis-history .filter-row p {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+}
+
+.findings-master-list strong,
+.capture-state > div > b {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.findings-master-list p,
+.capture-state p {
+  font-size: 0.6875rem;
+  line-height: 1.55;
+}
+
+.record-inspect,
+.reference-links button {
+  min-height: 1.75rem;
+  padding-block: 0.25rem;
+}
+
+.analysis-snapshot-banner > div {
+  min-width: 0;
+}
+
+.analysis-snapshot-banner b {
+  overflow-wrap: anywhere;
+}
+
+/* Import workflow */
+.capability-chip,
+.source-format-guide span,
+.source-format-guide em,
+.source-format-guide .problem-location,
+.rejection-group h4,
+.partial-approval span {
+  font-size: 0.625rem;
+  line-height: 1.45;
+}
+
+.workflow-state > p,
+.import-error p,
+.import-empty p,
+.import-warning,
+.source-format-guide small,
+.source-format-guide a,
+.source-format-guide code,
+.problem-correction {
+  font-size: 0.6875rem;
+  line-height: 1.55;
+}
+
+.import-error b,
+.import-empty b,
+.source-format-guide b {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.import-error code {
+  font-size: 0.625rem;
+  overflow-wrap: anywhere;
+}
+
+.source-format-guide > div,
+.partial-approval {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+/* Assistant, live monitor, settings, and system status */
+.assistant-context-action,
+.assistant-scope-panel b,
+.global-pins p,
+.retrieved-context > p,
+.retrieved-context > div:first-child b,
+.feed-indicators em,
+.settings-scope,
+.settings-nav-label,
+.settings-nav button small,
+.settings-nav-foot b,
+.settings-nav-foot span,
+.setting-control small,
+.settings-runtime-card p {
+  font-size: 0.625rem;
+  line-height: 1.5;
+}
+
+.assistant-scope-panel select,
+.global-assistant-workspace .suggested-prompts button,
+.settings-notice b,
+.settings-nav button b,
+.settings-panel-head p,
+.settings-section > header p,
+.setting-row p,
+.setting-control b,
+.setting-control select,
+.setting-control input,
+.settings-runtime-card b,
+.settings-unavailable b,
+.settings-unavailable p,
+.settings-save > span,
+.capability-table > div,
+.notes-list p {
+  font-size: 0.6875rem;
+  line-height: 1.5;
+}
+
+.setting-row b,
+.settings-section > header h3,
+.notes-list b {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.connection-banner p,
+.connection-stats span,
+.feed-row code,
+.feed-row span,
+.alert-row p,
+.alert-meta time,
+.streaming,
+.semantics p,
+.device-main > span,
+.device-rate span {
+  font-size: 0.625rem;
+  line-height: 1.45;
+}
+
+.feed-row strong,
+.alert-title strong,
+.semantics b,
+.device-main > strong {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+  .page-header,
+  .panel-head,
+  .table-panel > .panel-head {
+    padding-inline: 1rem;
+  }
+
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .page-actions,
+  .panel-actions {
+    width: 100%;
+  }
+
+  .page-actions .button,
+  .panel-actions .button {
+    flex: 1 1 9rem;
+  }
+
+  .overview-case-link {
+    max-width: 70vw;
+  }
+
+  .empty-state {
+    min-height: 10rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .case-create-header,
+  .case-create-fields,
+  .case-create-actions {
+    padding-inline: 1rem;
+  }
+
+  .case-create-actions {
+    flex-direction: column-reverse;
+  }
+
+  .case-create-actions .button {
+    width: 100%;
+  }
+
+  .cases-register .table-toolbar {
+    align-items: stretch;
+  }
+
+  .cases-search {
+    width: 100%;
+    min-width: 0;
+    flex-basis: 100%;
+  }
+
+  .cases-register .toolbar-spacer {
+    display: none;
+  }
+
+  .cases-register .table-toolbar > .button {
+    width: 100%;
+  }
+}

@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { normalizeApiError } from "../api/client";
 import { batchApi, type ApiCase } from "../api/batch";
-import { Button, PageHeader } from "../components/ui/core";
+import { Button, EmptyState, PageHeader } from "../components/ui/core";
 import { EvidenceFileIntake, EvidenceSourcePicker, ImportActions, ImportConfigurationPanel, SourceFormatGuide, ValidationSummary, WorkflowStatus } from "../features/evidence-import/components";
 import { inspectEvidenceFile } from "../features/evidence-import/fileValidation";
 import { importDataSource } from "../features/evidence-import/importDataSource";
@@ -83,7 +83,7 @@ export function ImportEvidencePage({ search = "", navigate = () => {}, dataSourc
   const capabilityLabel = dataSource.capability === "mock" ? "Mock adapter" : "Connected API";
   return <><PageHeader eyebrow={`Evidence intake · ${capabilityLabel}`} title="Import evidence" description={dataSource.capability === "mock" ? "Prepare CSV or JSON evidence without backend persistence." : "Validate evidence first, then explicitly commit accepted records to the selected case."} actions={<span className="capability-chip">{capabilityLabel}</span>}/>
     {caseError && <div className="import-error" role="alert"><b>Cases could not be loaded</b><p>{caseError}</p><Button onClick={() => navigate("/cases")}>Open Cases</Button></div>}
-    {!caseLoading && !caseError && dataSource.capability === "backend" && caseOptions.length === 0 && <div className="state-box"><strong>No persisted cases</strong><p>Create a case before importing evidence.</p><Button variant="primary" onClick={() => navigate("/cases")}>Open Cases</Button></div>}
+    {!caseLoading && !caseError && dataSource.capability === "backend" && caseOptions.length === 0 && <EmptyState className="empty-state--standalone" title="No persisted cases" description="Create a case before importing evidence." action={<Button variant="primary" onClick={() => navigate("/cases")}>Open Cases</Button>}/>}
     {caseSelectionMessage && <div className="import-error" role="alert"><b>Case selection required</b><p>{caseSelectionMessage}</p><Button onClick={() => navigate("/cases")}>Open Cases</Button></div>}
     <div className="import-progress" aria-label="Import progress">{["Select source", "Choose file", "Validate", "Review & import"].map((label, index) => <div className={index + 1 <= completedSteps ? "active" : ""} key={label}><i>{index + 1 < completedSteps ? "✓" : index + 1}</i><span>{label}</span>{index < 3 && <em/>}</div>)}</div>
     <div className="import-grid"><section className="import-main"><EvidenceSourcePicker value={configuration.source} disabled={busy} onChange={updateSource}/><SourceFormatGuide source={configuration.source}/><EvidenceFileIntake inputRef={inputRef} file={workflow.file} busy={busy} dragActive={dragActive} onBrowse={chooseFile} onFile={selectFile} onRemove={() => { setPartialApproved(false); dispatch({ type: "REMOVE_FILE" }); }} onDragActive={setDragActive}/><ImportConfigurationPanel configuration={configuration} disabled={busy || caseLoading || Boolean(caseError) || (dataSource.capability === "backend" && !caseOptions.length)} onChange={updateConfiguration} cases={caseOptions} mock={dataSource.capability === "mock"}/></section>

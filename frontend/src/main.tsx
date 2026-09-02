@@ -9,6 +9,7 @@ import "./settings-refinements.css";
 import "./shell-core.css";
 import "./assistant-central-refinements.css";
 import "./sidebar.css";
+import "./typography-refinements.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
