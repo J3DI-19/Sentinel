@@ -234,4 +234,4 @@ class BatchInvestigationService:
         result=self.analyzer.analyze(case_id=case_id,events=events); now=utcnow()
         with self.repository.write_lock, self.db:
             created_at, created = self._persist_analysis(result, now)
-        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at,"outcome":"created" if created else "reused"}
+        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at,"outcome":"created" if created else "reused","reused_existing":not created}

@@ -44,7 +44,7 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     fireEvent.click(screen.getByRole("button", { name: evidenceId }));
     expect(navigate).toHaveBeenCalledWith(`/cases/7/evidence?evidence=${evidenceId}`);
 
-    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/evidence": page([{ evidence_id: evidenceId, original_name: "visible.csv" }]) });
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/evidence": page([{ evidence_id: evidenceId, original_filename: "visible.csv" }]) });
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/evidence" search="?evidence=not-a-uuid" navigate={vi.fn()}/>);
     expect(await screen.findByText("Source reference unavailable")).toBeInTheDocument();
     expect(screen.getByText("visible.csv")).toBeInTheDocument();

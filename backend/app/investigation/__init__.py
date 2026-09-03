@@ -1,0 +1,1 @@
+"""Public investigation API models."""

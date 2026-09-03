@@ -1,6 +1,6 @@
 # Traceveil Roadmap
 
-> Phase 3 software status (August 2026): batch investigation APIs, CASAS and TON_IoT telemetry adapters, authenticated HTTP live collection, durable receipts, SSE replay, connected historical views, grounded optional Ollama assistance, deterministic PDF reports, approval-gated SMTP delivery, audit history, and the controlled simulator are implemented. Physical hardware assembly and MQTT remain optional future work.
+> Current software status (September 2026): the persisted batch-investigation workflow through Step 8 is implemented. Controlled live-shaped adapters and fixtures exist for compatibility testing, but genuine device ingestion, physical hardware acceptance, and real-time browser delivery remain explicitly deferred to Steps 5, 7, and 12.
 
 ## 1. Initialization
 - [x] Set up React + Vite frontend
@@ -145,14 +145,21 @@ real-time delivery, and persistence of derived artifacts remain later steps.
 - [x] Expose provenance/source references through event APIs
 - [x] Add refresh controls
 - [x] Add reanalysis controls
-- [x] Allow historical review of persisted analysis snapshots and live incidents
+- [x] Allow historical review of persisted batch analysis snapshots and incidents
+- [x] Preserve the selected snapshot across result tabs and browser refreshes
+- [x] Verify generated OpenAPI types and connected frontend workflows in CI
+- [x] Document genuine live-incident history as deferred to Steps 5 and 7
 
-**Current result:** Step 8 is complete. Case-scoped endpoints
+**Current result:** Step 8 is complete for the persisted batch-investigation scope. Case-scoped endpoints
 ingest and retrieve evidence, persist and filter canonical events, execute the
 deterministic analysis engine, and return findings, alerts, incidents, timelines,
 graphs, charts, provenance, risk factors, and historical analysis snapshots.
 The React investigation views consume these persisted APIs through generated
-OpenAPI types; mock adapters remain explicit test/demo configuration only.
+OpenAPI types, expose manual refresh and safe idempotent reanalysis, and retain a
+selected historical snapshot while navigating between analytical views. Mock and
+live-shaped adapters remain explicit test/demo configuration only. End-to-end
+genuine live ingestion, real-time delivery, and historical review of genuine live
+incidents are acceptance dependencies of Steps 5 and 7, not Step 8.
 
 ## 9. Visualization Engine + Qwen
 - [ ] Create allowed visualization components

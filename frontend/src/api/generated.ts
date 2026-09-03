@@ -864,6 +864,251 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Alert */
+        Alert: {
+            /**
+             * Alert Id
+             * Format: uuid
+             */
+            alert_id: string;
+            /** Case Id */
+            case_id: number;
+            /**
+             * Delivery Status
+             * @default pending
+             * @constant
+             */
+            delivery_status: "pending";
+            /** Event Ids */
+            event_ids: string[];
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Finding Id
+             * Format: uuid
+             */
+            finding_id: string;
+            /** Risk Score */
+            risk_score: number;
+            /** Rule Id */
+            rule_id: string;
+            severity: components["schemas"]["Severity"];
+            /** Title */
+            title: string;
+            /**
+             * Triggered At
+             * Format: date-time
+             */
+            triggered_at: string;
+        };
+        /** AnalysisConfig */
+        AnalysisConfig: {
+            /**
+             * Authentication Failure Threshold
+             * @default 10
+             */
+            authentication_failure_threshold: number;
+            /**
+             * Authentication Window Seconds
+             * @default 60
+             */
+            authentication_window_seconds: number;
+            /**
+             * Baseline Max Samples
+             * @default 20
+             */
+            baseline_max_samples: number;
+            /**
+             * Baseline Min Samples
+             * @default 3
+             */
+            baseline_min_samples: number;
+            /**
+             * Baseline Minimum Delta
+             * @default 1
+             */
+            baseline_minimum_delta: number;
+            /**
+             * Baseline Repetition Reference
+             * @default 3
+             */
+            baseline_repetition_reference: number;
+            /**
+             * Baseline Sigma
+             * @default 3
+             */
+            baseline_sigma: number;
+            /**
+             * Baseline Version
+             * @default 1.0
+             * @constant
+             */
+            baseline_version: "1.0";
+            /**
+             * Configuration Version
+             * @default 1.0
+             * @constant
+             */
+            configuration_version: "1.0";
+            /**
+             * Correlation Version
+             * @default 1.0
+             * @constant
+             */
+            correlation_version: "1.0";
+            /**
+             * Correlation Window Seconds
+             * @default 120
+             */
+            correlation_window_seconds: number;
+            /** Critical Device Scores */
+            critical_device_scores?: {
+                [key: string]: number;
+            };
+            /**
+             * Dataset Benign Labels
+             * @default [
+             *       "0",
+             *       "benign",
+             *       "benigntraffic",
+             *       "normal"
+             *     ]
+             */
+            dataset_benign_labels: string[];
+            /**
+             * Default Device Criticality
+             * @default 50
+             */
+            default_device_criticality: number;
+            /**
+             * Label Repetition Reference
+             * @default 4
+             */
+            label_repetition_reference: number;
+            /**
+             * Malicious Labels
+             * @default [
+             *       "1",
+             *       "attack",
+             *       "backdoor",
+             *       "ddos",
+             *       "dos",
+             *       "injection",
+             *       "malicious",
+             *       "malware",
+             *       "password",
+             *       "ransomware",
+             *       "scanning",
+             *       "xss"
+             *     ]
+             */
+            malicious_labels: string[];
+            /**
+             * Request Rate Multiplier
+             * @default 3
+             */
+            request_rate_multiplier: number;
+            /**
+             * Request Rate Repetition Reference
+             * @default 4
+             */
+            request_rate_repetition_reference: number;
+            risk_weights?: components["schemas"]["RiskWeights"];
+            /**
+             * Rule Set Version
+             * @default 1.0
+             * @constant
+             */
+            rule_set_version: "1.0";
+            /**
+             * Scoring Version
+             * @default 1.0
+             * @constant
+             */
+            scoring_version: "1.0";
+        };
+        /** AnalysisResult */
+        AnalysisResult: {
+            /** Alerts */
+            alerts?: components["schemas"]["Alert"][];
+            /**
+             * Analysis Id
+             * Format: uuid
+             */
+            analysis_id: string;
+            /**
+             * Analysis Version
+             * @default 1.0
+             * @constant
+             */
+            analysis_version: "1.0";
+            /** Analyzed Event Count */
+            analyzed_event_count: number;
+            /** Baselines */
+            baselines?: components["schemas"]["BaselineSummary"][];
+            /** Case Id */
+            case_id: number;
+            /** Chart Points */
+            chart_points?: components["schemas"]["ChartPoint"][];
+            configuration: components["schemas"]["AnalysisConfig"];
+            /**
+             * Configuration Version
+             * @default 1.0
+             * @constant
+             */
+            configuration_version: "1.0";
+            /** Correlations */
+            correlations?: components["schemas"]["CorrelationEdge"][];
+            /** Event Ids */
+            event_ids?: string[];
+            filter: components["schemas"]["EventFilter"];
+            /** Findings */
+            findings?: components["schemas"]["DetectionFinding"][];
+            graph: components["schemas"]["GraphData"];
+            /** Incidents */
+            incidents?: components["schemas"]["Incident"][];
+            /** Input Event Count */
+            input_event_count: number;
+            /**
+             * Rule Set Version
+             * @default 1.0
+             * @constant
+             */
+            rule_set_version: "1.0";
+            /** Timeline */
+            timeline?: components["schemas"]["TimelineEntry"][];
+        };
+        /** AnalysisSnapshotPublic */
+        AnalysisSnapshotPublic: {
+            /** Alert Count */
+            alert_count: number;
+            /**
+             * Analysis Id
+             * Format: uuid
+             */
+            analysis_id: string;
+            /** Case Id */
+            case_id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Finding Count */
+            finding_count: number;
+            /** Incident Count */
+            incident_count: number;
+            /** Input Event Count */
+            input_event_count: number;
+            /** Input Fingerprint */
+            input_fingerprint: string;
+            /** Is Latest */
+            is_latest: boolean;
+            /** Maximum Risk */
+            maximum_risk: number;
+            /** Status */
+            status: string;
+        };
         /** Approval */
         Approval: {
             /** Approver */
@@ -892,6 +1137,49 @@ export interface components {
              */
             scope: "auto" | "all_cases" | "specific_case" | "selected_references";
         };
+        /** BaselineSummary */
+        BaselineSummary: {
+            /**
+             * Baseline Id
+             * Format: uuid
+             */
+            baseline_id: string;
+            /**
+             * Baseline Version
+             * @default 1.0
+             * @constant
+             */
+            baseline_version: "1.0";
+            /** Entity Id */
+            entity_id: string;
+            /**
+             * Evaluated Event Id
+             * Format: uuid
+             */
+            evaluated_event_id: string;
+            /** Mean */
+            mean: number;
+            /** Metric */
+            metric: string;
+            /** Population Stddev */
+            population_stddev: number;
+            /** Sample Count */
+            sample_count: number;
+            /** Sample Event Ids */
+            sample_event_ids: string[];
+            /** Threshold */
+            threshold: number;
+            /**
+             * Window End
+             * Format: date-time
+             */
+            window_end: string;
+            /**
+             * Window Start
+             * Format: date-time
+             */
+            window_start: string;
+        };
         /** Body_upload_import_api_v1_cases__case_id__imports_post */
         Body_upload_import_api_v1_cases__case_id__imports_post: {
             /**
@@ -918,6 +1206,76 @@ export interface components {
              */
             timezone: string;
         };
+        /** CanonicalEntity */
+        CanonicalEntity: {
+            /** Device Type */
+            device_type?: string | null;
+            /** Id */
+            id: string;
+            /** Ip */
+            ip?: string | null;
+            kind: components["schemas"]["EntityKind"];
+            /** Mac */
+            mac?: string | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** CanonicalNetwork */
+        CanonicalNetwork: {
+            /** Bytes Received */
+            bytes_received?: number | null;
+            /** Bytes Sent */
+            bytes_sent?: number | null;
+            /** Destination Ip */
+            destination_ip?: string | null;
+            /** Destination Port */
+            destination_port?: number | null;
+            /** Packets Received */
+            packets_received?: number | null;
+            /** Packets Sent */
+            packets_sent?: number | null;
+            /** Protocol */
+            protocol?: string | null;
+            /** Source Ip */
+            source_ip?: string | null;
+            /** Source Port */
+            source_port?: number | null;
+        };
+        /** CanonicalProvenance */
+        CanonicalProvenance: {
+            /** Adapter Name */
+            adapter_name: string;
+            /** Adapter Version */
+            adapter_version: string;
+            /**
+             * Evidence Id
+             * Format: uuid
+             */
+            evidence_id: string;
+            /**
+             * Normalization Version
+             * @default 1.0
+             * @constant
+             */
+            normalization_version: "1.0";
+            origin: components["schemas"]["EventOrigin"];
+            /** Raw Record Hash */
+            raw_record_hash: string;
+            /** Source Hash */
+            source_hash: string;
+            /** Source Id */
+            source_id?: string | null;
+            /** Source Name */
+            source_name: string;
+            /** Source Record Reference */
+            source_record_reference: string;
+            source_type: components["schemas"]["CanonicalSourceType"];
+        };
+        /**
+         * CanonicalSourceType
+         * @enum {string}
+         */
+        CanonicalSourceType: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "simulated" | "ton_iot_network" | "ciciot2023_network" | "generic" | "live_telemetry";
         /** CaseCreate */
         CaseCreate: {
             /**
@@ -937,7 +1295,10 @@ export interface components {
         CasePublic: {
             /** Case Type */
             case_type: string;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
             /** Description */
             description: string;
@@ -952,6 +1313,38 @@ export interface components {
             /** Updated At */
             updated_at?: string | null;
         };
+        /** CaseSummaryPublic */
+        CaseSummaryPublic: {
+            /** Alert Count */
+            alert_count: number;
+            /** Analysis Id */
+            analysis_id: string | null;
+            case: components["schemas"]["CasePublic"];
+            /** Entity Count */
+            entity_count: number;
+            /** Event Count */
+            event_count: number;
+            /** Finding Count */
+            finding_count: number;
+            /** Incident Count */
+            incident_count: number;
+            /** Maximum Risk */
+            maximum_risk: number;
+        };
+        /** ChartPoint */
+        ChartPoint: {
+            /** Category */
+            category: string;
+            /**
+             * Series
+             * @enum {string}
+             */
+            series: "event_type" | "origin" | "source_label" | "finding_severity" | "risk_band" | "activity_minute";
+            /** Subgroup */
+            subgroup?: string | null;
+            /** Value */
+            value: number;
+        };
         /** CommitRequest */
         CommitRequest: {
             /**
@@ -959,6 +1352,99 @@ export interface components {
              * @default false
              */
             allow_partial: boolean;
+        };
+        /** ConditionTrace */
+        ConditionTrace: {
+            /** Actual */
+            actual: string;
+            /** Condition */
+            condition: string;
+            /** Expected */
+            expected: string;
+            /** Field */
+            field: string;
+            /** Matched */
+            matched: boolean;
+            /** Operator */
+            operator: string;
+        };
+        /** CorrelationEdge */
+        CorrelationEdge: {
+            /**
+             * Correlation Version
+             * @default 1.0
+             * @constant
+             */
+            correlation_version: "1.0";
+            /** Difference Seconds */
+            difference_seconds: number;
+            /**
+             * Edge Id
+             * Format: uuid
+             */
+            edge_id: string;
+            /** Reasons */
+            reasons: components["schemas"]["CorrelationReason"][];
+            /**
+             * Source Event Id
+             * Format: uuid
+             */
+            source_event_id: string;
+            /**
+             * Target Event Id
+             * Format: uuid
+             */
+            target_event_id: string;
+            /** Window Seconds */
+            window_seconds: number;
+        };
+        /**
+         * CorrelationReason
+         * @enum {string}
+         */
+        CorrelationReason: "shared_device" | "shared_actor" | "shared_target" | "shared_network_address";
+        /** DashboardSummaryPublic */
+        DashboardSummaryPublic: {
+            /** Active Cases */
+            active_cases: number;
+            /** Case Count */
+            case_count: number;
+            /** Event Count */
+            event_count: number;
+            /** Recent Cases */
+            recent_cases: components["schemas"]["CasePublic"][];
+        };
+        /** DetectionFinding */
+        DetectionFinding: {
+            /** Case Id */
+            case_id: number;
+            /** Condition Trace */
+            condition_trace: components["schemas"]["ConditionTrace"][];
+            /** Confidence */
+            confidence: number;
+            /** Event Ids */
+            event_ids: string[];
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Finding Id
+             * Format: uuid
+             */
+            finding_id: string;
+            /** Live Detected */
+            live_detected: boolean;
+            risk: components["schemas"]["RiskScore"];
+            /** Rule Id */
+            rule_id: string;
+            /** Rule Version */
+            rule_version: string;
+            severity: components["schemas"]["Severity"];
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+            /** Trigger Event Ids */
+            trigger_event_ids: string[];
         };
         /** EmailDraftBody */
         EmailDraftBody: {
@@ -970,46 +1456,370 @@ export interface components {
             subject: string;
         };
         /**
+         * EntityKind
+         * @enum {string}
+         */
+        EntityKind: "device" | "ip_address" | "user" | "service" | "source" | "unknown";
+        /** EventFilter */
+        EventFilter: {
+            /** Device Ids */
+            device_ids?: string[];
+            /** Event Types */
+            event_types?: string[];
+            /** Observed From */
+            observed_from?: string | null;
+            /** Observed To */
+            observed_to?: string | null;
+            /** Origins */
+            origins?: ("batch" | "live")[];
+            /** @default asc */
+            sort_direction: components["schemas"]["SortDirection"];
+            /** @default observed_at */
+            sort_field: components["schemas"]["SortField"];
+            /** Source Labels */
+            source_labels?: string[];
+        };
+        /**
+         * EventOrigin
+         * @enum {string}
+         */
+        EventOrigin: "batch" | "live";
+        /** EventPublic */
+        EventPublic: {
+            /** Action */
+            action?: string | null;
+            actor?: components["schemas"]["CanonicalEntity"] | null;
+            /** Attributes */
+            attributes?: {
+                [key: string]: string | number | boolean | null;
+            };
+            /** Case Id */
+            case_id: number;
+            device?: components["schemas"]["CanonicalEntity"] | null;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Event Type */
+            event_type: string;
+            /**
+             * Ingested At
+             * Format: date-time
+             */
+            ingested_at: string;
+            network?: components["schemas"]["CanonicalNetwork"] | null;
+            /** Normalization Warnings */
+            normalization_warnings?: components["schemas"]["NormalizationIssue"][];
+            /** Observed At */
+            observed_at: string | null;
+            /** Outcome */
+            outcome?: string | null;
+            provenance: components["schemas"]["CanonicalProvenance"];
+            /** Raw Record */
+            raw_record: {
+                [key: string]: components["schemas"]["JsonValue"];
+            };
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /** Source Event Type */
+            source_event_type?: string | null;
+            /** Source Label */
+            source_label?: string | null;
+            target?: components["schemas"]["CanonicalEntity"] | null;
+        };
+        /** EvidenceDetailPublic */
+        EvidenceDetailPublic: {
+            /** Accepted Records */
+            accepted_records: number;
+            /** Byte Size */
+            byte_size: number;
+            /** Case Id */
+            case_id: number;
+            /** Committed At */
+            committed_at?: string | null;
+            /** Dataset Profile */
+            dataset_profile: string;
+            /**
+             * Evidence Id
+             * Format: uuid
+             */
+            evidence_id: string;
+            /** Issues */
+            issues: components["schemas"]["ValidationIssuePublic"][];
+            /** Media Type */
+            media_type: string | null;
+            /** Original Filename */
+            original_filename: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /** Rejected Records */
+            rejected_records: number;
+            /** Sanitized Filename */
+            sanitized_filename: string;
+            /** Sha256 */
+            sha256: string;
+            source_type: components["schemas"]["EvidenceSource"];
+            /** Total Records */
+            total_records: number;
+            /** Validation Status */
+            validation_status: string;
+            /** Validator Version */
+            validator_version: string;
+        };
+        /** EvidenceMetadata */
+        EvidenceMetadata: {
+            /** Byte Size */
+            byte_size: number;
+            /** Case Id */
+            case_id?: number | null;
+            /** Dataset Profile */
+            dataset_profile: string;
+            /**
+             * Evidence Id
+             * Format: uuid
+             */
+            evidence_id: string;
+            /** Media Type */
+            media_type?: string | null;
+            /** Original Filename */
+            original_filename: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /** Sanitized Filename */
+            sanitized_filename: string;
+            /** Sha256 */
+            sha256: string;
+            source_type: components["schemas"]["EvidenceSource"];
+            /** Validator Version */
+            validator_version: string;
+        };
+        /** EvidencePublic */
+        EvidencePublic: {
+            /** Accepted Records */
+            accepted_records: number;
+            /** Byte Size */
+            byte_size: number;
+            /** Case Id */
+            case_id: number;
+            /** Committed At */
+            committed_at?: string | null;
+            /** Dataset Profile */
+            dataset_profile: string;
+            /**
+             * Evidence Id
+             * Format: uuid
+             */
+            evidence_id: string;
+            /** Media Type */
+            media_type: string | null;
+            /** Original Filename */
+            original_filename: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+            /** Rejected Records */
+            rejected_records: number;
+            /** Sanitized Filename */
+            sanitized_filename: string;
+            /** Sha256 */
+            sha256: string;
+            source_type: components["schemas"]["EvidenceSource"];
+            /** Total Records */
+            total_records: number;
+            /** Validation Status */
+            validation_status: string;
+            /** Validator Version */
+            validator_version: string;
+        };
+        /**
          * EvidenceSource
          * @enum {string}
          */
         EvidenceSource: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "ton_iot_network" | "ciciot2023_network" | "simulated" | "generic";
+        /** EvidenceValidationIssue */
+        EvidenceValidationIssue: {
+            /** Code */
+            code: string;
+            /** Field */
+            field?: string | null;
+            /** @default error */
+            level: components["schemas"]["IssueLevel"];
+            /** Message */
+            message: string;
+            /** Rejected Value */
+            rejected_value?: string | null;
+            /** Row Number */
+            row_number?: number | null;
+        };
+        /** EvidenceValidationReport */
+        EvidenceValidationReport: {
+            /** Accepted Records */
+            accepted_records: number;
+            /** Issues */
+            issues?: components["schemas"]["EvidenceValidationIssue"][];
+            metadata: components["schemas"]["EvidenceMetadata"];
+            /** Rejected Records */
+            rejected_records: number;
+            status: components["schemas"]["ValidationStatus"];
+            /** Total Records */
+            total_records: number;
+        };
+        /** GraphData */
+        GraphData: {
+            /** Edges */
+            edges?: components["schemas"]["GraphEdge"][];
+            /**
+             * Graph Version
+             * @default 1.0
+             * @constant
+             */
+            graph_version: "1.0";
+            /** Nodes */
+            nodes?: components["schemas"]["GraphNode"][];
+        };
+        /** GraphEdge */
+        GraphEdge: {
+            /**
+             * Edge Id
+             * Format: uuid
+             */
+            edge_id: string;
+            /** Event Count */
+            event_count: number;
+            /** Event Ids */
+            event_ids: string[];
+            /** Relationships */
+            relationships: string[];
+            /** Source Node Id */
+            source_node_id: string;
+            /** Target Node Id */
+            target_node_id: string;
+        };
+        /** GraphNode */
+        GraphNode: {
+            /** Entity Id */
+            entity_id: string;
+            /** Event Count */
+            event_count: number;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Maximum Risk */
+            maximum_risk: number;
+            /** Node Id */
+            node_id: string;
+        };
+        /** GraphPublic */
+        GraphPublic: {
+            /** Edges */
+            edges: components["schemas"]["GraphEdge"][];
+            /** Nodes */
+            nodes: components["schemas"]["GraphNode"][];
+            /** Truncated */
+            truncated: boolean;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** ImportErrorPublic */
+        ImportErrorPublic: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Retryable */
+            retryable: boolean;
+        };
+        /** ImportProgress */
+        ImportProgress: {
+            /**
+             * Mode
+             * @constant
+             */
+            mode: "indeterminate";
+        };
         /** ImportPublic */
         ImportPublic: {
             /** Case Id */
             case_id: number;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
-            /** Error */
-            error: {
-                [key: string]: unknown;
-            } | null;
+            error: components["schemas"]["ImportErrorPublic"] | null;
             /** Evidence Id */
             evidence_id: string | null;
             /** Filename */
             filename: string;
-            /** Import Id */
+            /**
+             * Import Id
+             * Format: uuid
+             */
             import_id: string;
-            /** Progress */
-            progress: {
-                [key: string]: unknown;
-            };
-            /** Source Type */
-            source_type: string;
+            progress: components["schemas"]["ImportProgress"];
+            source_type: components["schemas"]["EvidenceSource"];
             /** State */
             state: string;
-            /** Updated At */
+            /**
+             * Updated At
+             * Format: date-time
+             */
             updated_at: string;
-            /** Validation */
-            validation: {
-                [key: string]: unknown;
-            } | null;
+            validation: components["schemas"]["EvidenceValidationReport"] | null;
         };
+        /** Incident */
+        Incident: {
+            /** Alert Ids */
+            alert_ids?: string[];
+            /** Case Id */
+            case_id: number;
+            /** Correlation Edge Ids */
+            correlation_edge_ids?: string[];
+            /** Ended At */
+            ended_at: string | null;
+            /** Event Ids */
+            event_ids: string[];
+            /** Finding Ids */
+            finding_ids: string[];
+            /**
+             * Incident Id
+             * Format: uuid
+             */
+            incident_id: string;
+            /**
+             * Incident Version
+             * @default 1.0
+             * @constant
+             */
+            incident_version: "1.0";
+            /** Maximum Risk */
+            maximum_risk: number;
+            /** Started At */
+            started_at: string | null;
+        };
+        /**
+         * IssueLevel
+         * @enum {string}
+         */
+        IssueLevel: "error" | "warning";
+        JsonValue: unknown;
         /** LiveSessionCreate */
         LiveSessionCreate: {
             /**
@@ -1025,12 +1835,109 @@ export interface components {
              */
             stale_after_seconds: number;
         };
-        /** PageResponse */
-        PageResponse: {
+        /** NormalizationIssue */
+        NormalizationIssue: {
+            /** Code */
+            code: string;
+            /** Field */
+            field?: string | null;
+            /** Message */
+            message: string;
+            /** Source Value */
+            source_value?: string | null;
+        };
+        /** PageResponse[Alert] */
+        PageResponse_Alert_: {
             /** Items */
-            items: {
-                [key: string]: unknown;
-            }[];
+            items: components["schemas"]["Alert"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[AnalysisSnapshotPublic] */
+        PageResponse_AnalysisSnapshotPublic_: {
+            /** Items */
+            items: components["schemas"]["AnalysisSnapshotPublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[CasePublic] */
+        PageResponse_CasePublic_: {
+            /** Items */
+            items: components["schemas"]["CasePublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[ChartPoint] */
+        PageResponse_ChartPoint_: {
+            /** Items */
+            items: components["schemas"]["ChartPoint"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[DetectionFinding] */
+        PageResponse_DetectionFinding_: {
+            /** Items */
+            items: components["schemas"]["DetectionFinding"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[EventPublic] */
+        PageResponse_EventPublic_: {
+            /** Items */
+            items: components["schemas"]["EventPublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[EvidencePublic] */
+        PageResponse_EvidencePublic_: {
+            /** Items */
+            items: components["schemas"]["EvidencePublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[Incident] */
+        PageResponse_Incident_: {
+            /** Items */
+            items: components["schemas"]["Incident"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** PageResponse[TimelineEntry] */
+        PageResponse_TimelineEntry_: {
+            /** Items */
+            items: components["schemas"]["TimelineEntry"][];
             /** Page */
             page: number;
             /** Page Size */
@@ -1040,6 +1947,8 @@ export interface components {
         };
         /** ReanalysisPublic */
         ReanalysisPublic: {
+            /** Alert Count */
+            alert_count: number;
             /**
              * Analysis Id
              * Format: uuid
@@ -1047,18 +1956,32 @@ export interface components {
             analysis_id: string;
             /** Case Id */
             case_id: number;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
+            /** Finding Count */
+            finding_count: number;
+            /** Incident Count */
+            incident_count: number;
+            /** Input Event Count */
+            input_event_count: number;
+            /** Input Fingerprint */
+            input_fingerprint: string;
+            /** Is Latest */
+            is_latest: boolean;
+            /** Maximum Risk */
+            maximum_risk: number;
             /**
              * Outcome
              * @enum {string}
              */
             outcome: "created" | "reused";
-            /**
-             * Status
-             * @constant
-             */
-            status: "completed";
+            /** Reused Existing */
+            reused_existing: boolean;
+            /** Status */
+            status: string;
         };
         /** ReanalysisRequest */
         ReanalysisRequest: Record<string, never>;
@@ -1071,6 +1994,116 @@ export interface components {
             /** Title */
             title: string;
         };
+        /**
+         * RiskBand
+         * @enum {string}
+         */
+        RiskBand: "low" | "medium" | "high" | "critical";
+        /** RiskFactor */
+        RiskFactor: {
+            /** Explanation */
+            explanation: string;
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "severity" | "confidence" | "repetition" | "device_criticality" | "corroboration";
+            /** Score */
+            score: number;
+            /** Weight */
+            weight: number;
+            /** Weighted Points */
+            weighted_points: number;
+        };
+        /** RiskScore */
+        RiskScore: {
+            band: components["schemas"]["RiskBand"];
+            /** Factors */
+            factors: components["schemas"]["RiskFactor"][];
+            /** Score */
+            score: number;
+            /**
+             * Scoring Version
+             * @default 1.0
+             * @constant
+             */
+            scoring_version: "1.0";
+        };
+        /** RiskWeights */
+        RiskWeights: {
+            /**
+             * Confidence
+             * @default 25
+             */
+            confidence: number;
+            /**
+             * Corroboration
+             * @default 10
+             */
+            corroboration: number;
+            /**
+             * Device Criticality
+             * @default 15
+             */
+            device_criticality: number;
+            /**
+             * Repetition
+             * @default 20
+             */
+            repetition: number;
+            /**
+             * Severity
+             * @default 30
+             */
+            severity: number;
+        };
+        /**
+         * Severity
+         * @enum {string}
+         */
+        Severity: "low" | "medium" | "high" | "critical";
+        /**
+         * SortDirection
+         * @enum {string}
+         */
+        SortDirection: "asc" | "desc";
+        /**
+         * SortField
+         * @enum {string}
+         */
+        SortField: "observed_at" | "ingested_at" | "event_type" | "event_id";
+        /** TimelineEntry */
+        TimelineEntry: {
+            /** Entry Id */
+            entry_id: string;
+            entry_type: components["schemas"]["TimelineEntryType"];
+            /** Event Ids */
+            event_ids?: string[];
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /**
+             * Ingested At
+             * Format: date-time
+             */
+            ingested_at: string;
+            /** Occurred At */
+            occurred_at: string | null;
+            /** Risk Score */
+            risk_score?: number | null;
+            severity?: components["schemas"]["Severity"] | null;
+            /**
+             * Timestamp Basis
+             * @enum {string}
+             */
+            timestamp_basis: "observed" | "unavailable";
+            /** Title */
+            title: string;
+        };
+        /**
+         * TimelineEntryType
+         * @enum {string}
+         */
+        TimelineEntryType: "event" | "alert" | "finding";
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -1084,6 +2117,26 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** ValidationIssuePublic */
+        ValidationIssuePublic: {
+            /** Code */
+            code: string;
+            /** Field */
+            field: string | null;
+            /** Level */
+            level: string;
+            /** Message */
+            message: string;
+            /** Rejected Value */
+            rejected_value: string | null;
+            /** Row Number */
+            row_number: number | null;
+        };
+        /**
+         * ValidationStatus
+         * @enum {string}
+         */
+        ValidationStatus: "accepted" | "accepted_with_warnings" | "rejected";
     };
     responses: never;
     parameters: never;
@@ -1110,7 +2163,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AnalysisResult"];
                 };
             };
             /** @description Validation Error */
@@ -1303,7 +2356,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PageResponse"];
+                    "application/json": components["schemas"]["PageResponse_CasePublic_"];
                 };
             };
             /** @description Validation Error */
@@ -1400,7 +2453,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_ChartPoint_"];
                 };
             };
             /** @description Validation Error */
@@ -1438,7 +2491,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_Alert_"];
                 };
             };
             /** @description Validation Error */
@@ -1472,7 +2525,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PageResponse"];
+                    "application/json": components["schemas"]["PageResponse_AnalysisSnapshotPublic_"];
                 };
             };
             /** @description Validation Error */
@@ -1538,7 +2591,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AnalysisResult"];
                 };
             };
             /** @description Validation Error */
@@ -1570,7 +2623,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AnalysisResult"];
                 };
             };
             /** @description Validation Error */
@@ -1637,7 +2690,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_ChartPoint_"];
                 };
             };
             /** @description Validation Error */
@@ -1677,7 +2730,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PageResponse"];
+                    "application/json": components["schemas"]["PageResponse_EventPublic_"];
                 };
             };
             /** @description Validation Error */
@@ -1709,7 +2762,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EventPublic"];
                 };
             };
             /** @description Validation Error */
@@ -1744,7 +2797,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PageResponse"];
+                    "application/json": components["schemas"]["PageResponse_EvidencePublic_"];
                 };
             };
             /** @description Validation Error */
@@ -1776,7 +2829,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EvidenceDetailPublic"];
                 };
             };
             /** @description Validation Error */
@@ -1814,7 +2867,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_DetectionFinding_"];
                 };
             };
             /** @description Validation Error */
@@ -1849,7 +2902,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["GraphPublic"];
                 };
             };
             /** @description Validation Error */
@@ -1922,7 +2975,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_Incident_"];
                 };
             };
             /** @description Validation Error */
@@ -2151,7 +3204,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["CaseSummaryPublic"];
                 };
             };
             /** @description Validation Error */
@@ -2189,7 +3242,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PageResponse_TimelineEntry_"];
                 };
             };
             /** @description Validation Error */
@@ -2218,7 +3271,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["DashboardSummaryPublic"];
                 };
             };
         };
@@ -2372,7 +3425,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EventPublic"];
                 };
             };
             /** @description Validation Error */
@@ -2403,7 +3456,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["EvidenceDetailPublic"];
                 };
             };
             /** @description Validation Error */

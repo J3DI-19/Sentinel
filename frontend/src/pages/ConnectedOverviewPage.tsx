@@ -1,36 +1,30 @@
 import { useEffect, useState } from "react";
-import { apiClient } from "../api/batch";
+import { investigationApi, type DashboardSummary } from "../api/investigation";
 import { normalizeApiError } from "../api/client";
 import { Button, EmptyState, PageHeader } from "../components/ui/core";
 
-interface Dashboard {
-  case_count: number;
-  event_count: number;
-  active_cases: number;
-  recent_cases: {
-    id: number;
-    name: string;
-    updated_at: string | null;
-    created_at: string;
-  }[];
-}
-
 export function ConnectedOverviewPage({ navigate }: { navigate: (path: string) => void }) {
-  const [data, setData] = useState<Dashboard | null>(null);
+  const [data, setData] = useState<DashboardSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [requestId, setRequestId] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
-    void apiClient
-      .request<Dashboard>("/dashboard/summary", { signal: controller.signal })
+    setLoading(true);
+    setError(null);
+    void investigationApi.dashboard(controller.signal)
       .then(setData)
       .catch(reason => {
-        if (!controller.signal.aborted) {
-          setError(normalizeApiError(reason).message);
-        }
+        if (!controller.signal.aborted) setError(normalizeApiError(reason).message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, []);
+  }, [requestId]);
+
+  const reload = () => setRequestId(value => value + 1);
 
   return (
     <>
@@ -38,27 +32,24 @@ export function ConnectedOverviewPage({ navigate }: { navigate: (path: string) =
         eyebrow="Investigation overview · Connected API"
         title="Investigation overview"
         description="Persisted batch workload and evidence activity. Authenticated live capture is available from the Live Monitor."
-        actions={
-          <Button variant="primary" onClick={() => navigate("/cases")}>
-            Open cases
-          </Button>
-        }
+        actions={<><Button onClick={reload} disabled={loading}>Refresh</Button><Button variant="primary" onClick={() => navigate("/cases")}>Open cases</Button></>}
       />
 
       {error && (
         <div className="state-box" role="alert">
           <strong>Dashboard unavailable</strong>
           <p>{error}</p>
+          <Button onClick={reload} disabled={loading}>Retry</Button>
         </div>
       )}
 
-      {!error && !data && (
+      {!error && loading && (
         <div className="state-box" aria-live="polite">
           <strong>Loading persisted overview…</strong>
         </div>
       )}
 
-      {data && (
+      {!loading && data && (
         <>
           <div className="case-status-summary">
             <div>

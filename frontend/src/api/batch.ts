@@ -2,14 +2,13 @@ import { ApiClient, serializeQuery } from "./client";
 import type { components } from "./generated";
 
 export type ApiCase = components["schemas"]["CasePublic"];
-
-export interface Page<T> { items: T[]; page: number; page_size: number; total: number }
+export type ApiCasePage = components["schemas"]["PageResponse_CasePublic_"];
 
 export const apiClient = new ApiClient("/api/v1");
 
 export const batchApi = {
   listCases(signal?: AbortSignal) {
-    return apiClient.request<Page<ApiCase>>(`/cases${serializeQuery({ page: 1, page_size: 100 })}`, { signal });
+    return apiClient.request<ApiCasePage>(`/cases${serializeQuery({ page: 1, page_size: 100 })}`, { signal });
   },
   createCase(name: string, description = "", owner = "Investigator", signal?: AbortSignal) {
     return apiClient.request<ApiCase>("/cases", {
