@@ -1,0 +1,95 @@
+// Copy to config.h and edit for the physical node. Never commit config.h.
+#pragma once
+
+// --- Wi-Fi (lab VLAN, isolated from the internet) ---
+#define TV_WIFI_SSID        "traceveil-lab"
+#define TV_WIFI_PSK         "change-me"
+
+// --- Traceveil case and identity (must match backend registration) ---
+#define TV_CASE_ID          1
+#define TV_SOURCE_ID        "esp32-lab-01"
+#define TV_DEVICE_ID        "esp32-lab-01"
+#define TV_SOURCE_TOKEN     "replace-with-a-long-random-token"
+
+// --- Transport selection: exactly one of these must be 1 ---
+#define TV_TRANSPORT_HTTP   1
+#define TV_TRANSPORT_MQTT   0
+
+// --- HTTP endpoint (Phase 3 live collector) ---
+// TV5-10: TLS is the DEFAULT and cannot be disabled without knowingly
+// editing this file. The source token is a bearer credential; anything
+// on-network that sees the header can forge evidence. If you truly must
+// run over loopback for a single-box demo, set TV_HTTP_TLS to 0 AND set
+// TV_HTTP_HOST to "127.0.0.1" - startup refuses any other combination.
+#define TV_HTTP_HOST        "traceveil.lab"
+#define TV_HTTP_PORT        8443
+#define TV_HTTP_PATH        "/api/v1/live/telemetry"
+#define TV_HTTP_TLS         1
+
+// PEM-encoded lab root CA that signs the FastAPI server cert. Required
+// when TV_HTTP_TLS is 1. Concatenate a full PEM block between the quotes;
+// the sketch pins against it and refuses to boot without it.
+static const char TV_HTTP_ROOT_CA_PEM[] = R"PEM(
+-----BEGIN CERTIFICATE-----
+REPLACE-WITH-LAB-ROOT-CA
+-----END CERTIFICATE-----
+)PEM";
+
+// --- MQTT broker (only used when TV_TRANSPORT_MQTT == 1) ---
+// TV5-02: mutual TLS is required. Startup refuses if any of the three
+// PEMs below is empty or does not parse.
+#define TV_MQTT_HOST                "traceveil.lab"
+#define TV_MQTT_PORT                8883
+#define TV_MQTT_CLIENT_ID           TV_SOURCE_ID   // must match ACL pattern
+#define TV_MQTT_TLS                 1
+
+static const char TV_MQTT_CA_PEM[] = R"PEM(
+-----BEGIN CERTIFICATE-----
+REPLACE-WITH-LAB-CA
+-----END CERTIFICATE-----
+)PEM";
+static const char TV_MQTT_CLIENT_CERT_PEM[] = R"PEM(
+-----BEGIN CERTIFICATE-----
+REPLACE-WITH-THIS-NODE-CLIENT-CERT
+-----END CERTIFICATE-----
+)PEM";
+static const char TV_MQTT_CLIENT_KEY_PEM[] = R"PEM(
+-----BEGIN PRIVATE KEY-----
+REPLACE-WITH-THIS-NODE-CLIENT-KEY
+-----END PRIVATE KEY-----
+)PEM";
+
+// --- Application-level delivery (TV5-08 / TV5-09) ---
+// PubSubClient publishes at QoS 0. The sketch compensates with an
+// in-RAM ring buffer of unacked frames; the bridge publishes an ACK on
+// tv/dev/<source_id>/ack after the backend accepts the frame, and the
+// sketch drops that sequence from the buffer. Anything still in the
+// buffer after TV_ACK_TIMEOUT_MS is retried over HTTP (fail-forward)
+// and re-queued if HTTP is also down.
+#define TV_ACK_BUFFER_SIZE          32
+#define TV_ACK_TIMEOUT_MS           6000
+#define TV_MQTT_FAILOVER_MS         4000
+
+// --- NTP (TV5-04) ---
+// The lab VLAN normally has no default route. Point these at a reachable
+// local NTP source, or provision a controlled UDP 123 egress rule. The
+// sketch refuses to emit anything until a valid clock is established.
+#define TV_NTP_SERVER_1             "10.10.0.5"
+#define TV_NTP_SERVER_2             "pool.ntp.org"
+#define TV_NTP_MIN_EPOCH            1735689600UL   // 2025-01-01 UTC
+#define TV_NTP_TIMEOUT_MS           30000
+
+// --- Sampling and cadence ---
+#define TV_SAMPLE_INTERVAL_MS       3000
+#define TV_HEARTBEAT_MS             15000
+
+// --- Pins ---
+#define TV_PIN_DHT                  4
+#define TV_PIN_PIR                  27
+#define TV_PIN_RELAY                26   // OUTPUT, driven by the sketch
+#define TV_PIN_RELAY_SENSE          25   // INPUT, high-Z tap on the relay coil (TV5-06)
+#define TV_PIN_COMMAND_BUTTON       33   // INPUT_PULLUP; pressing it toggles the relay via the sketch
+#define TV_PIN_STATUS_LED           2
+
+// --- Thresholds surfaced to detection rules via metrics ---
+#define TV_TEMP_C_ALERT_ABOVE       32.0f
