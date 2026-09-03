@@ -8,6 +8,14 @@ describe("Traceveil investigation interface", () => {
       const path = String(input);
       const response = path.endsWith("/dashboard/summary")
         ? { case_count: 1, event_count: 12, active_cases: 1, recent_cases: [{ id: 1, name: "Persisted demo", created_at: "2026-01-01T00:00:00Z", updated_at: null }] }
+        : path.includes("/cases/1/analyses?page=")
+        ? { items: [], page: 1, page_size: 100, total: 0 }
+        : path.endsWith("/cases/1/summary")
+        ? { case: { id: 1, name: "Persisted demo", description: "", case_type: "batch", status: "active", owner: "Investigator", created_at: "2026-01-01T00:00:00Z", updated_at: null }, event_count: 0, entity_count: 0, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: null }
+        : /\/cases\/1\/(?:evidence|events|findings|alerts|incidents|timeline|charts)/.test(path)
+        ? { items: [], page: 1, page_size: 50, total: 0 }
+        : path.includes("/cases/1/graph")
+        ? { nodes: [], edges: [], truncated: false }
         : path.includes("/cases?page=")
         ? { items: [{ id: 1, name: "Persisted demo", description: "", case_type: "batch", status: "active", owner: "Investigator", created_at: "2026-01-01T00:00:00Z", updated_at: null }], page: 1, page_size: 100, total: 1 }
         : path.endsWith("/assistant/sessions")
@@ -113,11 +121,13 @@ describe("Traceveil investigation interface", () => {
     expect(screen.queryByText("Risk model")).not.toBeInTheDocument();
   });
 
-  it("keeps connected analytics backend-authored and links to live capture", async () => {
+  it("keeps connected analytics backend-authored and outside the deferred live-capture scope", async () => {
     window.history.replaceState({}, "", "/cases/1/analytics");
     const { unmount } = render(<App />);
     expect(await screen.findByRole("heading", { name: "Analytics" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Live capture" })).toBeInTheDocument();
+    expect(screen.getByText(/Persisted batch investigation/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Live capture" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Live Monitor" })).toBeInTheDocument();
     unmount();
     window.history.replaceState({}, "", "/live?case=1");
     render(<App />);

@@ -1,6 +1,451 @@
 {
   "components": {
     "schemas": {
+      "Alert": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_id": {
+            "format": "uuid",
+            "title": "Alert Id",
+            "type": "string"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "delivery_status": {
+            "const": "pending",
+            "default": "pending",
+            "title": "Delivery Status",
+            "type": "string"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "minItems": 1,
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "evidence_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "minItems": 1,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "finding_id": {
+            "format": "uuid",
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "risk_score": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Risk Score",
+            "type": "integer"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "triggered_at": {
+            "format": "date-time",
+            "title": "Triggered At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "alert_id",
+          "case_id",
+          "finding_id",
+          "rule_id",
+          "title",
+          "severity",
+          "risk_score",
+          "event_ids",
+          "evidence_ids",
+          "triggered_at"
+        ],
+        "title": "Alert",
+        "type": "object"
+      },
+      "AnalysisConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "authentication_failure_threshold": {
+            "default": 10,
+            "maximum": 1000.0,
+            "minimum": 2.0,
+            "title": "Authentication Failure Threshold",
+            "type": "integer"
+          },
+          "authentication_window_seconds": {
+            "default": 60,
+            "maximum": 86400.0,
+            "minimum": 1.0,
+            "title": "Authentication Window Seconds",
+            "type": "integer"
+          },
+          "baseline_max_samples": {
+            "default": 20,
+            "maximum": 10000.0,
+            "minimum": 2.0,
+            "title": "Baseline Max Samples",
+            "type": "integer"
+          },
+          "baseline_min_samples": {
+            "default": 3,
+            "maximum": 1000.0,
+            "minimum": 2.0,
+            "title": "Baseline Min Samples",
+            "type": "integer"
+          },
+          "baseline_minimum_delta": {
+            "default": 1.0,
+            "minimum": 0.0,
+            "title": "Baseline Minimum Delta",
+            "type": "number"
+          },
+          "baseline_repetition_reference": {
+            "default": 3,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Baseline Repetition Reference",
+            "type": "integer"
+          },
+          "baseline_sigma": {
+            "default": 3.0,
+            "maximum": 20.0,
+            "minimum": 0.1,
+            "title": "Baseline Sigma",
+            "type": "number"
+          },
+          "baseline_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Baseline Version",
+            "type": "string"
+          },
+          "configuration_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Configuration Version",
+            "type": "string"
+          },
+          "correlation_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Correlation Version",
+            "type": "string"
+          },
+          "correlation_window_seconds": {
+            "default": 120,
+            "maximum": 86400.0,
+            "minimum": 1.0,
+            "title": "Correlation Window Seconds",
+            "type": "integer"
+          },
+          "critical_device_scores": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "maxProperties": 1024,
+            "title": "Critical Device Scores",
+            "type": "object"
+          },
+          "dataset_benign_labels": {
+            "default": [
+              "0",
+              "benign",
+              "benigntraffic",
+              "normal"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 32,
+            "minItems": 1,
+            "title": "Dataset Benign Labels",
+            "type": "array"
+          },
+          "default_device_criticality": {
+            "default": 50,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Default Device Criticality",
+            "type": "integer"
+          },
+          "label_repetition_reference": {
+            "default": 4,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Label Repetition Reference",
+            "type": "integer"
+          },
+          "malicious_labels": {
+            "default": [
+              "1",
+              "attack",
+              "backdoor",
+              "ddos",
+              "dos",
+              "injection",
+              "malicious",
+              "malware",
+              "password",
+              "ransomware",
+              "scanning",
+              "xss"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 128,
+            "minItems": 1,
+            "title": "Malicious Labels",
+            "type": "array"
+          },
+          "request_rate_multiplier": {
+            "default": 3.0,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Request Rate Multiplier",
+            "type": "number"
+          },
+          "request_rate_repetition_reference": {
+            "default": 4,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Request Rate Repetition Reference",
+            "type": "integer"
+          },
+          "risk_weights": {
+            "$ref": "#/components/schemas/RiskWeights"
+          },
+          "rule_set_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Rule Set Version",
+            "type": "string"
+          },
+          "scoring_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Scoring Version",
+            "type": "string"
+          }
+        },
+        "title": "AnalysisConfig",
+        "type": "object"
+      },
+      "AnalysisResult": {
+        "additionalProperties": false,
+        "properties": {
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/Alert"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "analysis_id": {
+            "format": "uuid",
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "analysis_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Analysis Version",
+            "type": "string"
+          },
+          "analyzed_event_count": {
+            "minimum": 0.0,
+            "title": "Analyzed Event Count",
+            "type": "integer"
+          },
+          "baselines": {
+            "items": {
+              "$ref": "#/components/schemas/BaselineSummary"
+            },
+            "title": "Baselines",
+            "type": "array"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "chart_points": {
+            "items": {
+              "$ref": "#/components/schemas/ChartPoint"
+            },
+            "title": "Chart Points",
+            "type": "array"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/AnalysisConfig"
+          },
+          "configuration_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Configuration Version",
+            "type": "string"
+          },
+          "correlations": {
+            "items": {
+              "$ref": "#/components/schemas/CorrelationEdge"
+            },
+            "title": "Correlations",
+            "type": "array"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/EventFilter"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/DetectionFinding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "graph": {
+            "$ref": "#/components/schemas/GraphData"
+          },
+          "incidents": {
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            },
+            "title": "Incidents",
+            "type": "array"
+          },
+          "input_event_count": {
+            "minimum": 0.0,
+            "title": "Input Event Count",
+            "type": "integer"
+          },
+          "rule_set_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Rule Set Version",
+            "type": "string"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEntry"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "configuration",
+          "case_id",
+          "input_event_count",
+          "analyzed_event_count",
+          "filter",
+          "graph"
+        ],
+        "title": "AnalysisResult",
+        "type": "object"
+      },
+      "AnalysisSnapshotPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_count": {
+            "minimum": 0.0,
+            "title": "Alert Count",
+            "type": "integer"
+          },
+          "analysis_id": {
+            "format": "uuid",
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finding_count": {
+            "minimum": 0.0,
+            "title": "Finding Count",
+            "type": "integer"
+          },
+          "incident_count": {
+            "minimum": 0.0,
+            "title": "Incident Count",
+            "type": "integer"
+          },
+          "input_event_count": {
+            "minimum": 0.0,
+            "title": "Input Event Count",
+            "type": "integer"
+          },
+          "input_fingerprint": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Input Fingerprint",
+            "type": "string"
+          },
+          "is_latest": {
+            "title": "Is Latest",
+            "type": "boolean"
+          },
+          "maximum_risk": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Maximum Risk",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "case_id",
+          "status",
+          "created_at",
+          "input_fingerprint",
+          "input_event_count",
+          "finding_count",
+          "alert_count",
+          "incident_count",
+          "maximum_risk",
+          "is_latest"
+        ],
+        "title": "AnalysisSnapshotPublic",
+        "type": "object"
+      },
       "Approval": {
         "properties": {
           "approver": {
@@ -70,6 +515,92 @@
         "title": "AssistantSessionCreate",
         "type": "object"
       },
+      "BaselineSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "baseline_id": {
+            "format": "uuid",
+            "title": "Baseline Id",
+            "type": "string"
+          },
+          "baseline_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Baseline Version",
+            "type": "string"
+          },
+          "entity_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "evaluated_event_id": {
+            "format": "uuid",
+            "title": "Evaluated Event Id",
+            "type": "string"
+          },
+          "mean": {
+            "title": "Mean",
+            "type": "number"
+          },
+          "metric": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Metric",
+            "type": "string"
+          },
+          "population_stddev": {
+            "minimum": 0.0,
+            "title": "Population Stddev",
+            "type": "number"
+          },
+          "sample_count": {
+            "minimum": 1.0,
+            "title": "Sample Count",
+            "type": "integer"
+          },
+          "sample_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 256,
+            "minItems": 1,
+            "title": "Sample Event Ids",
+            "type": "array"
+          },
+          "threshold": {
+            "title": "Threshold",
+            "type": "number"
+          },
+          "window_end": {
+            "format": "date-time",
+            "title": "Window End",
+            "type": "string"
+          },
+          "window_start": {
+            "format": "date-time",
+            "title": "Window Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "baseline_id",
+          "entity_id",
+          "metric",
+          "sample_event_ids",
+          "sample_count",
+          "mean",
+          "population_stddev",
+          "threshold",
+          "evaluated_event_id",
+          "window_start",
+          "window_end"
+        ],
+        "title": "BaselineSummary",
+        "type": "object"
+      },
       "Body_upload_import_api_v1_cases__case_id__imports_post": {
         "properties": {
           "duplicate_policy": {
@@ -108,6 +639,288 @@
         "title": "Body_upload_import_api_v1_cases__case_id__imports_post",
         "type": "object"
       },
+      "CanonicalEntity": {
+        "additionalProperties": false,
+        "properties": {
+          "device_type": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Type"
+          },
+          "id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "ip": {
+            "anyOf": [
+              {
+                "format": "ipvanyaddress",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/EntityKind"
+          },
+          "mac": {
+            "anyOf": [
+              {
+                "pattern": "^(?:[0-9a-f]{2}:){5}[0-9a-f]{2}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mac"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "id",
+          "kind"
+        ],
+        "title": "CanonicalEntity",
+        "type": "object"
+      },
+      "CanonicalNetwork": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes_received": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes Received"
+          },
+          "bytes_sent": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes Sent"
+          },
+          "destination_ip": {
+            "anyOf": [
+              {
+                "format": "ipvanyaddress",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Ip"
+          },
+          "destination_port": {
+            "anyOf": [
+              {
+                "maximum": 65535.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Port"
+          },
+          "packets_received": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Packets Received"
+          },
+          "packets_sent": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Packets Sent"
+          },
+          "protocol": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9_.-]{1,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Protocol"
+          },
+          "source_ip": {
+            "anyOf": [
+              {
+                "format": "ipvanyaddress",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Ip"
+          },
+          "source_port": {
+            "anyOf": [
+              {
+                "maximum": 65535.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Port"
+          }
+        },
+        "title": "CanonicalNetwork",
+        "type": "object"
+      },
+      "CanonicalProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter_name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Adapter Name",
+            "type": "string"
+          },
+          "adapter_version": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Adapter Version",
+            "type": "string"
+          },
+          "evidence_id": {
+            "format": "uuid",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "normalization_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Normalization Version",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/EventOrigin"
+          },
+          "raw_record_hash": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Raw Record Hash",
+            "type": "string"
+          },
+          "source_hash": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Source Hash",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "source_name": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Source Name",
+            "type": "string"
+          },
+          "source_record_reference": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Source Record Reference",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/CanonicalSourceType"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "origin",
+          "source_type",
+          "source_name",
+          "source_hash",
+          "source_record_reference",
+          "raw_record_hash",
+          "adapter_name",
+          "adapter_version"
+        ],
+        "title": "CanonicalProvenance",
+        "type": "object"
+      },
+      "CanonicalSourceType": {
+        "enum": [
+          "casas",
+          "casas_smart_home",
+          "ton_iot_telemetry",
+          "ton_iot_fridge_telemetry",
+          "simulation",
+          "simulated",
+          "ton_iot_network",
+          "ciciot2023_network",
+          "generic",
+          "live_telemetry"
+        ],
+        "title": "CanonicalSourceType",
+        "type": "string"
+      },
       "CaseCreate": {
         "properties": {
           "description": {
@@ -136,12 +949,14 @@
         "type": "object"
       },
       "CasePublic": {
+        "additionalProperties": false,
         "properties": {
           "case_type": {
             "title": "Case Type",
             "type": "string"
           },
           "created_at": {
+            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
@@ -150,6 +965,7 @@
             "type": "string"
           },
           "id": {
+            "minimum": 1.0,
             "title": "Id",
             "type": "integer"
           },
@@ -168,6 +984,7 @@
           "updated_at": {
             "anyOf": [
               {
+                "format": "date-time",
                 "type": "string"
               },
               {
@@ -189,6 +1006,116 @@
         "title": "CasePublic",
         "type": "object"
       },
+      "CaseSummaryPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_count": {
+            "minimum": 0.0,
+            "title": "Alert Count",
+            "type": "integer"
+          },
+          "analysis_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Analysis Id"
+          },
+          "case": {
+            "$ref": "#/components/schemas/CasePublic"
+          },
+          "entity_count": {
+            "minimum": 0.0,
+            "title": "Entity Count",
+            "type": "integer"
+          },
+          "event_count": {
+            "minimum": 0.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "finding_count": {
+            "minimum": 0.0,
+            "title": "Finding Count",
+            "type": "integer"
+          },
+          "incident_count": {
+            "minimum": 0.0,
+            "title": "Incident Count",
+            "type": "integer"
+          },
+          "maximum_risk": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Maximum Risk",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "case",
+          "event_count",
+          "entity_count",
+          "finding_count",
+          "alert_count",
+          "incident_count",
+          "maximum_risk",
+          "analysis_id"
+        ],
+        "title": "CaseSummaryPublic",
+        "type": "object"
+      },
+      "ChartPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Category",
+            "type": "string"
+          },
+          "series": {
+            "enum": [
+              "event_type",
+              "origin",
+              "source_label",
+              "finding_severity",
+              "risk_band",
+              "activity_minute"
+            ],
+            "title": "Series",
+            "type": "string"
+          },
+          "subgroup": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subgroup"
+          },
+          "value": {
+            "minimum": 0.0,
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "series",
+          "category",
+          "value"
+        ],
+        "title": "ChartPoint",
+        "type": "object"
+      },
       "CommitRequest": {
         "properties": {
           "allow_partial": {
@@ -198,6 +1125,265 @@
           }
         },
         "title": "CommitRequest",
+        "type": "object"
+      },
+      "ConditionTrace": {
+        "additionalProperties": false,
+        "properties": {
+          "actual": {
+            "maxLength": 256,
+            "title": "Actual",
+            "type": "string"
+          },
+          "condition": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Condition",
+            "type": "string"
+          },
+          "expected": {
+            "maxLength": 256,
+            "title": "Expected",
+            "type": "string"
+          },
+          "field": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "matched": {
+            "title": "Matched",
+            "type": "boolean"
+          },
+          "operator": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Operator",
+            "type": "string"
+          }
+        },
+        "required": [
+          "condition",
+          "field",
+          "operator",
+          "expected",
+          "actual",
+          "matched"
+        ],
+        "title": "ConditionTrace",
+        "type": "object"
+      },
+      "CorrelationEdge": {
+        "additionalProperties": false,
+        "properties": {
+          "correlation_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Correlation Version",
+            "type": "string"
+          },
+          "difference_seconds": {
+            "minimum": 0.0,
+            "title": "Difference Seconds",
+            "type": "number"
+          },
+          "edge_id": {
+            "format": "uuid",
+            "title": "Edge Id",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/CorrelationReason"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "title": "Reasons",
+            "type": "array"
+          },
+          "source_event_id": {
+            "format": "uuid",
+            "title": "Source Event Id",
+            "type": "string"
+          },
+          "target_event_id": {
+            "format": "uuid",
+            "title": "Target Event Id",
+            "type": "string"
+          },
+          "window_seconds": {
+            "minimum": 1.0,
+            "title": "Window Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "edge_id",
+          "source_event_id",
+          "target_event_id",
+          "reasons",
+          "difference_seconds",
+          "window_seconds"
+        ],
+        "title": "CorrelationEdge",
+        "type": "object"
+      },
+      "CorrelationReason": {
+        "enum": [
+          "shared_device",
+          "shared_actor",
+          "shared_target",
+          "shared_network_address"
+        ],
+        "title": "CorrelationReason",
+        "type": "string"
+      },
+      "DashboardSummaryPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "active_cases": {
+            "minimum": 0.0,
+            "title": "Active Cases",
+            "type": "integer"
+          },
+          "case_count": {
+            "minimum": 0.0,
+            "title": "Case Count",
+            "type": "integer"
+          },
+          "event_count": {
+            "minimum": 0.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "recent_cases": {
+            "items": {
+              "$ref": "#/components/schemas/CasePublic"
+            },
+            "title": "Recent Cases",
+            "type": "array"
+          }
+        },
+        "required": [
+          "case_count",
+          "event_count",
+          "active_cases",
+          "recent_cases"
+        ],
+        "title": "DashboardSummaryPublic",
+        "type": "object"
+      },
+      "DetectionFinding": {
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "condition_trace": {
+            "items": {
+              "$ref": "#/components/schemas/ConditionTrace"
+            },
+            "maxItems": 64,
+            "minItems": 1,
+            "title": "Condition Trace",
+            "type": "array"
+          },
+          "confidence": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "minItems": 1,
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "evidence_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "minItems": 1,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "finding_id": {
+            "format": "uuid",
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "live_detected": {
+            "title": "Live Detected",
+            "type": "boolean"
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskScore"
+          },
+          "rule_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "rule_version": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Rule Version",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "summary": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "trigger_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "minItems": 1,
+            "title": "Trigger Event Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "finding_id",
+          "case_id",
+          "rule_id",
+          "rule_version",
+          "title",
+          "summary",
+          "severity",
+          "confidence",
+          "event_ids",
+          "trigger_event_ids",
+          "evidence_ids",
+          "condition_trace",
+          "risk",
+          "live_detected"
+        ],
+        "title": "DetectionFinding",
         "type": "object"
       },
       "EmailDraftBody": {
@@ -229,6 +1415,591 @@
         "title": "EmailDraftBody",
         "type": "object"
       },
+      "EntityKind": {
+        "enum": [
+          "device",
+          "ip_address",
+          "user",
+          "service",
+          "source",
+          "unknown"
+        ],
+        "title": "EntityKind",
+        "type": "string"
+      },
+      "EventFilter": {
+        "additionalProperties": false,
+        "properties": {
+          "device_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Device Ids",
+            "type": "array"
+          },
+          "event_types": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Event Types",
+            "type": "array"
+          },
+          "observed_from": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed From"
+          },
+          "observed_to": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed To"
+          },
+          "origins": {
+            "items": {
+              "enum": [
+                "batch",
+                "live"
+              ],
+              "type": "string"
+            },
+            "maxItems": 2,
+            "title": "Origins",
+            "type": "array"
+          },
+          "sort_direction": {
+            "$ref": "#/components/schemas/SortDirection",
+            "default": "asc"
+          },
+          "sort_field": {
+            "$ref": "#/components/schemas/SortField",
+            "default": "observed_at"
+          },
+          "source_labels": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Source Labels",
+            "type": "array"
+          }
+        },
+        "title": "EventFilter",
+        "type": "object"
+      },
+      "EventOrigin": {
+        "enum": [
+          "batch",
+          "live"
+        ],
+        "title": "EventOrigin",
+        "type": "string"
+      },
+      "EventPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9_]{1,64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalEntity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attributes": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "maxProperties": 256,
+            "title": "Attributes",
+            "type": "object"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalEntity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "pattern": "^[a-z0-9_]{1,64}$",
+            "title": "Event Type",
+            "type": "string"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "network": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalNetwork"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "normalization_warnings": {
+            "items": {
+              "$ref": "#/components/schemas/NormalizationIssue"
+            },
+            "title": "Normalization Warnings",
+            "type": "array"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "pattern": "^[a-z0-9_]{1,64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/CanonicalProvenance"
+          },
+          "raw_record": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Raw Record",
+            "type": "object"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_event_type": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Event Type"
+          },
+          "source_label": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Label"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalEntity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "event_id",
+          "case_id",
+          "observed_at",
+          "ingested_at",
+          "event_type",
+          "provenance",
+          "raw_record"
+        ],
+        "title": "EventPublic",
+        "type": "object"
+      },
+      "EvidenceDetailPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_records": {
+            "minimum": 0.0,
+            "title": "Accepted Records",
+            "type": "integer"
+          },
+          "byte_size": {
+            "minimum": 0.0,
+            "title": "Byte Size",
+            "type": "integer"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "committed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Committed At"
+          },
+          "dataset_profile": {
+            "title": "Dataset Profile",
+            "type": "string"
+          },
+          "evidence_id": {
+            "format": "uuid",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationIssuePublic"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "media_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Type"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "received_at": {
+            "format": "date-time",
+            "title": "Received At",
+            "type": "string"
+          },
+          "rejected_records": {
+            "minimum": 0.0,
+            "title": "Rejected Records",
+            "type": "integer"
+          },
+          "sanitized_filename": {
+            "title": "Sanitized Filename",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/EvidenceSource"
+          },
+          "total_records": {
+            "minimum": 0.0,
+            "title": "Total Records",
+            "type": "integer"
+          },
+          "validation_status": {
+            "title": "Validation Status",
+            "type": "string"
+          },
+          "validator_version": {
+            "title": "Validator Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "case_id",
+          "original_filename",
+          "sanitized_filename",
+          "media_type",
+          "byte_size",
+          "sha256",
+          "source_type",
+          "dataset_profile",
+          "validator_version",
+          "validation_status",
+          "total_records",
+          "accepted_records",
+          "rejected_records",
+          "received_at",
+          "issues"
+        ],
+        "title": "EvidenceDetailPublic",
+        "type": "object"
+      },
+      "EvidenceMetadata": {
+        "properties": {
+          "byte_size": {
+            "minimum": 0.0,
+            "title": "Byte Size",
+            "type": "integer"
+          },
+          "case_id": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Id"
+          },
+          "dataset_profile": {
+            "title": "Dataset Profile",
+            "type": "string"
+          },
+          "evidence_id": {
+            "format": "uuid",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "media_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Type"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "received_at": {
+            "format": "date-time",
+            "title": "Received At",
+            "type": "string"
+          },
+          "sanitized_filename": {
+            "title": "Sanitized Filename",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/EvidenceSource"
+          },
+          "validator_version": {
+            "title": "Validator Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "original_filename",
+          "sanitized_filename",
+          "byte_size",
+          "sha256",
+          "source_type",
+          "dataset_profile",
+          "validator_version",
+          "received_at"
+        ],
+        "title": "EvidenceMetadata",
+        "type": "object"
+      },
+      "EvidencePublic": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_records": {
+            "minimum": 0.0,
+            "title": "Accepted Records",
+            "type": "integer"
+          },
+          "byte_size": {
+            "minimum": 0.0,
+            "title": "Byte Size",
+            "type": "integer"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "committed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Committed At"
+          },
+          "dataset_profile": {
+            "title": "Dataset Profile",
+            "type": "string"
+          },
+          "evidence_id": {
+            "format": "uuid",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "media_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Type"
+          },
+          "original_filename": {
+            "title": "Original Filename",
+            "type": "string"
+          },
+          "received_at": {
+            "format": "date-time",
+            "title": "Received At",
+            "type": "string"
+          },
+          "rejected_records": {
+            "minimum": 0.0,
+            "title": "Rejected Records",
+            "type": "integer"
+          },
+          "sanitized_filename": {
+            "title": "Sanitized Filename",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/EvidenceSource"
+          },
+          "total_records": {
+            "minimum": 0.0,
+            "title": "Total Records",
+            "type": "integer"
+          },
+          "validation_status": {
+            "title": "Validation Status",
+            "type": "string"
+          },
+          "validator_version": {
+            "title": "Validator Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "case_id",
+          "original_filename",
+          "sanitized_filename",
+          "media_type",
+          "byte_size",
+          "sha256",
+          "source_type",
+          "dataset_profile",
+          "validator_version",
+          "validation_status",
+          "total_records",
+          "accepted_records",
+          "rejected_records",
+          "received_at"
+        ],
+        "title": "EvidencePublic",
+        "type": "object"
+      },
       "EvidenceSource": {
         "enum": [
           "casas",
@@ -244,6 +2015,263 @@
         "title": "EvidenceSource",
         "type": "string"
       },
+      "EvidenceValidationIssue": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "level": {
+            "$ref": "#/components/schemas/IssueLevel",
+            "default": "error"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rejected_value": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejected Value"
+          },
+          "row_number": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row Number"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "EvidenceValidationIssue",
+        "type": "object"
+      },
+      "EvidenceValidationReport": {
+        "properties": {
+          "accepted_records": {
+            "minimum": 0.0,
+            "title": "Accepted Records",
+            "type": "integer"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceValidationIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/EvidenceMetadata"
+          },
+          "rejected_records": {
+            "minimum": 0.0,
+            "title": "Rejected Records",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ValidationStatus"
+          },
+          "total_records": {
+            "minimum": 0.0,
+            "title": "Total Records",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metadata",
+          "status",
+          "total_records",
+          "accepted_records",
+          "rejected_records"
+        ],
+        "title": "EvidenceValidationReport",
+        "type": "object"
+      },
+      "GraphData": {
+        "additionalProperties": false,
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "graph_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Graph Version",
+            "type": "string"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "title": "GraphData",
+        "type": "object"
+      },
+      "GraphEdge": {
+        "additionalProperties": false,
+        "properties": {
+          "edge_id": {
+            "format": "uuid",
+            "title": "Edge Id",
+            "type": "string"
+          },
+          "event_count": {
+            "minimum": 1.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 4096,
+            "minItems": 1,
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "relationships": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 32,
+            "minItems": 1,
+            "title": "Relationships",
+            "type": "array"
+          },
+          "source_node_id": {
+            "title": "Source Node Id",
+            "type": "string"
+          },
+          "target_node_id": {
+            "title": "Target Node Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "edge_id",
+          "source_node_id",
+          "target_node_id",
+          "relationships",
+          "event_ids",
+          "event_count"
+        ],
+        "title": "GraphEdge",
+        "type": "object"
+      },
+      "GraphNode": {
+        "additionalProperties": false,
+        "properties": {
+          "entity_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "event_count": {
+            "minimum": 1.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "kind": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "maximum_risk": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Maximum Risk",
+            "type": "integer"
+          },
+          "node_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Node Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id",
+          "entity_id",
+          "kind",
+          "label",
+          "event_count",
+          "maximum_risk"
+        ],
+        "title": "GraphNode",
+        "type": "object"
+      },
+      "GraphPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "nodes",
+          "edges",
+          "truncated"
+        ],
+        "title": "GraphPublic",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -257,31 +2285,72 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "ImportErrorPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "retryable"
+        ],
+        "title": "ImportErrorPublic",
+        "type": "object"
+      },
+      "ImportProgress": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "indeterminate",
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "ImportProgress",
+        "type": "object"
+      },
       "ImportPublic": {
+        "additionalProperties": false,
         "properties": {
           "case_id": {
+            "minimum": 1.0,
             "title": "Case Id",
             "type": "integer"
           },
           "created_at": {
+            "format": "date-time",
             "title": "Created At",
             "type": "string"
           },
           "error": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/ImportErrorPublic"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Error"
+            ]
           },
           "evidence_id": {
             "anyOf": [
               {
+                "format": "uuid",
                 "type": "string"
               },
               {
@@ -295,37 +2364,34 @@
             "type": "string"
           },
           "import_id": {
+            "format": "uuid",
             "title": "Import Id",
             "type": "string"
           },
           "progress": {
-            "additionalProperties": true,
-            "title": "Progress",
-            "type": "object"
+            "$ref": "#/components/schemas/ImportProgress"
           },
           "source_type": {
-            "title": "Source Type",
-            "type": "string"
+            "$ref": "#/components/schemas/EvidenceSource"
           },
           "state": {
             "title": "State",
             "type": "string"
           },
           "updated_at": {
+            "format": "date-time",
             "title": "Updated At",
             "type": "string"
           },
           "validation": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/EvidenceValidationReport"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Validation"
+            ]
           }
         },
         "required": [
@@ -344,6 +2410,115 @@
         "title": "ImportPublic",
         "type": "object"
       },
+      "Incident": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1024,
+            "title": "Alert Ids",
+            "type": "array"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "correlation_edge_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 4096,
+            "title": "Correlation Edge Ids",
+            "type": "array"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 4096,
+            "minItems": 1,
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "finding_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1024,
+            "minItems": 1,
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "incident_id": {
+            "format": "uuid",
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "incident_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Incident Version",
+            "type": "string"
+          },
+          "maximum_risk": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Maximum Risk",
+            "type": "integer"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          }
+        },
+        "required": [
+          "incident_id",
+          "case_id",
+          "event_ids",
+          "finding_ids",
+          "started_at",
+          "ended_at",
+          "maximum_risk"
+        ],
+        "title": "Incident",
+        "type": "object"
+      },
+      "IssueLevel": {
+        "enum": [
+          "error",
+          "warning"
+        ],
+        "title": "IssueLevel",
+        "type": "string"
+      },
+      "JsonValue": {},
       "LiveSessionCreate": {
         "properties": {
           "label": {
@@ -376,25 +2551,70 @@
         "title": "LiveSessionCreate",
         "type": "object"
       },
-      "PageResponse": {
+      "NormalizationIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "source_value": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Value"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "NormalizationIssue",
+        "type": "object"
+      },
+      "PageResponse_Alert_": {
+        "additionalProperties": false,
         "properties": {
           "items": {
             "items": {
-              "additionalProperties": true,
-              "type": "object"
+              "$ref": "#/components/schemas/Alert"
             },
             "title": "Items",
             "type": "array"
           },
           "page": {
+            "minimum": 1.0,
             "title": "Page",
             "type": "integer"
           },
           "page_size": {
+            "minimum": 0.0,
             "title": "Page Size",
             "type": "integer"
           },
           "total": {
+            "minimum": 0.0,
             "title": "Total",
             "type": "integer"
           }
@@ -405,7 +2625,366 @@
           "page_size",
           "total"
         ],
-        "title": "PageResponse",
+        "title": "PageResponse[Alert]",
+        "type": "object"
+      },
+      "PageResponse_AnalysisSnapshotPublic_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AnalysisSnapshotPublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[AnalysisSnapshotPublic]",
+        "type": "object"
+      },
+      "PageResponse_CasePublic_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CasePublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[CasePublic]",
+        "type": "object"
+      },
+      "PageResponse_ChartPoint_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChartPoint"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[ChartPoint]",
+        "type": "object"
+      },
+      "PageResponse_DetectionFinding_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DetectionFinding"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[DetectionFinding]",
+        "type": "object"
+      },
+      "PageResponse_EventPublic_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EventPublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[EventPublic]",
+        "type": "object"
+      },
+      "PageResponse_EvidencePublic_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EvidencePublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[EvidencePublic]",
+        "type": "object"
+      },
+      "PageResponse_Incident_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[Incident]",
+        "type": "object"
+      },
+      "PageResponse_TimelineEntry_": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEntry"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 0.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "PageResponse[TimelineEntry]",
+        "type": "object"
+      },
+      "ReanalysisPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_count": {
+            "minimum": 0.0,
+            "title": "Alert Count",
+            "type": "integer"
+          },
+          "analysis_id": {
+            "format": "uuid",
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "case_id": {
+            "minimum": 1.0,
+            "title": "Case Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finding_count": {
+            "minimum": 0.0,
+            "title": "Finding Count",
+            "type": "integer"
+          },
+          "incident_count": {
+            "minimum": 0.0,
+            "title": "Incident Count",
+            "type": "integer"
+          },
+          "input_event_count": {
+            "minimum": 0.0,
+            "title": "Input Event Count",
+            "type": "integer"
+          },
+          "input_fingerprint": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Input Fingerprint",
+            "type": "string"
+          },
+          "is_latest": {
+            "title": "Is Latest",
+            "type": "boolean"
+          },
+          "maximum_risk": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Maximum Risk",
+            "type": "integer"
+          },
+          "reused_existing": {
+            "title": "Reused Existing",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "case_id",
+          "status",
+          "created_at",
+          "input_fingerprint",
+          "input_event_count",
+          "finding_count",
+          "alert_count",
+          "incident_count",
+          "maximum_risk",
+          "is_latest",
+          "reused_existing"
+        ],
+        "title": "ReanalysisPublic",
         "type": "object"
       },
       "ReanalysisRequest": {
@@ -448,6 +3027,276 @@
         "title": "ReportCreate",
         "type": "object"
       },
+      "RiskBand": {
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ],
+        "title": "RiskBand",
+        "type": "string"
+      },
+      "RiskFactor": {
+        "additionalProperties": false,
+        "properties": {
+          "explanation": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "name": {
+            "enum": [
+              "severity",
+              "confidence",
+              "repetition",
+              "device_criticality",
+              "corroboration"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "integer"
+          },
+          "weight": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Weight",
+            "type": "integer"
+          },
+          "weighted_points": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Weighted Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "score",
+          "weight",
+          "weighted_points",
+          "explanation"
+        ],
+        "title": "RiskFactor",
+        "type": "object"
+      },
+      "RiskScore": {
+        "additionalProperties": false,
+        "properties": {
+          "band": {
+            "$ref": "#/components/schemas/RiskBand"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/RiskFactor"
+            },
+            "maxItems": 5,
+            "minItems": 5,
+            "title": "Factors",
+            "type": "array"
+          },
+          "score": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "integer"
+          },
+          "scoring_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Scoring Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "score",
+          "band",
+          "factors"
+        ],
+        "title": "RiskScore",
+        "type": "object"
+      },
+      "RiskWeights": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "default": 25,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "corroboration": {
+            "default": 10,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Corroboration",
+            "type": "integer"
+          },
+          "device_criticality": {
+            "default": 15,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Device Criticality",
+            "type": "integer"
+          },
+          "repetition": {
+            "default": 20,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Repetition",
+            "type": "integer"
+          },
+          "severity": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Severity",
+            "type": "integer"
+          }
+        },
+        "title": "RiskWeights",
+        "type": "object"
+      },
+      "Severity": {
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ],
+        "title": "Severity",
+        "type": "string"
+      },
+      "SortDirection": {
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "title": "SortDirection",
+        "type": "string"
+      },
+      "SortField": {
+        "enum": [
+          "observed_at",
+          "ingested_at",
+          "event_type",
+          "event_id"
+        ],
+        "title": "SortField",
+        "type": "string"
+      },
+      "TimelineEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "entry_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Entry Id",
+            "type": "string"
+          },
+          "entry_type": {
+            "$ref": "#/components/schemas/TimelineEntryType"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "evidence_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 512,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "ingested_at": {
+            "format": "date-time",
+            "title": "Ingested At",
+            "type": "string"
+          },
+          "occurred_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred At"
+          },
+          "risk_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Risk Score"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timestamp_basis": {
+            "enum": [
+              "observed",
+              "unavailable"
+            ],
+            "title": "Timestamp Basis",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entry_id",
+          "entry_type",
+          "occurred_at",
+          "ingested_at",
+          "timestamp_basis",
+          "title"
+        ],
+        "title": "TimelineEntry",
+        "type": "object"
+      },
+      "TimelineEntryType": {
+        "enum": [
+          "event",
+          "alert",
+          "finding"
+        ],
+        "title": "TimelineEntryType",
+        "type": "string"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -487,6 +3336,75 @@
         ],
         "title": "ValidationError",
         "type": "object"
+      },
+      "ValidationIssuePublic": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rejected_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejected Value"
+          },
+          "row_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row Number"
+          }
+        },
+        "required": [
+          "level",
+          "code",
+          "message",
+          "row_number",
+          "field",
+          "rejected_value"
+        ],
+        "title": "ValidationIssuePublic",
+        "type": "object"
+      },
+      "ValidationStatus": {
+        "enum": [
+          "accepted",
+          "accepted_with_warnings",
+          "rejected"
+        ],
+        "title": "ValidationStatus",
+        "type": "string"
       }
     }
   },
@@ -515,7 +3433,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
               }
             },
             "description": "Successful Response"
@@ -781,7 +3701,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponse"
+                  "$ref": "#/components/schemas/PageResponse_CasePublic_"
                 }
               }
             },
@@ -920,7 +3840,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_ChartPoint_"
+                }
               }
             },
             "description": "Successful Response"
@@ -1048,7 +3970,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_Alert_"
+                }
               }
             },
             "description": "Successful Response"
@@ -1112,7 +4036,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponse"
+                  "$ref": "#/components/schemas/PageResponse_AnalysisSnapshotPublic_"
                 }
               }
             },
@@ -1168,7 +4092,9 @@
           "202": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReanalysisPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -1208,7 +4134,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
               }
             },
             "description": "Successful Response"
@@ -1258,7 +4186,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
               }
             },
             "description": "Successful Response"
@@ -1378,7 +4308,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_ChartPoint_"
+                }
               }
             },
             "description": "Successful Response"
@@ -1538,7 +4470,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponse"
+                  "$ref": "#/components/schemas/PageResponse_EventPublic_"
                 }
               }
             },
@@ -1589,7 +4521,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EventPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -1669,7 +4603,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageResponse"
+                  "$ref": "#/components/schemas/PageResponse_EvidencePublic_"
                 }
               }
             },
@@ -1720,7 +4654,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceDetailPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -1848,7 +4784,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_DetectionFinding_"
+                }
               }
             },
             "description": "Successful Response"
@@ -1929,7 +4867,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/GraphPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -2109,7 +5049,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_Incident_"
+                }
               }
             },
             "description": "Successful Response"
@@ -2439,7 +5381,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CaseSummaryPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -2567,7 +5511,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponse_TimelineEntry_"
+                }
               }
             },
             "description": "Successful Response"
@@ -2596,7 +5542,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSummaryPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -2809,7 +5757,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EventPublic"
+                }
               }
             },
             "description": "Successful Response"
@@ -2850,7 +5800,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceDetailPublic"
+                }
               }
             },
             "description": "Successful Response"
