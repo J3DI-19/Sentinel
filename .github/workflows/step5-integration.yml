@@ -1,0 +1,96 @@
+name: Step 5 integration
+
+on:
+  push:
+    branches: [main, Aarya]
+    paths:
+      - "hardware/**"
+      - "backend/tests/test_mqtt_bridge_forwarding.py"
+      - ".github/workflows/step5-integration.yml"
+  pull_request:
+    paths:
+      - "hardware/**"
+      - "backend/tests/test_mqtt_bridge_forwarding.py"
+      - ".github/workflows/step5-integration.yml"
+
+# TV5-14: expand CI coverage of the Step 5 code paths that a green
+# backend-only pytest run cannot detect. Three jobs run in parallel:
+#
+#   * bridge-unit   - the fast in-process tests already in the pytest
+#                     suite, pinned as a required check for hardware PRs.
+#   * bridge-broker - runs a real mosquitto broker with generated lab
+#                     certs and the traceveil ACL, boots the bridge
+#                     against it, and asserts that (a) an untrusted
+#                     client cannot connect and (b) a valid client
+#                     cannot publish to another node's topic.
+#   * esp32-compile - runs arduino-cli against the reference sketch so a
+#                     C++ regression in the firmware fails CI.
+#
+# Any single job failing blocks the merge.
+
+jobs:
+  bridge-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest tests/test_mqtt_bridge_forwarding.py -v
+
+  bridge-broker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install mosquitto and paho
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mosquitto mosquitto-clients openssl
+          python -m pip install --upgrade pip
+          pip install -r hardware/mqtt_bridge/requirements.txt
+
+      - name: Generate a lab CA and per-CN client certs
+        run: bash tests/step5/generate_lab_pki.sh
+
+      - name: Start mosquitto with the traceveil ACL
+        run: bash tests/step5/start_broker.sh &
+
+      - name: Assert an untrusted client cannot connect (TV5-02)
+        run: bash tests/step5/assert_untrusted_client_rejected.sh
+
+      - name: Assert a valid client cannot publish under another CN (TV5-03)
+        run: bash tests/step5/assert_topic_acl_enforced.sh
+
+  esp32-compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arduino-cli
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR="$HOME/bin" sh
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+      - name: Install ESP32 core and libraries
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+          arduino-cli lib install "DHT sensor library" "Adafruit Unified Sensor" "ArduinoJson" "PubSubClient"
+      - name: Provide a CI config.h stub
+        run: cp tests/step5/ci_config.h hardware/esp32/traceveil_node/config.h
+      - name: Compile the sketch
+        run: |
+          arduino-cli compile --fqbn esp32:esp32:esp32 \
+            hardware/esp32/traceveil_node/traceveil_node.ino
