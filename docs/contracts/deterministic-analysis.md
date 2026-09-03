@@ -23,16 +23,16 @@ Filters may select canonical event types, batch/live origins, device identities,
 
 Observed-time filtering never substitutes ingestion time. Events without `observed_at` do not satisfy an observed-time bound. In an observed-time sort or timeline, timed events are ordered first and untimed events remain explicitly marked `timestamp_basis: unavailable`.
 
-## Rule set `1.0`
+## Rule set `1.1`
 
 | Rule | Deterministic condition | Default output |
 | --- | --- | --- |
-| `LABEL-001` | TON_IoT network or telemetry label is `1`; CICIoT2023 label is outside the versioned benign set; other source labels use the versioned malicious allow-list | High severity, 95 confidence |
+| `LABEL-001` | TON_IoT network or telemetry label is `1`; CICIoT2023 label is outside the versioned benign set; other source labels use the versioned malicious allow-list. Matches are grouped by evidence, primary entity, and persisted attack class. | Medium, high, or critical severity based on the normalized attack class; 95 confidence |
 | `RATE-001` | Numeric `attributes.requests` is at least three times positive numeric `attributes.baseline` | High severity, 90 confidence |
 | `AUTH-001` | Ten authentication failures for the same known target entity and known actor occur within 60 observed seconds | Critical severity, 98 confidence |
 | `BASELINE-001` | A telemetry metric exceeds its previous-sample mean plus the greater of three population standard deviations or the minimum delta | High severity, 80 confidence |
 
-Every finding exposes its rule/version, condition trace, supporting event IDs, triggering event IDs, evidence IDs, confidence, and whether the actual trigger was live. Authentication failures with a missing actor or missing target identity are not grouped under a shared placeholder and therefore cannot trigger `AUTH-001`. A source label is evidence supplied by a selected dataset or adapter; matching it is a transparent rule result, not an independent claim about intent.
+Every finding exposes its rule/version, condition trace, supporting event IDs, triggering event IDs, evidence IDs, confidence, and whether the actual trigger was live. Authentication failures with a missing actor or missing target identity are not grouped under a shared placeholder and therefore cannot trigger `AUTH-001`. A source label is evidence supplied by a selected dataset or adapter; matching it is a transparent rule result, not an independent claim about intent. Rule set `1.0` artifacts remain readable; `1.1` changes `LABEL-001` grouping and therefore produces a new deterministic analysis ID.
 
 The default behavioural baseline requires three prior samples and retains at most twenty. It is calculated independently per primary entity and scalar telemetry metric. Boolean values and the transport `sequence` field are not treated as measurements. Each evaluated baseline stores its sample IDs, window, mean, population standard deviation, threshold, and evaluated event ID.
 
@@ -63,7 +63,7 @@ Two events receive a correlation edge only when both have observed timestamps, f
 
 Each edge records the event pair, exact difference in seconds, window, version, and sorted reasons. Sharing a collector alone is deliberately insufficient. Correlation indicates a reproducible relationship for investigation, not causation.
 
-NetworkX groups complete connected components. Only components containing at least one finding become incidents. An incident retains all component event, finding, alert and correlation-edge IDs, observed start/end when available, maximum risk, case ID, and version.
+NetworkX groups complete connected components. Only components containing at least one finding become incidents. An incident retains all component event, finding, and alert IDs, observed start/end when available, maximum risk, case ID, and version. Correlation-edge references are ordered deterministically by temporal proximity and capped at 4,096 per incident so dense datasets cannot make the analysis payload invalid. Each incident also reports the complete correlation-edge count and whether its retained reference list was truncated. This bounded-reference behavior is identified by the versioned `incident_reference_policy_version` analysis configuration field so upgraded reanalysis cannot collide with snapshots created before the policy existed.
 
 ## Timelines, graphs, aggregates, and alerts
 

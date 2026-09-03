@@ -70,15 +70,15 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     expect(await screen.findByText("Historical snapshot")).toBeInTheDocument();
     expect(screen.getByText(historicalId)).toBeInTheDocument();
     expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes(`/cases/7/findings?page=1&page_size=50&analysis_id=${historicalId}`))).toBe(true);
-    fireEvent.click(screen.getByRole("button", { name: "incidents" }));
-    expect(navigate).toHaveBeenCalledWith(`/cases/7/incidents?analysis=${historicalId}`);
+    fireEvent.click(screen.getByRole("button", { name: "timeline" }));
+    expect(navigate).toHaveBeenCalledWith(`/cases/7/timeline?analysis=${historicalId}`);
   });
 
   it("loads historical chart data and rejects malformed snapshot IDs", async () => {
     const latestId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"; const historicalId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
-    respond({ "/cases/7/summary": summary(latestId), "/cases/7/charts": page([{ series: "event_type", category: "motion", value: 2 }]), [`/cases/7/analyses/${historicalId}`]: { analysis_id: historicalId, case_id: 7 } });
+    respond({ "/cases/7/summary": summary(latestId), "/cases/7/charts": page([{ series: "event_type", category: "motion", value: 2 }]), "/cases/7/graph": { nodes: [], edges: [], truncated: false }, [`/cases/7/analyses/${historicalId}`]: { analysis_id: historicalId, case_id: 7 } });
     const { unmount } = render(<ConnectedCaseWorkspaceV3Page path="/cases/7/charts" search={`?analysis=${historicalId}`} navigate={vi.fn()}/>);
-    expect(await screen.findByText("motion")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Event types" })).toBeInTheDocument();
     expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes(`/cases/7/charts?analysis_id=${historicalId}`))).toBe(true); unmount();
 
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" search="?analysis=invalid" navigate={vi.fn()}/>);
@@ -197,5 +197,38 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     expect(await screen.findByText("Reanalysis failed")).toBeInTheDocument();
     expect(screen.getByText("Existing finding")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reanalyze" })).toBeEnabled();
+  });
+
+  it("uses six primary sections and opens Inspect in a dismissible detail drawer", async () => {
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/findings": page([{ finding_id: "finding-1", title: "Persisted finding", severity: "medium" }]) });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    const navigation = await screen.findByRole("navigation", { name: "Connected case views" });
+    expect(navigation.querySelectorAll("button")).toHaveLength(6);
+    fireEvent.click(screen.getByRole("button", { name: "Inspect finding-1" }));
+    expect(screen.getByRole("dialog", { name: "Details for finding-1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close record details" })).toHaveFocus();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Details for finding-1" })).not.toBeInTheDocument();
+  });
+
+  it("shows incidents as context within Findings instead of a separate destination", async () => {
+    const incidentId = "44444444-4444-4444-8444-444444444444";
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/findings": page([{ finding_id: "finding-1", title: "Grouped finding", severity: "high" }]), "/cases/7/incidents": page([{ incident_id: incidentId, finding_ids: ["finding-1"], event_ids: ["event-1", "event-2"], maximum_risk: 81, correlation_edge_count: 4, started_at: "2026-09-01T00:00:00Z", ended_at: "2026-09-01T00:01:00Z" }]) });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    expect(await screen.findByText("1 incidents organize these findings")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Incidents" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: `Inspect ${incidentId}` }));
+    expect(screen.getByRole("dialog", { name: `Details for ${incidentId}` })).toBeInTheDocument();
+  });
+
+  it("summarizes timeline activity and collapses repeated raw records", async () => {
+    const entries = [1, 2, 3].map(index => ({ entry_id: `event-${index}`, entry_type: "event", occurred_at: `2026-09-01T00:00:0${index}Z`, title: "telemetry", event_ids: [`event-${index}`] }));
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/timeline": page(entries), "/cases/7/charts": page([{ series: "activity_minute", category: "2026-09-01T00:00:00Z", value: 3 }]) });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/timeline" navigate={vi.fn()}/>);
+    expect(await screen.findByRole("heading", { name: "Timeline summary" })).toBeInTheDocument();
+    const group = screen.getByText("3 telemetry records").closest("details");
+    expect(group).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("3 telemetry records"));
+    expect(screen.getAllByRole("button", { name: /Inspect event-/ })).toHaveLength(3);
   });
 });

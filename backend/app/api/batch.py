@@ -127,21 +127,21 @@ def cancel(import_id:UUID,request:Request) -> ImportPublic: return public_import
 
 @router.get("/cases/{case_id}/evidence")
 def evidence(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100),source:EvidenceSource|None=None) -> PageResponse[EvidencePublic]:
-    service(request).get_case(case_id); db=service(request).db; where="case_id=?"; values:list[Any]=[case_id]
+    service(request).get_case(case_id); db=service(request).db; where="case_id=? AND committed_at IS NOT NULL"; values:list[Any]=[case_id]
     if source: where += " AND source_type=?"; values.append(source.value)
     total=db.execute(f"SELECT COUNT(*) FROM evidence_metadata WHERE {where}",values).fetchone()[0]
     rows=[public_evidence(r) for r in db.execute(f"SELECT * FROM evidence_metadata WHERE {where} ORDER BY received_at DESC,id DESC LIMIT ? OFFSET ?",(*values,page_size,(page_number-1)*page_size)).fetchall()]
     return page(rows,total,page_number,page_size)
 @router.get("/evidence/{evidence_id}")
 def evidence_detail(evidence_id:UUID,request:Request) -> EvidenceDetailPublic:
-    db=service(request).db; row=db.execute("SELECT * FROM evidence_metadata WHERE evidence_id=?",(str(evidence_id),)).fetchone()
+    db=service(request).db; row=db.execute("SELECT * FROM evidence_metadata WHERE evidence_id=? AND committed_at IS NOT NULL",(str(evidence_id),)).fetchone()
     if not row: raise KeyError("evidence_not_found")
     result=public_evidence(row); result["issues"]=[public_issue(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
 
 @router.get("/cases/{case_id}/evidence/{evidence_id}")
 def case_evidence_detail(case_id:int,evidence_id:UUID,request:Request) -> EvidenceDetailPublic:
     service(request).get_case(case_id); db=service(request).db
-    row=db.execute("SELECT * FROM evidence_metadata WHERE case_id=? AND evidence_id=?",(case_id,str(evidence_id))).fetchone()
+    row=db.execute("SELECT * FROM evidence_metadata WHERE case_id=? AND evidence_id=? AND committed_at IS NOT NULL",(case_id,str(evidence_id))).fetchone()
     if not row: raise KeyError("evidence_not_found")
     result=public_evidence(row); result["issues"]=[public_issue(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
 

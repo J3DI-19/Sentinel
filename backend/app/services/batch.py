@@ -61,7 +61,7 @@ class BatchInvestigationService:
         if self.storage not in directory.parents: raise ValueError("unsafe evidence path")
         directory.mkdir(parents=True, exist_ok=True); path = directory / "source"
         if not path.exists(): path.write_bytes(content)
-        duplicate = self.repository.find_evidence_by_hash(case_id, digest)
+        duplicate = self.repository.find_committed_evidence_by_hash(case_id, digest)
         status = "duplicate" if duplicate else "queued"
         with self.repository.write_lock, self.db:
             self.db.execute("INSERT INTO import_jobs VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (import_id,case_id,str(duplicate) if duplicate else None,filename,str(path),source.value,json.dumps(configuration),status,None,None,now,now))

@@ -194,8 +194,49 @@ def test_commit_rejects_evidence_changed_after_validation(client):
     assert response.status_code == 202
     failed = wait_for(client, job["import_id"], {"failed"})
     assert failed["error"]["code"] == "evidence_content_hash_mismatch"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 0
     assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 0
     assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 0
+
+
+def test_failed_analysis_commit_can_retry_the_same_evidence(client, monkeypatch):
+    case_id = create_case(client)
+    body = (
+        b"timestamp,device_id,event_type,label\n"
+        b"2026-01-01T00:00:00Z,sensor-1,motion,malicious\n"
+    )
+    uploaded = upload(client, case_id, body).json()
+    job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
+    analyzer = client.app.state.batch_service.analyzer
+    original_analyze = analyzer.analyze
+
+    def fail_analysis(**_kwargs):
+        raise RuntimeError("forced analysis failure")
+
+    monkeypatch.setattr(analyzer, "analyze", fail_analysis)
+    client.post(
+        f"/api/v1/imports/{job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    failed = wait_for(client, job["import_id"], {"failed"})
+
+    assert failed["error"]["code"] == "commit_failed"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 0
+    assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 0
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 0
+
+    monkeypatch.setattr(analyzer, "analyze", original_analyze)
+    retried = upload(client, case_id, body).json()
+    assert retried["state"] != "duplicate"
+    retry_job = wait_for(client, retried["import_id"], {"awaiting_commit"})
+    client.post(
+        f"/api/v1/imports/{retry_job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    assert wait_for(client, retry_job["import_id"], {"completed"})["state"] == "completed"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
 
 
 def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
