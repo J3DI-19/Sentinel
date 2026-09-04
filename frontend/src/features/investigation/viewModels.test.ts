@@ -11,6 +11,10 @@ describe("investigation DTO mapping", () => {
   it("retains null-heavy and unknown-enum records without inventing conclusions", () => {
     expect(mapInvestigationRecord("alerts", { alert_id: "a-1", severity: "future_severity", occurred_at: null, risk: null })).toMatchObject({ id: "a-1", severity: "future_severity", timestampUtc: null, risk: null });
   });
+  it("uses persisted timeline entry types for visual composition", () => {
+    expect(mapInvestigationRecord("timeline", { entry_id: "event:1", entry_type: "event", title: "motion" }).category).toBe("event");
+  });
+
   it("keeps partial collections and gives malformed records stable fallback IDs", () => {
     expect(mapInvestigationRecords("findings", [{ finding_id: "f-1" }, null]).map(item => item.id)).toEqual(["f-1", "findings-1"]);
   });

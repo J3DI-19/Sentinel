@@ -16,7 +16,7 @@ function first(source: Record<string, unknown>, keys: string[]): unknown { for (
 export function mapInvestigationRecord(kind: InvestigationRecordKind, value: unknown, index = 0): InvestigationRecordViewModel {
   const source = record(value);
   const id = string(first(source, ["evidence_id", "event_id", "finding_id", "alert_id", "incident_id", "entry_id", "timeline_id", "audit_id", "node_id", "edge_id", "item_id", "id"])) ?? `${kind}-${index}`;
-  const category = string(first(source, ["event_type", "kind", "type", "action", "source_type", "source"]));
+  const category = string(first(source, ["event_type", "entry_type", "kind", "type", "action", "source_type", "source"]));
   return { id, kind, title: string(first(source, ["title", "original_name", "filename", "message", "label", "name"])) ?? category ?? id,
     timestampUtc: string(first(source, ["observed_at", "timestamp", "occurred_at", "created_at", "started_at", "received_at", "ingested_at"])),
     origin: string(first(source, ["origin", "source_type", "source"])), category,

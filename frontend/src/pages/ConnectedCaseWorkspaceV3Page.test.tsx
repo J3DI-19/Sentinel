@@ -221,14 +221,29 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     expect(screen.getByRole("dialog", { name: `Details for ${incidentId}` })).toBeInTheDocument();
   });
 
-  it("summarizes timeline activity and collapses repeated raw records", async () => {
-    const entries = [1, 2, 3].map(index => ({ entry_id: `event-${index}`, entry_type: "event", occurred_at: `2026-09-01T00:00:0${index}Z`, title: "telemetry", event_ids: [`event-${index}`] }));
-    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/timeline": page(entries), "/cases/7/charts": page([{ series: "activity_minute", category: "2026-09-01T00:00:00Z", value: 3 }]) });
+  it("paginates a safely batched timeline by ten minute windows", async () => {
+    const entries = Array.from({ length: 11 }, (_, index) => ({ entry_id: `event-${index + 1}`, entry_type: "event", occurred_at: `2026-09-01T00:${String(index).padStart(2, "0")}:01Z`, title: "telemetry", event_ids: [`event-${index + 1}`] }));
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      const url = new URL(String(input), "http://traceveil.test");
+      if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary("analysis-1")));
+      if (url.pathname.endsWith("/cases/7/charts")) return Promise.resolve(jsonResponse(page([{ series: "activity_minute", category: "2026-09-01T00:00:00Z", value: 3 }])));
+      if (url.pathname.endsWith("/cases/7/timeline")) {
+        const batch = url.searchParams.get("page") === "2" ? entries.slice(10) : entries.slice(0, 10);
+        return Promise.resolve(jsonResponse({ items: batch, page: Number(url.searchParams.get("page")), page_size: 200, total: 201 }));
+      }
+      return Promise.resolve(jsonResponse({ code: "not_found", message: "Not found", retryable: false }, 404));
+    }));
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/timeline" navigate={vi.fn()}/>);
-    expect(await screen.findByRole("heading", { name: "Timeline summary" })).toBeInTheDocument();
-    const group = screen.getByText("3 telemetry records").closest("details");
+    expect(await screen.findByRole("heading", { name: "Activity across the full snapshot" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Chronological investigation timeline" }).children).toHaveLength(10);
+    expect(document.querySelector(".timeline-pagination")).toHaveTextContent("Minute blocks 1–10 of 11");
+    expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes("/cases/7/timeline?page=2&page_size=200"))).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("list", { name: "Chronological investigation timeline" }).children).toHaveLength(1);
+    expect(document.querySelector(".timeline-pagination")).toHaveTextContent("Minute blocks 11–11 of 11");
+    const group = screen.getByText("Review records in this minute").closest("details");
     expect(group).not.toHaveAttribute("open");
-    fireEvent.click(screen.getByText("3 telemetry records"));
-    expect(screen.getAllByRole("button", { name: /Inspect event-/ })).toHaveLength(3);
+    fireEvent.click(screen.getByText("Review records in this minute"));
+    expect(screen.getByRole("button", { name: "Inspect event-11" })).toBeInTheDocument();
   });
 });
