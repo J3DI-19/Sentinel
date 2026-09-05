@@ -1,0 +1,138 @@
+name: Step 5 integration
+
+on:
+  push:
+    branches: [main, Aarya]
+    paths:
+      - "hardware/**"
+      - "tests/step5/**"
+      - "backend/tests/test_mqtt_bridge_forwarding.py"
+      - "backend/tests/test_step5_audit_signals.py"
+      - "backend/app/services/phase3.py"
+      - "backend/app/api/phase3.py"
+      - "backend/app/core/config.py"
+      - "backend/app/db/sqlite.py"
+      - ".github/workflows/step5-integration.yml"
+  pull_request:
+    paths:
+      - "hardware/**"
+      - "tests/step5/**"
+      - "backend/tests/test_mqtt_bridge_forwarding.py"
+      - "backend/tests/test_step5_audit_signals.py"
+      - "backend/app/services/phase3.py"
+      - "backend/app/api/phase3.py"
+      - "backend/app/core/config.py"
+      - "backend/app/db/sqlite.py"
+      - ".github/workflows/step5-integration.yml"
+
+# TV5-14: every job below must be a REQUIRED status check in branch
+# protection for the Step 5 merge gate:
+#   backend-step5    - backend audit + bridge-forwarding unit tests
+#   bridge-broker    - real mosquitto + mTLS + ACL + REAL bridge process
+#   native-cpp       - ack-buffer and delivery-policy native tests
+#   esp32-compile    - arduino-cli compile of the firmware
+# A red job blocks merge. (Branch-protection required-checks are
+# configured in the repo settings, not in this file.)
+
+jobs:
+  backend-step5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      - name: Bridge forwarding + Step 5 audit signals
+        run: |
+          python -m pytest \
+            tests/test_mqtt_bridge_forwarding.py \
+            tests/test_step5_audit_signals.py -v
+
+  bridge-broker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install mosquitto, clients, openssl, paho
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mosquitto mosquitto-clients openssl
+          python -m pip install --upgrade pip
+          pip install -r hardware/mqtt_bridge/requirements.txt
+
+      - name: Generate a lab CA and per-CN client certs
+        run: bash tests/step5/generate_lab_pki.sh
+
+      - name: Start mosquitto with the traceveil ACL
+        run: |
+          bash tests/step5/start_broker.sh > tests/step5/mosquitto.ci.log 2>&1 &
+          echo "MOSQUITTO_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Negative - untrusted client certificate is rejected (TV5-02)
+        run: bash tests/step5/assert_untrusted_client_rejected.sh
+
+      - name: Negative - cross-CN publish is denied by the ACL (TV5-03)
+        run: bash tests/step5/assert_topic_acl_enforced.sh
+
+      - name: Positive - REAL bridge forwards over mTLS and ACKs (TV5-02)
+        run: python tests/step5/real_bridge_test.py
+
+      - name: Upload broker log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mosquitto-log
+          path: tests/step5/mosquitto.ci.log
+
+  native-cpp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ring-buffer test (TV5-09 buffer contract)
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror \
+              tests/step5/ack_buffer_test.cpp -o /tmp/ack_buffer_test
+          /tmp/ack_buffer_test
+      - name: Delivery-policy test (TV5-09 five loss scenarios)
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror \
+              tests/step5/delivery_policy_test.cpp -o /tmp/delivery_policy_test
+          /tmp/delivery_policy_test
+
+  esp32-compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arduino-cli
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR="$HOME/bin" sh
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+      - name: Install ESP32 core and libraries
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+          arduino-cli lib install "DHT sensor library" "Adafruit Unified Sensor" "ArduinoJson" "PubSubClient"
+      - name: Compile in HTTP transport mode
+        run: |
+          cp tests/step5/ci_config.h hardware/esp32/traceveil_node/config.h
+          arduino-cli compile --fqbn esp32:esp32:esp32 \
+            hardware/esp32/traceveil_node/traceveil_node.ino
+      - name: Compile in MQTT transport mode
+        run: |
+          cp tests/step5/ci_config_mqtt.h hardware/esp32/traceveil_node/config.h
+          arduino-cli compile --fqbn esp32:esp32:esp32 \
+            hardware/esp32/traceveil_node/traceveil_node.ino

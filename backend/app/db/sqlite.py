@@ -120,6 +120,16 @@ class SQLiteRepository:
                 UNIQUE(session_id, dedupe_key), FOREIGN KEY (session_id) REFERENCES live_sessions(session_id)
             );
             CREATE INDEX IF NOT EXISTS idx_live_receipts_status ON live_receipts(status, received_at);
+            CREATE INDEX IF NOT EXISTS idx_live_receipts_source_seq ON live_receipts(source_id, sequence);
+            -- TV5-11: source-level (not session-level) high-water sequence
+            -- state. The ESP32 monotonic counter survives reboot, so this
+            -- state is keyed by source_id and persists across sessions.
+            CREATE TABLE IF NOT EXISTS live_source_sequence_state (
+                source_id TEXT PRIMARY KEY,
+                high_water_sequence INTEGER NOT NULL,
+                high_water_payload_hash TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS live_evidence_records (
                 evidence_id TEXT PRIMARY KEY, receipt_id TEXT NOT NULL UNIQUE, case_id INTEGER NOT NULL,
                 session_id TEXT NOT NULL, source_id TEXT NOT NULL, payload_hash TEXT NOT NULL,
