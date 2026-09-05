@@ -53,6 +53,11 @@ class Phase3Service:
         self.queue: Queue[tuple[str, str]] = Queue(maxsize=settings.live_queue_size)
         self.stop_event = Event()
         self.rate_windows: dict[str, deque[float]] = defaultdict(deque)
+        # TV5-12: per-(source_id | client_ip) sliding window used to cap
+        # how many `live.auth_failure` audit rows can be recorded from any
+        # single caller inside one minute. Attacker floods therefore
+        # cannot fill audit_events.
+        self.auth_failure_windows: dict[str, deque[float]] = defaultdict(deque)
         self.report_storage = Path(settings.report_storage_path).resolve()
         self.report_storage.mkdir(parents=True, exist_ok=True)
         self.worker = Thread(target=self._worker, name="traceveil-phase3-worker", daemon=True)
@@ -204,6 +209,26 @@ class Phase3Service:
         dedupe_key = f"sequence:{telemetry.source_id}:{telemetry.sequence}" if telemetry.sequence is not None else f"hash:{digest(raw)}"
         existing = self.db.execute("SELECT * FROM live_receipts WHERE session_id=? AND dedupe_key=?", (session_id, dedupe_key)).fetchone()
         if existing:
+            # TV5-11: emit an explicit audit signal so a defender scanning
+            # the case audit can distinguish "attempted replay of a
+            # previously-accepted frame" from "operator resubmitted a
+            # duplicate by accident". The receipt itself still returns
+            # duplicate=true unchanged.
+            self.audit(
+                telemetry.case_id,
+                "live.replay_detected",
+                "live_receipt",
+                existing["receipt_id"],
+                actor="system",
+                request_id=request_id,
+                details={
+                    "source_id": telemetry.source_id,
+                    "sequence": telemetry.sequence,
+                    "dedupe_key": dedupe_key,
+                    "original_receipt_id": existing["receipt_id"],
+                    "original_received_at": existing["received_at"],
+                },
+            )
             result = self.get_live_receipt(existing["receipt_id"])
             result["duplicate"] = True
             return result
@@ -216,6 +241,49 @@ class Phase3Service:
         self.audit(telemetry.case_id, "live.received", "live_receipt", receipt_id, request_id=request_id, details={"source_id": telemetry.source_id})
         self._enqueue("live", receipt_id)
         return self.get_live_receipt(receipt_id)
+
+    # TV5-12: structured audit for live-endpoint auth failures.
+    #
+    # Never stores the presented token (secret) or unbounded attacker
+    # payload. Sanitizes source_id (must match the same allow-list the
+    # canonical contract uses); other-shaped source_ids are recorded as
+    # `"invalid_format"`. Rate-limited per (source_id or client_ip) to
+    # `settings.live_auth_failure_audit_per_minute` rows/minute; overflow
+    # is dropped silently to bound audit_events under a brute-force
+    # flood. The rejection HTTP 401 is unchanged.
+    def record_auth_failure(
+        self,
+        source_id: str | None,
+        reason: str,
+        *,
+        request_id: str | None = None,
+        client_ip: str | None = None,
+    ) -> bool:
+        """Returns True when an audit row was written, False when rate-limited."""
+        key = source_id or client_ip or "unknown"
+        window = self.auth_failure_windows[key]
+        now = time.monotonic()
+        while window and now - window[0] >= 60:
+            window.popleft()
+        if len(window) >= self.settings.live_auth_failure_audit_per_minute:
+            return False
+        window.append(now)
+
+        details: dict[str, Any] = {"reason": reason}
+        if source_id is not None:
+            details["source_id"] = source_id if re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", source_id) else "invalid_format"
+        if client_ip:
+            details["client_ip"] = client_ip
+        self.audit(
+            None,
+            "live.auth_failure",
+            "live_source",
+            None,
+            actor="system",
+            request_id=request_id,
+            details=details,
+        )
+        return True
 
     def record_malformed(self, case_id: int | None, source_id: str | None, code: str, message: str, raw: str | None) -> None:
         session = None
