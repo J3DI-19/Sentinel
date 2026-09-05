@@ -7,12 +7,12 @@ import json
 import re
 import smtplib
 import time
-from collections import defaultdict, deque
+from collections import OrderedDict, defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
 from queue import Empty, Full, Queue
-from threading import Event, Thread
+from threading import Event, Lock, Thread
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -53,6 +53,17 @@ class Phase3Service:
         self.queue: Queue[tuple[str, str]] = Queue(maxsize=settings.live_queue_size)
         self.stop_event = Event()
         self.rate_windows: dict[str, deque[float]] = defaultdict(deque)
+        # TV5-12: bounded LRU of sliding windows used to cap how many
+        # `live.auth_failure` audit rows can be recorded from any single
+        # caller per minute. Keyed primarily by client IP so a caller
+        # rotating source_id values cannot bypass the limit, and capped in
+        # total size so distinct keys cannot grow memory without bound
+        # (least-recently-used keys are evicted). Guarded by its own lock
+        # because auth failures are handled on the request path across
+        # threads.
+        self.auth_failure_windows: OrderedDict[str, deque[float]] = OrderedDict()
+        self.auth_failure_lock = Lock()
+        self.auth_failure_max_keys = 4096
         self.report_storage = Path(settings.report_storage_path).resolve()
         self.report_storage.mkdir(parents=True, exist_ok=True)
         self.worker = Thread(target=self._worker, name="traceveil-phase3-worker", daemon=True)
@@ -201,21 +212,204 @@ class Phase3Service:
         if row is None or telemetry.source_id not in json.loads(row["source_ids_json"]):
             raise ValueError("active_live_session_required")
         session_id = row["session_id"]
-        dedupe_key = f"sequence:{telemetry.source_id}:{telemetry.sequence}" if telemetry.sequence is not None else f"hash:{digest(raw)}"
-        existing = self.db.execute("SELECT * FROM live_receipts WHERE session_id=? AND dedupe_key=?", (session_id, dedupe_key)).fetchone()
-        if existing:
-            result = self.get_live_receipt(existing["receipt_id"])
-            result["duplicate"] = True
-            return result
+        seq = telemetry.sequence
+        payload_hash = digest(raw)
+
+        # TV5-11: source-level sequence integrity. A monotonic per-source
+        # counter (the ESP32 stores it in NVS across reboots) means an
+        # out-of-order or backwards sequence is a security signal, not a
+        # normal event. Detection order:
+        #   1. exact replay      - same (source, sequence) AND same payload
+        #   2. sequence collision- same (source, sequence), DIFFERENT payload
+        #   3. sequence regression- a previously unseen sequence below the
+        #                           source high-water mark
+        # (1) returns the original receipt with duplicate=true; (2) and (3)
+        # are rejected and quarantined in live_ingest_issues with an audit.
+        if seq is not None:
+            prior = self.db.execute(
+                "SELECT * FROM live_receipts WHERE source_id=? AND sequence=? ORDER BY received_at LIMIT 1",
+                (telemetry.source_id, seq),
+            ).fetchone()
+            state = self.db.execute(
+                "SELECT high_water_sequence FROM live_source_sequence_state WHERE source_id=?",
+                (telemetry.source_id,),
+            ).fetchone()
+
+            if prior is not None:
+                if prior["payload_hash"] == payload_hash:
+                    self.audit(
+                        telemetry.case_id, "live.replay_detected", "live_receipt", prior["receipt_id"],
+                        actor="system", request_id=request_id,
+                        details={
+                            "source_id": telemetry.source_id, "sequence": seq,
+                            "original_receipt_id": prior["receipt_id"],
+                            "original_received_at": prior["received_at"],
+                        },
+                    )
+                    result = self.get_live_receipt(prior["receipt_id"])
+                    result["duplicate"] = True
+                    return result
+                # Same sequence number, different bytes -> tampering/collision.
+                self._quarantine_live(
+                    telemetry.case_id, session_id, telemetry.source_id, "sequence_collision",
+                    f"sequence {seq} already accepted with a different payload hash", raw,
+                )
+                self.audit(
+                    telemetry.case_id, "live.sequence_collision", "live_receipt", prior["receipt_id"],
+                    actor="system", request_id=request_id,
+                    details={
+                        "source_id": telemetry.source_id, "sequence": seq,
+                        "original_receipt_id": prior["receipt_id"],
+                        "original_payload_hash": prior["payload_hash"],
+                        "attempted_payload_hash": payload_hash,
+                    },
+                )
+                raise ValueError("live_sequence_collision")
+
+            if state is not None and seq < state["high_water_sequence"]:
+                self._quarantine_live(
+                    telemetry.case_id, session_id, telemetry.source_id, "sequence_regression",
+                    f"sequence {seq} is below source high-water {state['high_water_sequence']}", raw,
+                )
+                self.audit(
+                    telemetry.case_id, "live.sequence_regression", "live_source", telemetry.source_id,
+                    actor="system", request_id=request_id,
+                    details={
+                        "source_id": telemetry.source_id, "sequence": seq,
+                        "high_water_sequence": state["high_water_sequence"],
+                    },
+                )
+                raise ValueError("live_sequence_regression")
+        else:
+            # No sequence supplied: fall back to per-session hash dedupe.
+            existing = self.db.execute(
+                "SELECT * FROM live_receipts WHERE session_id=? AND dedupe_key=?",
+                (session_id, f"hash:{payload_hash}"),
+            ).fetchone()
+            if existing:
+                self.audit(
+                    telemetry.case_id, "live.replay_detected", "live_receipt", existing["receipt_id"],
+                    actor="system", request_id=request_id,
+                    details={
+                        "source_id": telemetry.source_id, "sequence": None,
+                        "original_receipt_id": existing["receipt_id"],
+                        "original_received_at": existing["received_at"],
+                    },
+                )
+                result = self.get_live_receipt(existing["receipt_id"])
+                result["duplicate"] = True
+                return result
+
+        dedupe_key = f"sequence:{telemetry.source_id}:{seq}" if seq is not None else f"hash:{payload_hash}"
         receipt_id, evidence_id, now = str(uuid4()), str(uuid4()), utcnow()
         with self.repository.write_lock, self.db:
             self.db.execute(
                 "INSERT INTO live_receipts VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (receipt_id, session_id, telemetry.case_id, evidence_id, telemetry.source_id, telemetry.device_id, telemetry.sequence, dedupe_key, digest(raw), raw, "queued", None, None, now, now),
+                (receipt_id, session_id, telemetry.case_id, evidence_id, telemetry.source_id, telemetry.device_id, seq, dedupe_key, payload_hash, raw, "queued", None, None, now, now),
             )
+            if seq is not None:
+                # Advance the source high-water mark (accept path only ever
+                # sees seq strictly above the current mark, but MAX keeps it
+                # safe under any race).
+                self.db.execute(
+                    "INSERT INTO live_source_sequence_state(source_id, high_water_sequence, high_water_payload_hash, updated_at)"
+                    " VALUES(?,?,?,?)"
+                    " ON CONFLICT(source_id) DO UPDATE SET"
+                    "   high_water_payload_hash=CASE WHEN excluded.high_water_sequence>live_source_sequence_state.high_water_sequence"
+                    "     THEN excluded.high_water_payload_hash ELSE live_source_sequence_state.high_water_payload_hash END,"
+                    "   high_water_sequence=MAX(live_source_sequence_state.high_water_sequence, excluded.high_water_sequence),"
+                    "   updated_at=excluded.updated_at",
+                    (telemetry.source_id, seq, payload_hash, now),
+                )
         self.audit(telemetry.case_id, "live.received", "live_receipt", receipt_id, request_id=request_id, details={"source_id": telemetry.source_id})
         self._enqueue("live", receipt_id)
         return self.get_live_receipt(receipt_id)
+
+    def _quarantine_live(self, case_id: int | None, session_id: str | None, source_id: str | None, code: str, message: str, raw: str | None) -> None:
+        """Records a rejected-but-authenticated live frame in
+        live_ingest_issues as a durable quarantine trail (TV5-11). Distinct
+        from record_malformed: it does not increment malformed_count, since
+        a regression/collision is a well-formed frame refused on integrity
+        grounds, not a schema failure."""
+        with self.repository.write_lock, self.db:
+            self.db.execute(
+                "INSERT INTO live_ingest_issues(session_id,case_id,source_id,code,message,raw_json,occurred_at) VALUES(?,?,?,?,?,?,?)",
+                (session_id, case_id, source_id, code, message, (raw or "")[:65536], utcnow()),
+            )
+
+    @staticmethod
+    def _sanitize_source_id(source_id: str | None) -> str | None:
+        """Returns the source_id only if it matches the canonical
+        safe-identifier allow-list; otherwise 'invalid_format'; None stays
+        None. Used both for the rate-limit key and for audit details so
+        attacker-controlled bytes never reach either."""
+        if source_id is None:
+            return None
+        return source_id if re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", source_id) else "invalid_format"
+
+    # TV5-12: structured, rate-limited audit for live-endpoint auth
+    # failures.
+    #
+    # * Never stores the presented token (secret) or the raw attacker
+    #   payload; source_id is sanitized to the safe-identifier allow-list
+    #   BEFORE it is used, both as the audit value and (as a fallback) as
+    #   the rate-limit key.
+    # * Rate-limited PRIMARILY by client IP so a caller rotating source_id
+    #   values from one address cannot exceed the cap. Only when no client
+    #   IP is available does it fall back to the sanitized source_id.
+    # * The window map is a bounded LRU: distinct keys cannot grow memory
+    #   without bound (LRU eviction at auth_failure_max_keys), so rotating
+    #   IPs cannot exhaust memory either.
+    # * Guarded by a dedicated lock for concurrent requests.
+    # The rejection HTTP 401 is unchanged whether or not a row is written.
+    def record_auth_failure(
+        self,
+        source_id: str | None,
+        reason: str,
+        *,
+        request_id: str | None = None,
+        client_ip: str | None = None,
+    ) -> bool:
+        """Returns True when an audit row was written, False when rate-limited."""
+        safe_source = self._sanitize_source_id(source_id)
+        # Primary key: client IP. Fallback: sanitized source_id. Last
+        # resort: a single shared "unknown" bucket.
+        key = client_ip or safe_source or "unknown"
+        cap = self.settings.live_auth_failure_audit_per_minute
+        now = time.monotonic()
+
+        with self.auth_failure_lock:
+            window = self.auth_failure_windows.get(key)
+            if window is None:
+                window = deque()
+                self.auth_failure_windows[key] = window
+            else:
+                self.auth_failure_windows.move_to_end(key)  # mark most-recently-used
+            while window and now - window[0] >= 60:
+                window.popleft()
+            if len(window) >= cap:
+                return False
+            window.append(now)
+            # Evict least-recently-used keys beyond the cap so a flood of
+            # distinct IPs/sources cannot grow the map without bound.
+            while len(self.auth_failure_windows) > self.auth_failure_max_keys:
+                self.auth_failure_windows.popitem(last=False)
+
+        details: dict[str, Any] = {"reason": reason}
+        if safe_source is not None:
+            details["source_id"] = safe_source
+        if client_ip:
+            details["client_ip"] = client_ip
+        self.audit(
+            None,
+            "live.auth_failure",
+            "live_source",
+            None,
+            actor="system",
+            request_id=request_id,
+            details=details,
+        )
+        return True
 
     def record_malformed(self, case_id: int | None, source_id: str | None, code: str, message: str, raw: str | None) -> None:
         session = None

@@ -1,0 +1,23 @@
+# Traceveil MQTT topic ACL (TV5-03).
+#
+# use_identity_as_username in mosquitto.conf means the username each client
+# is authenticated as is the CN of its client certificate. These patterns
+# lock each node CN to its own device topics; a valid node with cert CN
+# esp32-lab-01 cannot publish anything on tv/dev/esp32-lab-02/... even
+# though the broker trusts its certificate.
+#
+# The %u placeholder in pattern rules expands to the connected client's
+# username at authorization time.
+
+# Device nodes: may publish telemetry and status only for themselves,
+# and subscribe to their own ACK topic to observe backend acknowledgements.
+pattern write tv/dev/%u/telemetry
+pattern write tv/dev/%u/status
+pattern read  tv/dev/%u/ack
+
+# Bridge: must be provisioned with client-cert CN "tv-bridge".
+# The bridge reads every device topic and writes the ACK topics.
+user tv-bridge
+topic read  tv/dev/+/telemetry
+topic read  tv/dev/+/status
+topic write tv/dev/+/ack
