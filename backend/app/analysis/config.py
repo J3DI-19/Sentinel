@@ -25,10 +25,11 @@ class AnalysisConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     configuration_version: Literal["1.0"] = "1.0"
-    rule_set_version: Literal["1.0"] = "1.0"
+    rule_set_version: Literal["1.0", "1.1"] = "1.1"
     baseline_version: Literal["1.0"] = "1.0"
     scoring_version: Literal["1.0"] = "1.0"
     correlation_version: Literal["1.0"] = "1.0"
+    incident_reference_policy_version: Literal["1.0"] = "1.0"
     authentication_failure_threshold: int = Field(default=10, ge=2, le=1000)
     authentication_window_seconds: int = Field(default=60, ge=1, le=86400)
     label_repetition_reference: int = Field(default=4, ge=1, le=1000)

@@ -261,8 +261,11 @@ class SQLiteRepository:
     def is_available(self) -> bool:
         if self.connection is None:
             return False
-        self.connection.execute("SELECT 1").fetchone()
-        return True
+        try:
+            self.connection.execute("SELECT 1").fetchone()
+            return True
+        except sqlite3.Error:
+            return False
 
     def find_evidence_by_hash(self, case_id: int, source_hash: str) -> UUID | None:
         if self.connection is None:
@@ -272,6 +275,26 @@ class SQLiteRepository:
             SELECT evidence_id
             FROM evidence_metadata
             WHERE case_id = ? AND source_hash = ? AND evidence_id IS NOT NULL
+            ORDER BY id ASC
+            LIMIT 1
+            """,
+            (case_id, source_hash),
+        ).fetchone()
+        return UUID(row["evidence_id"]) if row is not None else None
+
+    def find_committed_evidence_by_hash(
+        self, case_id: int, source_hash: str
+    ) -> UUID | None:
+        if self.connection is None:
+            raise RuntimeError("repository is not initialized")
+        row = self.connection.execute(
+            """
+            SELECT evidence_id
+            FROM evidence_metadata
+            WHERE case_id = ?
+              AND source_hash = ?
+              AND evidence_id IS NOT NULL
+              AND committed_at IS NOT NULL
             ORDER BY id ASC
             LIMIT 1
             """,

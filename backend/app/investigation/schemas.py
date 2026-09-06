@@ -123,6 +123,7 @@ class AnalysisSnapshotPublic(StrictModel):
 
 class ReanalysisPublic(AnalysisSnapshotPublic):
     reused_existing: bool
+    outcome: Literal["created", "reused"]
 
 
 class GraphPublic(StrictModel):

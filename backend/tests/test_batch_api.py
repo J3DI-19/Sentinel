@@ -10,6 +10,26 @@ def create_case(client):
     return response.json()["id"]
 
 
+def test_case_creation_trims_fields_and_rejects_blank_names(client):
+    response = client.post(
+        "/api/v1/cases",
+        json={"name": "  Batch review  ", "description": "  Showcase case  ", "owner": "  Reviewer  "},
+    )
+    assert response.status_code == 201
+    assert response.json()["name"] == "Batch review"
+    assert response.json()["description"] == "Showcase case"
+    assert response.json()["owner"] == "Reviewer"
+    listed = client.get("/api/v1/cases?page=1&page_size=100").json()
+    assert listed["items"][0]["id"] == response.json()["id"]
+
+    blank = client.post("/api/v1/cases", json={"name": "   "})
+    assert blank.status_code == 422
+    assert blank.json()["code"] == "request_validation_error"
+
+    oversized = client.post("/api/v1/cases", json={"name": "x" * 201})
+    assert oversized.status_code == 422
+
+
 def upload(client, case_id, content, *, source="simulation", filename="events.csv"):
     return client.post(
         f"/api/v1/cases/{case_id}/imports",
@@ -174,8 +194,49 @@ def test_commit_rejects_evidence_changed_after_validation(client):
     assert response.status_code == 202
     failed = wait_for(client, job["import_id"], {"failed"})
     assert failed["error"]["code"] == "evidence_content_hash_mismatch"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 0
     assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 0
     assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 0
+
+
+def test_failed_analysis_commit_can_retry_the_same_evidence(client, monkeypatch):
+    case_id = create_case(client)
+    body = (
+        b"timestamp,device_id,event_type,label\n"
+        b"2026-01-01T00:00:00Z,sensor-1,motion,malicious\n"
+    )
+    uploaded = upload(client, case_id, body).json()
+    job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
+    analyzer = client.app.state.batch_service.analyzer
+    original_analyze = analyzer.analyze
+
+    def fail_analysis(**_kwargs):
+        raise RuntimeError("forced analysis failure")
+
+    monkeypatch.setattr(analyzer, "analyze", fail_analysis)
+    client.post(
+        f"/api/v1/imports/{job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    failed = wait_for(client, job["import_id"], {"failed"})
+
+    assert failed["error"]["code"] == "commit_failed"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 0
+    assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 0
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 0
+
+    monkeypatch.setattr(analyzer, "analyze", original_analyze)
+    retried = upload(client, case_id, body).json()
+    assert retried["state"] != "duplicate"
+    retry_job = wait_for(client, retried["import_id"], {"awaiting_commit"})
+    client.post(
+        f"/api/v1/imports/{retry_job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+    assert wait_for(client, retry_job["import_id"], {"completed"})["state"] == "completed"
+    assert client.get(f"/api/v1/cases/{case_id}/evidence").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/events").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
 
 
 def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
@@ -273,8 +334,25 @@ def test_analysis_history_details_charts_and_reanalysis_are_idempotent(client):
     first = client.post(f"/api/v1/cases/{case_id}/analyses").json()
     second = client.post(f"/api/v1/cases/{case_id}/analyses").json()
     assert first["analysis_id"] == second["analysis_id"] == latest_analysis_id
+    assert first["outcome"] == second["outcome"] == "reused"
     assert first["reused_existing"] is second["reused_existing"] is True
+    assert first["created_at"] == second["created_at"] == history["items"][0]["created_at"]
     assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 2
+
+
+def test_reanalysis_reports_created_then_reused_without_duplicate_artifacts(client):
+    case_id = create_case(client)
+
+    created = client.post(f"/api/v1/cases/{case_id}/analyses")
+    reused = client.post(f"/api/v1/cases/{case_id}/analyses")
+
+    assert created.status_code == reused.status_code == 202
+    assert created.json()["outcome"] == "created"
+    assert reused.json()["outcome"] == "reused"
+    assert reused.json()["analysis_id"] == created.json()["analysis_id"]
+    assert reused.json()["created_at"] == created.json()["created_at"]
+    assert client.get(f"/api/v1/cases/{case_id}/analyses").json()["total"] == 1
+    assert client.get(f"/api/v1/cases/{case_id}/findings").json()["total"] == 0
 
 
 def test_custom_analysis_configuration_is_explicitly_rejected(client):

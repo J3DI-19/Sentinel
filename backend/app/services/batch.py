@@ -61,7 +61,7 @@ class BatchInvestigationService:
         if self.storage not in directory.parents: raise ValueError("unsafe evidence path")
         directory.mkdir(parents=True, exist_ok=True); path = directory / "source"
         if not path.exists(): path.write_bytes(content)
-        duplicate = self.repository.find_evidence_by_hash(case_id, digest)
+        duplicate = self.repository.find_committed_evidence_by_hash(case_id, digest)
         status = "duplicate" if duplicate else "queued"
         with self.repository.write_lock, self.db:
             self.db.execute("INSERT INTO import_jobs VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (import_id,case_id,str(duplicate) if duplicate else None,filename,str(path),source.value,json.dumps(configuration),status,None,None,now,now))
@@ -195,7 +195,7 @@ class BatchInvestigationService:
                 occurred=data.get("occurred_at") or data.get("triggered_at") or data.get("started_at"); severity=data.get("severity"); risk=data.get("risk_score") or data.get("maximum_risk") or (data.get("risk") or {}).get("score")
                 self.db.execute("INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)", (str(result.analysis_id),result.case_id,kind,item_id,occurred,severity,risk,json.dumps(data,sort_keys=True)))
 
-    def _persist_analysis(self, result, created_at: str) -> str:
+    def _persist_analysis(self, result, created_at: str) -> tuple[str, bool]:
         """Persist a deterministic result once and reject identifier reuse."""
 
         analysis_id = str(result.analysis_id)
@@ -207,13 +207,13 @@ class BatchInvestigationService:
         if existing is not None:
             if existing["result_json"] != payload:
                 raise ValueError("analysis_id_content_mismatch")
-            return existing["created_at"]
+            return existing["created_at"], False
         self.db.execute(
             "INSERT INTO analysis_runs VALUES(?,?,?,?,?)",
             (analysis_id, result.case_id, "completed", payload, created_at),
         )
         self._store_artifacts(result)
-        return created_at
+        return created_at, True
 
     def get_import(self, import_id: str) -> dict:
         with self.repository.write_lock:
@@ -232,7 +232,6 @@ class BatchInvestigationService:
     def reanalyze(self, case_id: int) -> dict:
         self.get_case(case_id); events=[CanonicalEvent.model_validate_json(row[0]) for row in self.db.execute("SELECT canonical_json FROM canonical_events WHERE case_id=? ORDER BY COALESCE(observed_at,ingested_at),event_id",(case_id,)).fetchall()]
         result=self.analyzer.analyze(case_id=case_id,events=events); now=utcnow()
-        existing=self.db.execute("SELECT 1 FROM analysis_runs WHERE analysis_id=?",(str(result.analysis_id),)).fetchone() is not None
         with self.repository.write_lock, self.db:
-            created_at = self._persist_analysis(result, now)
-        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at,"reused_existing":existing}
+            created_at, created = self._persist_analysis(result, now)
+        return {"analysis_id":str(result.analysis_id),"case_id":case_id,"status":"completed","created_at":created_at,"outcome":"created" if created else "reused","reused_existing":not created}

@@ -7,7 +7,11 @@ import pytest
 from pydantic import ValidationError
 
 from app.analysis.config import AnalysisConfig, RiskWeights
-from app.analysis.schemas import EventFilter, SortDirection
+from app.analysis.schemas import (
+    INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT,
+    EventFilter,
+    SortDirection,
+)
 from app.analysis.service import AnalysisService
 from app.normalization.schemas import (
     CanonicalEntity,
@@ -335,6 +339,44 @@ def test_ton_iot_telemetry_uses_the_binary_dataset_label_rule():
     assert label_findings[0].trigger_event_ids == [UUID(int=105)]
 
 
+def test_dataset_label_findings_group_shared_attack_classes_and_vary_severity():
+    evidence_id = UUID(int=20_000)
+    events = [
+        canonical_event(
+            130 + index,
+            seconds=index,
+            event_type="telemetry",
+            source_label="1",
+            source_type=CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
+            attributes={"attack_type": attack_class},
+        )
+        for index, attack_class in enumerate(("scanning", "scanning", "ransomware"))
+    ]
+    events = [
+        event.model_copy(
+            update={
+                "provenance": event.provenance.model_copy(
+                    update={"evidence_id": evidence_id}
+                )
+            }
+        )
+        for event in events
+    ]
+
+    result = AnalysisService().analyze(case_id=1, events=events)
+
+    label_findings = [finding for finding in result.findings if finding.rule_id == "LABEL-001"]
+    assert len(label_findings) == 2
+    by_title = {finding.title: finding for finding in label_findings}
+    assert by_title["Dataset identifies scanning activity"].severity.value == "medium"
+    assert len(by_title["Dataset identifies scanning activity"].event_ids) == 2
+    assert by_title["Dataset identifies ransomware activity"].severity.value == "critical"
+    assert {point.category for point in result.chart_points if point.series == "attack_class"} == {
+        "ransomware",
+        "scanning",
+    }
+
+
 def test_live_baseline_support_does_not_turn_a_batch_spike_into_a_live_alert():
     events = [
         canonical_event(
@@ -400,6 +442,32 @@ def test_one_finding_remains_one_incident_without_temporal_edges():
     assert len(result.incidents) == 1
     assert set(result.incidents[0].event_ids) == {event.event_id for event in events}
     assert result.incidents[0].correlation_edge_ids == []
+    assert result.incidents[0].correlation_edge_count == 0
+    assert result.incidents[0].correlation_edges_truncated is False
+
+
+def test_dense_incident_bounds_correlation_references_without_losing_total():
+    events = [
+        canonical_event(
+            1_000 + index,
+            seconds=index,
+            event_type="network_flow",
+            source_label="malicious",
+        )
+        for index in range(100)
+    ]
+
+    first = AnalysisService().analyze(case_id=1, events=events)
+    second = AnalysisService().analyze(case_id=1, events=list(reversed(events)))
+
+    assert len(first.correlations) > INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT
+    assert len(first.incidents) == 1
+    incident = first.incidents[0]
+    assert len(incident.correlation_edge_ids) == INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT
+    assert incident.correlation_edge_count == len(first.correlations)
+    assert incident.correlation_edges_truncated is True
+    assert incident.correlation_edge_ids == second.incidents[0].correlation_edge_ids
+    assert first.configuration.incident_reference_policy_version == "1.0"
 
 
 def test_equal_entity_text_with_different_kinds_does_not_correlate():

@@ -54,83 +54,101 @@ The deterministic engine may still produce finding, risk, incident, and other
 analytical records. The exclusions above apply to live and notification
 workflows, not to the batch engine's persisted analytical output.
 
-## 1. Startup and setup
+## Phase 1: Implementation
+
+Complete the required product behaviour and user-facing workflow before fixing
+interaction defects or running acceptance checks.
+
+### 1. Batch configuration and service-state messaging
+
+- [x] Provide working `.env.example` defaults for batch-only use.
+- [x] Show a clear message when the backend or database is unavailable.
+
+### 2. Case workflow
+
+- [x] Allow users to create a case successfully.
+- [x] Automatically select the newly created case when entering the import page.
+- [x] Prevent importing without a valid persisted case.
+- [x] Provide clear empty states when no cases exist.
+
+### 3. Evidence-import workflow
+
+- [x] Clearly document supported columns and source profiles.
+- [x] Provide at least one small working example evidence file.
+- [x] Show understandable validation errors with source-row references.
+- [x] Make partial-import approval clear and deliberate.
+- [x] Prevent duplicate submission while an import is running.
+- [x] Add an **Open case results** action after a successful import.
+- [x] Either implement **View import history** or remove the disabled control
+  until that functionality exists.
+
+### 4. Analysis and result presentation
+
+- [x] Clearly distinguish "analysis completed with no findings" from an analysis
+  failure.
+- [x] Show evidence, canonical events, findings, incidents, timelines, risk
+  factors, provenance, graph data, and aggregates from persisted backend data.
+- [x] Handle cases with no evidence or no analysis without crashing.
+- [x] Display meaningful loading, empty, partial-result, and error states.
+- [x] Ensure displayed identifiers and evidence references can be followed back
+  to their source records.
+
+### 5. Historical batch analysis
+
+- [x] Add a visible Analysis History entry point.
+- [x] List persisted batch-analysis snapshots.
+- [x] Let users select a historical snapshot.
+- [x] Load the selected snapshot's findings, incidents, timeline, graph, charts,
+  and aggregates using its `analysis_id`.
+- [x] Clearly identify whether the user is viewing the latest or a historical
+  analysis.
+- [x] Preserve or intentionally reset the selected snapshot during navigation.
+
+## Phase 2: Functional fixes and recovery
+
+Resolve known interaction defects and make the implemented workflow resilient
+before beginning final verification.
+
+### 6. Refresh and error recovery
+
+- [x] Add a working refresh control to the connected case workspace.
+- [x] Make **Retry** execute the failed request directly.
+- [x] Prevent stale responses from overwriting newer results.
+- [x] Preserve the current tab, filter, page, and selected snapshot during
+  refresh.
+
+### 7. Reanalysis
+
+- [x] Fix reanalysis when the user is already on the Findings page.
+- [x] Prevent the interface from remaining stuck in a loading state.
+- [x] Disable or safely deduplicate the control while reanalysis is running.
+- [x] Refresh the case summary and analytical result tabs after completion.
+- [x] Clearly report whether reanalysis created a new snapshot or reused an
+  identical persisted snapshot.
+
+## Phase 3: Verification and acceptance
+
+Run these checks only after the implementation and functional-fix phases are
+complete.
+
+### 8. Integration verification
 
 - [ ] Confirm a clean machine can install the backend and frontend using only
   the README instructions.
-- [ ] Provide working `.env.example` defaults for batch-only use.
-- [ ] Show a clear message when the backend or database is unavailable.
 - [ ] Verify database tables are created automatically on first run.
 - [ ] Confirm the application works without Ollama, SMTP, hardware, or
   live-telemetry configuration.
-
-## 2. Case workflow
-
-- [ ] Allow users to create a case successfully.
-- [ ] Automatically select the newly created case when entering the import page.
-- [ ] Prevent importing without a valid persisted case.
-- [ ] Provide clear empty states when no cases exist.
 - [ ] Confirm cases and their data remain available after restarting the
   backend.
-
-## 3. Evidence import
-
 - [ ] Confirm CSV and JSON imports work through the browser.
-- [ ] Clearly document supported columns and source profiles.
-- [ ] Provide at least one small working example evidence file.
-- [ ] Show understandable validation errors with source-row references.
-- [ ] Make partial-import approval clear and deliberate.
-- [ ] Prevent duplicate submission while an import is running.
 - [ ] Confirm cancellation and retry behave correctly.
-- [ ] Add an **Open case results** action after a successful import.
-- [ ] Either implement **View import history** or remove the disabled control
-  until that functionality exists.
 - [ ] Verify failed imports do not accidentally create partial evidence, events,
   or analysis snapshots.
-
-## 4. Analysis and results
-
 - [ ] Confirm committing an import automatically produces an analysis result.
-- [ ] Clearly distinguish "analysis completed with no findings" from an analysis
-  failure.
-- [ ] Show evidence, canonical events, findings, incidents, timelines, risk
-  factors, provenance, graph data, and aggregates from persisted backend data.
-- [ ] Handle cases with no evidence or no analysis without crashing.
-- [ ] Display meaningful loading, empty, partial-result, and error states.
-- [ ] Ensure displayed identifiers and evidence references can be followed back
-  to their source records.
-
-## 5. Refresh and error recovery
-
-- [ ] Add a working refresh control to the connected case workspace.
-- [ ] Make **Retry** execute the failed request directly.
-- [ ] Prevent stale responses from overwriting newer results.
-- [ ] Preserve the current tab, filter, page, and selected snapshot during
-  refresh.
 - [ ] Confirm temporary backend failures can be recovered from without
   restarting the frontend.
 
-## 6. Reanalysis
-
-- [ ] Fix reanalysis when the user is already on the Findings page.
-- [ ] Prevent the interface from remaining stuck in a loading state.
-- [ ] Disable or safely deduplicate the control while reanalysis is running.
-- [ ] Refresh the case summary and analytical result tabs after completion.
-- [ ] Clearly report whether reanalysis created a new snapshot or reused an
-  identical persisted snapshot.
-
-## 7. Historical batch analysis
-
-- [ ] Add a visible Analysis History entry point.
-- [ ] List persisted batch-analysis snapshots.
-- [ ] Let users select a historical snapshot.
-- [ ] Load the selected snapshot's findings, incidents, timeline, graph, charts,
-  and aggregates using its `analysis_id`.
-- [ ] Clearly identify whether the user is viewing the latest or a historical
-  analysis.
-- [ ] Preserve or intentionally reset the selected snapshot during navigation.
-
-## 8. Automated verification
+### 9. Automated verification
 
 - [ ] Add frontend tests for Refresh, Retry, reanalysis, history selection, and
   post-import navigation.
@@ -143,7 +161,7 @@ workflows, not to the batch engine's persisted analytical output.
 - [ ] Confirm an imported case remains usable after restarting both
   applications.
 
-## 9. Final usability smoke test
+### 10. Final usability smoke test
 
 A person unfamiliar with the codebase must be able to complete the following
 workflow without developer assistance:

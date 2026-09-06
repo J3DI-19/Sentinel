@@ -187,6 +187,17 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+.health-indicator.health-checking i { background: var(--yellow); box-shadow: 0 0 9px rgba(214, 198, 92, .45); }
+.health-indicator.health-database-unavailable,
+.health-indicator.health-backend-unavailable { border-color: rgba(255, 123, 130, .32); color: #df8b91; background: rgba(42, 16, 22, .7); }
+.health-indicator.health-database-unavailable i,
+.health-indicator.health-backend-unavailable i { background: var(--red); border-color: rgba(255, 160, 166, .5); box-shadow: 0 0 9px rgba(255, 123, 130, .5); }
+.system-banner.system-checking { border-color: #4b4319; background: #211e0d; }
+.system-banner.system-database-unavailable,
+.system-banner.system-backend-unavailable { border-color: #4e242b; background: #251016; }
+.system-banner.system-checking .large-status-dot:after { content: "…"; color: var(--yellow); }
+.system-banner.system-database-unavailable .large-status-dot:after,
+.system-banner.system-backend-unavailable .large-status-dot:after { content: "!"; color: var(--red); }
 .command-results {
   position: absolute;
   z-index: 100;

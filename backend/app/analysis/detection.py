@@ -93,7 +93,7 @@ def _detect_malicious_labels(
 ) -> list[DetectionCandidate]:
     labels = {label.casefold() for label in config.malicious_labels}
     benign_labels = {label.casefold() for label in config.dataset_benign_labels}
-    findings: list[DetectionCandidate] = []
+    matched_events: dict[tuple[str, str, str, str], list[tuple[CanonicalEvent, str, str]]] = {}
     for event in events:
         label = (event.source_label or "").strip().casefold()
         if event.provenance.source_type in {
@@ -110,17 +110,30 @@ def _detect_malicious_labels(
             expected = "Source label is in the configured malicious-label set"
         if not matched:
             continue
+        attack_class = _attack_class(event)
+        entity_id = primary_entity_id(event) or "unknown-entity"
+        evidence_id = str(event.provenance.evidence_id)
+        key = (event.provenance.source_type.value, evidence_id, entity_id, attack_class)
+        matched_events.setdefault(key, []).append((event, expected, label))
+
+    findings: list[DetectionCandidate] = []
+    for (_, _, entity_id, attack_class), matches in sorted(matched_events.items()):
+        grouped = [event for event, _, _ in matches]
+        expected = matches[0][1]
+        actual_labels = sorted({actual for _, _, actual in matches})
+        severity = _dataset_attack_severity(attack_class)
         findings.append(
             _candidate(
                 rule_id="LABEL-001",
-                title="Source record carries a deterministic malicious class label",
+                title=f"Dataset identifies {attack_class} activity",
                 summary=(
-                    f"The normalized source label {event.source_label!r} matched the "
-                    "versioned malicious-label rule."
+                    f"{len(grouped)} source records for {entity_id} were grouped by the "
+                    f"persisted attack class {attack_class!r} and matched the versioned "
+                    "malicious-label rule."
                 ),
-                severity=Severity.HIGH,
+                severity=severity,
                 confidence=95,
-                events=[event],
+                events=grouped,
                 trace=[
                     ConditionTrace(
                         condition=expected,
@@ -138,15 +151,48 @@ def _detect_malicious_labels(
                             }
                             else ",".join(sorted(labels))
                         ),
-                        actual=label,
+                        actual=",".join(actual_labels),
                         matched=True,
-                    )
+                    ),
+                    ConditionTrace(
+                        condition="Records share a normalized source attack class",
+                        field="attributes.attack_type",
+                        operator="equals",
+                        expected=attack_class,
+                        actual=attack_class,
+                        matched=True,
+                    ),
                 ],
-                entity_id=primary_entity_id(event),
+                entity_id=None if entity_id == "unknown-entity" else entity_id,
                 repetition_reference=config.label_repetition_reference,
+                repetition_count=len(grouped),
             )
         )
     return findings
+
+
+def _attack_class(event: CanonicalEvent) -> str:
+    """Return the most specific persisted source classification available."""
+    for value in (
+        event.attributes.get("attack_type"),
+        event.source_event_type,
+        event.source_label,
+    ):
+        if isinstance(value, str) and value.strip():
+            return value.strip().casefold().replace("_", " ")
+    return "malicious"
+
+
+def _dataset_attack_severity(attack_class: str) -> Severity:
+    """Classify source-labelled activity without pretending every class is equal."""
+    normalized = attack_class.casefold()
+    if any(token in normalized for token in ("ransom", "ddos", "dos", "botnet")):
+        return Severity.CRITICAL
+    if any(token in normalized for token in ("backdoor", "inject", "password", "brute", "exploit")):
+        return Severity.HIGH
+    if any(token in normalized for token in ("scan", "recon", "probe")):
+        return Severity.MEDIUM
+    return Severity.HIGH
 
 
 def _detect_request_rate(

@@ -12,6 +12,7 @@ from app.analysis.config import AnalysisConfig
 
 
 ANALYSIS_VERSION = "1.0"
+INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT = 4096
 
 
 class Severity(str, Enum):
@@ -225,11 +226,39 @@ class Incident(BaseModel):
     event_ids: list[UUID] = Field(min_length=1, max_length=4096)
     finding_ids: list[UUID] = Field(min_length=1, max_length=1024)
     alert_ids: list[UUID] = Field(default_factory=list, max_length=1024)
-    correlation_edge_ids: list[UUID] = Field(default_factory=list, max_length=4096)
+    correlation_edge_ids: list[UUID] = Field(
+        default_factory=list,
+        max_length=INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT,
+    )
+    correlation_edge_count: int = Field(default=0, ge=0)
+    correlation_edges_truncated: bool = False
     started_at: datetime | None
     ended_at: datetime | None
     maximum_risk: int = Field(ge=0, le=100)
     incident_version: Literal["1.0"] = ANALYSIS_VERSION
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_correlation_edge_metadata(cls, value: object) -> object:
+        if not isinstance(value, dict):
+            return value
+        data = dict(value)
+        edge_ids = data.get("correlation_edge_ids") or []
+        data.setdefault("correlation_edge_count", len(edge_ids))
+        data.setdefault("correlation_edges_truncated", False)
+        return data
+
+    @model_validator(mode="after")
+    def validate_correlation_edge_metadata(self) -> Incident:
+        if self.correlation_edge_count < len(self.correlation_edge_ids):
+            raise ValueError(
+                "correlation_edge_count cannot be smaller than the retained references"
+            )
+        if self.correlation_edges_truncated != (
+            self.correlation_edge_count > len(self.correlation_edge_ids)
+        ):
+            raise ValueError("correlation edge truncation metadata is inconsistent")
+        return self
 
     @field_validator("started_at", "ended_at")
     @classmethod
@@ -308,6 +337,7 @@ class ChartPoint(BaseModel):
         "event_type",
         "origin",
         "source_label",
+        "attack_class",
         "finding_severity",
         "risk_band",
         "activity_minute",
@@ -323,7 +353,7 @@ class AnalysisResult(BaseModel):
     analysis_id: UUID
     analysis_version: Literal["1.0"] = ANALYSIS_VERSION
     configuration_version: Literal["1.0"] = ANALYSIS_VERSION
-    rule_set_version: Literal["1.0"] = ANALYSIS_VERSION
+    rule_set_version: Literal["1.0", "1.1"] = "1.1"
     configuration: AnalysisConfig
     case_id: int = Field(ge=1)
     input_event_count: int = Field(ge=0)

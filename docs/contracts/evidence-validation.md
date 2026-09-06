@@ -31,6 +31,8 @@ Invalid data is never silently repaired. A mixed file may be accepted with warni
 | `ciciot2023_network@1.0` | `flow_duration`, `Protocol Type`, `label` |
 | `generic@1.0` | No dataset-specific columns; structural checks still apply |
 
+A small redistributable [`simulated@1.0` example](../../frontend/public/examples/simulated-evidence.csv) is provided for the connected import workflow. It contains synthetic records only. Select **Simulation** in the import page before uploading it. The table above remains the authoritative list of supported profile columns.
+
 The two primary profiles are pinned to a CSV projection of the [CASAS Milan public smart-home dataset](https://casas.wsu.edu/datasets/index) catalog snapshot updated 2018-09-07 and the [2020 TON_IoT telemetry release](https://research.unsw.edu.au/projects/toniot-datasets)'s `Train_Test_IoT_Fridge.csv` subset. CASAS CSV records preserve the observed timestamp, sensor identity, message, and optional activity annotation. The fridge profile validates its release-specific date/time format, finite temperature, device state, binary label, and attack type.
 
 CASAS smart-home telemetry and TON_IoT device telemetry are the primary public evaluation sources, supplemented by controlled simulation. The TON_IoT network and CICIoT2023 profiles remain secondary compatibility paths. The TON_IoT network profile intentionally names a separate network subset because TON_IoT contains heterogeneous sources. Additional CASAS testbeds or TON_IoT devices must receive separate versioned profiles instead of weakening these contracts. Small synthetic contract fixtures preserve the expected layouts without redistributing dataset records.
