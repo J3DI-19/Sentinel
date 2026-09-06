@@ -7,12 +7,12 @@ import json
 import re
 import smtplib
 import time
-from collections import defaultdict, deque
+from collections import OrderedDict, defaultdict, deque
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
 from queue import Empty, Full, Queue
-from threading import Event, Thread
+from threading import Event, Lock, Thread
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -53,6 +53,17 @@ class Phase3Service:
         self.queue: Queue[tuple[str, str]] = Queue(maxsize=settings.live_queue_size)
         self.stop_event = Event()
         self.rate_windows: dict[str, deque[float]] = defaultdict(deque)
+        # TV5-12: bounded LRU of sliding windows used to cap how many
+        # `live.auth_failure` audit rows can be recorded from any single
+        # caller per minute. Keyed primarily by client IP so a caller
+        # rotating source_id values cannot bypass the limit, and capped in
+        # total size so distinct keys cannot grow memory without bound
+        # (least-recently-used keys are evicted). Guarded by its own lock
+        # because auth failures are handled on the request path across
+        # threads.
+        self.auth_failure_windows: OrderedDict[str, deque[float]] = OrderedDict()
+        self.auth_failure_lock = Lock()
+        self.auth_failure_max_keys = 4096
         self.report_storage = Path(settings.report_storage_path).resolve()
         self.report_storage.mkdir(parents=True, exist_ok=True)
         self.worker = Thread(target=self._worker, name="traceveil-phase3-worker", daemon=True)
@@ -189,33 +200,221 @@ class Phase3Service:
             raise OverflowError("live_rate_limit_exceeded")
         window.append(now)
 
+    def _audit_locked(self, case_id: int | None, action: str, subject_type: str, subject_id: str | None, *, actor: str = "Investigator", request_id: str | None = None, details: dict | None = None) -> None:
+        """audit() without opening its own lock/transaction. MUST be called
+        while already holding self.repository.write_lock inside an open
+        `with self.db:` transaction, so it participates in the caller's
+        atomic commit rather than committing early."""
+        self.db.execute(
+            "INSERT INTO audit_events VALUES(?,?,?,?,?,?,?,?,?)",
+            (str(uuid4()), case_id, action, subject_type, subject_id, actor, request_id, canonical_json(details or {}), utcnow()),
+        )
+
+    def _quarantine_locked(self, case_id: int | None, session_id: str | None, source_id: str | None, code: str, message: str, raw: str | None) -> None:
+        """Records a rejected-but-authenticated live frame (regression or
+        collision) in live_ingest_issues. Like _audit_locked, it assumes
+        the caller already holds the lock and an open transaction, so the
+        quarantine record commits atomically with the audit record."""
+        self.db.execute(
+            "INSERT INTO live_ingest_issues(session_id,case_id,source_id,code,message,raw_json,occurred_at) VALUES(?,?,?,?,?,?,?)",
+            (session_id, case_id, source_id, code, message, (raw or "")[:65536], utcnow()),
+        )
+
     def submit_live(self, telemetry: LiveTelemetryInput, token: str, request_id: str | None) -> dict:
         self.verify_source(telemetry.source_id, token)
         raw = canonical_json(telemetry.model_dump(mode="json"))
         if len(raw.encode("utf-8")) > self.settings.live_max_payload_bytes:
             raise OverflowError("live_payload_too_large")
-        row = self.db.execute(
-            "SELECT * FROM live_sessions WHERE case_id=? AND status='active' ORDER BY started_at DESC",
-            (telemetry.case_id,),
-        ).fetchone()
-        if row is None or telemetry.source_id not in json.loads(row["source_ids_json"]):
-            raise ValueError("active_live_session_required")
-        session_id = row["session_id"]
-        dedupe_key = f"sequence:{telemetry.source_id}:{telemetry.sequence}" if telemetry.sequence is not None else f"hash:{digest(raw)}"
-        existing = self.db.execute("SELECT * FROM live_receipts WHERE session_id=? AND dedupe_key=?", (session_id, dedupe_key)).fetchone()
-        if existing:
-            result = self.get_live_receipt(existing["receipt_id"])
+        seq = telemetry.sequence
+        payload_hash = digest(raw)
+        now = utcnow()
+        receipt_id, evidence_id = str(uuid4()), str(uuid4())
+
+        # TV5-11 atomicity: the session lookup, sequence classification,
+        # receipt insert AND high-water update all happen inside ONE write
+        # lock + transaction. This guarantees two concurrent frames (e.g.
+        # 100 and 99) are serialized - the second sees the first's
+        # committed high-water and cannot slip through - and that the
+        # request thread never shares the SQLite connection mid-statement
+        # with the worker thread (the root of the intermittent
+        # KeyError:'status' race). Rejected frames commit their quarantine
+        # and audit rows here; the API exception is only raised AFTER this
+        # block commits (see below), satisfying "records committed before
+        # raising".
+        #
+        # decision is one of:
+        #   ("accept", receipt_id) | ("replay", existing_receipt_id)
+        #   | ("reject", error_code)
+        decision: tuple[str, str]
+        with self.repository.write_lock, self.db:
+            row = self.db.execute(
+                "SELECT session_id, source_ids_json FROM live_sessions WHERE case_id=? AND status='active' ORDER BY started_at DESC",
+                (telemetry.case_id,),
+            ).fetchone()
+            if row is None or telemetry.source_id not in json.loads(row["source_ids_json"]):
+                raise ValueError("active_live_session_required")
+            session_id = row["session_id"]
+
+            decision = ("accept", receipt_id)  # default unless a check overrides
+            if seq is not None:
+                prior = self.db.execute(
+                    "SELECT receipt_id, payload_hash, received_at FROM live_receipts WHERE source_id=? AND sequence=? ORDER BY received_at LIMIT 1",
+                    (telemetry.source_id, seq),
+                ).fetchone()
+                state = self.db.execute(
+                    "SELECT high_water_sequence FROM live_source_sequence_state WHERE source_id=?",
+                    (telemetry.source_id,),
+                ).fetchone()
+
+                if prior is not None and prior["payload_hash"] == payload_hash:
+                    self._audit_locked(
+                        telemetry.case_id, "live.replay_detected", "live_receipt", prior["receipt_id"],
+                        actor="system", request_id=request_id,
+                        details={"source_id": telemetry.source_id, "sequence": seq,
+                                 "original_receipt_id": prior["receipt_id"],
+                                 "original_received_at": prior["received_at"]},
+                    )
+                    decision = ("replay", prior["receipt_id"])
+                elif prior is not None:
+                    # Same sequence, different bytes -> tampering/collision.
+                    self._quarantine_locked(
+                        telemetry.case_id, session_id, telemetry.source_id, "sequence_collision",
+                        f"sequence {seq} already accepted with a different payload hash", raw)
+                    self._audit_locked(
+                        telemetry.case_id, "live.sequence_collision", "live_receipt", prior["receipt_id"],
+                        actor="system", request_id=request_id,
+                        details={"source_id": telemetry.source_id, "sequence": seq,
+                                 "original_receipt_id": prior["receipt_id"],
+                                 "original_payload_hash": prior["payload_hash"],
+                                 "attempted_payload_hash": payload_hash})
+                    decision = ("reject", "live_sequence_collision")
+                elif state is not None and seq < state["high_water_sequence"]:
+                    self._quarantine_locked(
+                        telemetry.case_id, session_id, telemetry.source_id, "sequence_regression",
+                        f"sequence {seq} is below source high-water {state['high_water_sequence']}", raw)
+                    self._audit_locked(
+                        telemetry.case_id, "live.sequence_regression", "live_source", telemetry.source_id,
+                        actor="system", request_id=request_id,
+                        details={"source_id": telemetry.source_id, "sequence": seq,
+                                 "high_water_sequence": state["high_water_sequence"]})
+                    decision = ("reject", "live_sequence_regression")
+            else:
+                existing = self.db.execute(
+                    "SELECT receipt_id, received_at FROM live_receipts WHERE session_id=? AND dedupe_key=?",
+                    (session_id, f"hash:{payload_hash}"),
+                ).fetchone()
+                if existing:
+                    self._audit_locked(
+                        telemetry.case_id, "live.replay_detected", "live_receipt", existing["receipt_id"],
+                        actor="system", request_id=request_id,
+                        details={"source_id": telemetry.source_id, "sequence": None,
+                                 "original_receipt_id": existing["receipt_id"],
+                                 "original_received_at": existing["received_at"]})
+                    decision = ("replay", existing["receipt_id"])
+
+            if decision[0] == "accept":
+                dedupe_key = f"sequence:{telemetry.source_id}:{seq}" if seq is not None else f"hash:{payload_hash}"
+                self.db.execute(
+                    "INSERT INTO live_receipts VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (receipt_id, session_id, telemetry.case_id, evidence_id, telemetry.source_id, telemetry.device_id, seq, dedupe_key, payload_hash, raw, "queued", None, None, now, now),
+                )
+                if seq is not None:
+                    self.db.execute(
+                        "INSERT INTO live_source_sequence_state(source_id, high_water_sequence, high_water_payload_hash, updated_at)"
+                        " VALUES(?,?,?,?)"
+                        " ON CONFLICT(source_id) DO UPDATE SET"
+                        "   high_water_payload_hash=CASE WHEN excluded.high_water_sequence>live_source_sequence_state.high_water_sequence"
+                        "     THEN excluded.high_water_payload_hash ELSE live_source_sequence_state.high_water_payload_hash END,"
+                        "   high_water_sequence=MAX(live_source_sequence_state.high_water_sequence, excluded.high_water_sequence),"
+                        "   updated_at=excluded.updated_at",
+                        (telemetry.source_id, seq, payload_hash, now),
+                    )
+                self._audit_locked(telemetry.case_id, "live.received", "live_receipt", receipt_id, request_id=request_id, details={"source_id": telemetry.source_id})
+
+        # --- transaction committed --------------------------------------
+        kind, value = decision
+        if kind == "reject":
+            raise ValueError(value)
+        if kind == "replay":
+            result = self.get_live_receipt(value)
             result["duplicate"] = True
             return result
-        receipt_id, evidence_id, now = str(uuid4()), str(uuid4()), utcnow()
-        with self.repository.write_lock, self.db:
-            self.db.execute(
-                "INSERT INTO live_receipts VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (receipt_id, session_id, telemetry.case_id, evidence_id, telemetry.source_id, telemetry.device_id, telemetry.sequence, dedupe_key, digest(raw), raw, "queued", None, None, now, now),
-            )
-        self.audit(telemetry.case_id, "live.received", "live_receipt", receipt_id, request_id=request_id, details={"source_id": telemetry.source_id})
         self._enqueue("live", receipt_id)
         return self.get_live_receipt(receipt_id)
+
+    @staticmethod
+    def _sanitize_source_id(source_id: str | None) -> str | None:
+        """Returns the source_id only if it matches the canonical
+        safe-identifier allow-list; otherwise 'invalid_format'; None stays
+        None. Used both for the rate-limit key and for audit details so
+        attacker-controlled bytes never reach either."""
+        if source_id is None:
+            return None
+        return source_id if re.fullmatch(r"[A-Za-z0-9._:-]{1,128}", source_id) else "invalid_format"
+
+    # TV5-12: structured, rate-limited audit for live-endpoint auth
+    # failures.
+    #
+    # * Never stores the presented token (secret) or the raw attacker
+    #   payload; source_id is sanitized to the safe-identifier allow-list
+    #   BEFORE it is used, both as the audit value and (as a fallback) as
+    #   the rate-limit key.
+    # * Rate-limited PRIMARILY by client IP so a caller rotating source_id
+    #   values from one address cannot exceed the cap. Only when no client
+    #   IP is available does it fall back to the sanitized source_id.
+    # * The window map is a bounded LRU: distinct keys cannot grow memory
+    #   without bound (LRU eviction at auth_failure_max_keys), so rotating
+    #   IPs cannot exhaust memory either.
+    # * Guarded by a dedicated lock for concurrent requests.
+    # The rejection HTTP 401 is unchanged whether or not a row is written.
+    def record_auth_failure(
+        self,
+        source_id: str | None,
+        reason: str,
+        *,
+        request_id: str | None = None,
+        client_ip: str | None = None,
+    ) -> bool:
+        """Returns True when an audit row was written, False when rate-limited."""
+        safe_source = self._sanitize_source_id(source_id)
+        # Primary key: client IP. Fallback: sanitized source_id. Last
+        # resort: a single shared "unknown" bucket.
+        key = client_ip or safe_source or "unknown"
+        cap = self.settings.live_auth_failure_audit_per_minute
+        now = time.monotonic()
+
+        with self.auth_failure_lock:
+            window = self.auth_failure_windows.get(key)
+            if window is None:
+                window = deque()
+                self.auth_failure_windows[key] = window
+            else:
+                self.auth_failure_windows.move_to_end(key)  # mark most-recently-used
+            while window and now - window[0] >= 60:
+                window.popleft()
+            if len(window) >= cap:
+                return False
+            window.append(now)
+            # Evict least-recently-used keys beyond the cap so a flood of
+            # distinct IPs/sources cannot grow the map without bound.
+            while len(self.auth_failure_windows) > self.auth_failure_max_keys:
+                self.auth_failure_windows.popitem(last=False)
+
+        details: dict[str, Any] = {"reason": reason}
+        if safe_source is not None:
+            details["source_id"] = safe_source
+        if client_ip:
+            details["client_ip"] = client_ip
+        self.audit(
+            None,
+            "live.auth_failure",
+            "live_source",
+            None,
+            actor="system",
+            request_id=request_id,
+            details=details,
+        )
+        return True
 
     def record_malformed(self, case_id: int | None, source_id: str | None, code: str, message: str, raw: str | None) -> None:
         session = None
@@ -238,10 +437,14 @@ class Phase3Service:
         return result
 
     def _process_live(self, receipt_id: str, *, analyze: bool = True) -> tuple[int, str] | None:
-        row = self.db.execute("SELECT * FROM live_receipts WHERE receipt_id=?", (receipt_id,)).fetchone()
-        if row is None or row["status"] != "queued":
-            return None
+        # Read + claim atomically under the write lock so this worker-thread
+        # read never shares the SQLite connection mid-statement with a
+        # request-thread write, and two workers cannot both claim the same
+        # receipt.
         with self.repository.write_lock, self.db:
+            row = self.db.execute("SELECT * FROM live_receipts WHERE receipt_id=?", (receipt_id,)).fetchone()
+            if row is None or row["status"] != "queued":
+                return None
             self.db.execute("UPDATE live_receipts SET status='processing',updated_at=? WHERE receipt_id=?", (utcnow(), receipt_id))
         telemetry = LiveTelemetryInput.model_validate_json(row["raw_json"])
         accepted = self.live_acceptance.accept(telemetry)
