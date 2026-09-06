@@ -1,9 +1,10 @@
 from functools import lru_cache
+from typing import Annotated
 
 import json
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -11,7 +12,11 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_prefix: str = "/api/v1"
     database_url: str = "sqlite:///./data/traceveil.db"
-    frontend_origins: list[str] = Field(
+    # NoDecode: pydantic-settings 2.6+ tries json.loads on list/dict env
+    # vars BEFORE mode="before" validators run, which breaks the
+    # comma-separated shape used in .env. NoDecode hands the raw string
+    # to parse_frontend_origins unchanged.
+    frontend_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"]
     )
     ollama_base_url: str = "http://127.0.0.1:11434"
@@ -28,13 +33,18 @@ class Settings(BaseSettings):
     live_stream_retention: int = Field(default=10000, ge=100, le=100000)
     live_stream_retention_hours: int = Field(default=24, ge=1, le=168)
     live_device_stale_seconds: int = Field(default=30, ge=5, le=300)
+    # TV5-12: cap on audit rows emitted per (source_id or client IP) per
+    # minute for live-endpoint authentication failures. Bounds the audit
+    # table under a brute-force flood while still recording the first
+    # rejection from each source/IP.
+    live_auth_failure_audit_per_minute: int = Field(default=6, ge=1, le=60)
     smtp_host: str | None = None
     smtp_port: int = Field(default=587, ge=1, le=65535)
     smtp_starttls: bool = True
     smtp_username: str | None = None
     smtp_password: str | None = None
     smtp_from_address: str | None = None
-    smtp_allowed_recipient_domains: list[str] = Field(default_factory=list)
+    smtp_allowed_recipient_domains: Annotated[list[str], NoDecode] = Field(default_factory=list)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
