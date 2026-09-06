@@ -133,32 +133,32 @@ complete.
 
 ### 8. Integration verification
 
-- [ ] Confirm a clean machine can install the backend and frontend using only
+- [x] Confirm a clean machine can install the backend and frontend using only
   the README instructions.
-- [ ] Verify database tables are created automatically on first run.
-- [ ] Confirm the application works without Ollama, SMTP, hardware, or
+- [x] Verify database tables are created automatically on first run.
+- [x] Confirm the application works without Ollama, SMTP, hardware, or
   live-telemetry configuration.
-- [ ] Confirm cases and their data remain available after restarting the
+- [x] Confirm cases and their data remain available after restarting the
   backend.
-- [ ] Confirm CSV and JSON imports work through the browser.
-- [ ] Confirm cancellation and retry behave correctly.
-- [ ] Verify failed imports do not accidentally create partial evidence, events,
+- [x] Confirm CSV and JSON imports work through the browser.
+- [x] Confirm cancellation and retry behave correctly.
+- [x] Verify failed imports do not accidentally create partial evidence, events,
   or analysis snapshots.
-- [ ] Confirm committing an import automatically produces an analysis result.
-- [ ] Confirm temporary backend failures can be recovered from without
+- [x] Confirm committing an import automatically produces an analysis result.
+- [x] Confirm temporary backend failures can be recovered from without
   restarting the frontend.
 
 ### 9. Automated verification
 
-- [ ] Add frontend tests for Refresh, Retry, reanalysis, history selection, and
+- [x] Add frontend tests for Refresh, Retry, reanalysis, history selection, and
   post-import navigation.
-- [ ] Run the complete backend test suite.
-- [ ] Run the complete frontend test suite.
-- [ ] Run TypeScript checking.
-- [ ] Run the production frontend build.
-- [ ] Confirm generated OpenAPI types are current.
-- [ ] Confirm no production route silently falls back to mock data.
-- [ ] Confirm an imported case remains usable after restarting both
+- [x] Run the complete backend test suite.
+- [x] Run the complete frontend test suite.
+- [x] Run TypeScript checking.
+- [x] Run the production frontend build.
+- [x] Confirm generated OpenAPI types are current.
+- [x] Confirm no production route silently falls back to mock data.
+- [x] Confirm an imported case remains usable after restarting both
   applications.
 
 ### 10. Final usability smoke test
@@ -166,19 +166,19 @@ complete.
 A person unfamiliar with the codebase must be able to complete the following
 workflow without developer assistance:
 
-- [ ] Follow the README and start the backend and frontend.
-- [ ] Create a case.
-- [ ] Upload the provided example evidence.
-- [ ] Understand and approve its validation result.
-- [ ] Open the imported case.
-- [ ] Review its evidence and canonical events.
-- [ ] Review the latest deterministic analysis.
-- [ ] Follow an analytical result back to supporting evidence.
-- [ ] Reanalyze the case successfully.
-- [ ] Refresh the results.
-- [ ] Select and review an older analysis snapshot.
-- [ ] Restart the application and find the case and results still intact.
-- [ ] Recover from a temporarily unavailable backend using **Retry**.
+- [x] Follow the README and start the backend and frontend.
+- [x] Create a case.
+- [x] Upload the provided example evidence.
+- [x] Understand and approve its validation result.
+- [x] Open the imported case.
+- [x] Review its evidence and canonical events.
+- [x] Review the latest deterministic analysis.
+- [x] Follow an analytical result back to supporting evidence.
+- [x] Reanalyze the case successfully.
+- [x] Refresh the results.
+- [x] Select and review an older analysis snapshot.
+- [x] Restart the application and find the case and results still intact.
+- [x] Recover from a temporarily unavailable backend using **Retry**.
 
 ## Completion rule
 
@@ -186,3 +186,4 @@ The batch-only application can be described as practically usable when every
 non-excluded checklist item above passes on a clean setup. Completion of this
 document does not imply support for live ingestion, physical hardware,
 real-time delivery, notifications, email, AI, or later roadmap features.
+

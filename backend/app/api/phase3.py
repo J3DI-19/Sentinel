@@ -81,8 +81,11 @@ def stop_session(session_id: UUID, request: Request):
 @router.post("/live/telemetry", status_code=202)
 async def receive_telemetry(request: Request, x_traceveil_source_token: str = Header(alias="X-Traceveil-Source-Token")):
     raw = await request.body()
-    if len(raw) > service(request).settings.live_max_payload_bytes:
+    svc = service(request)
+    if len(raw) > svc.settings.live_max_payload_bytes:
         raise OverflowError("live_payload_too_large")
+    request_id = getattr(request.state, "request_id", None)
+    client_ip = request.client.host if request.client else None
     try:
         payload = json.loads(raw)
         telemetry = LiveTelemetryInput.model_validate(payload)
@@ -90,11 +93,26 @@ async def receive_telemetry(request: Request, x_traceveil_source_token: str = He
         payload = payload if "payload" in locals() and isinstance(payload, dict) else {}
         source_id = payload.get("source_id")
         if not isinstance(source_id, str):
+            # TV5-12: audit before raising so a rogue-source request
+            # produces a bounded, structured record even when the body
+            # does not carry a usable source_id.
+            svc.record_auth_failure(None, "missing_source_id", request_id=request_id, client_ip=client_ip)
             raise PermissionError("invalid_live_source_token") from exc
-        service(request).verify_source(source_id, x_traceveil_source_token)
-        service(request).record_malformed(payload.get("case_id"), source_id, "malformed_live_telemetry", str(exc), raw.decode("utf-8", errors="replace")[:65536])
+        try:
+            svc.verify_source(source_id, x_traceveil_source_token)
+        except PermissionError:
+            svc.record_auth_failure(source_id, "invalid_token", request_id=request_id, client_ip=client_ip)
+            raise
+        svc.record_malformed(payload.get("case_id"), source_id, "malformed_live_telemetry", str(exc), raw.decode("utf-8", errors="replace")[:65536])
         raise ValueError("malformed_live_telemetry") from exc
-    return service(request).submit_live(telemetry, x_traceveil_source_token, getattr(request.state, "request_id", None))
+
+    try:
+        return svc.submit_live(telemetry, x_traceveil_source_token, request_id)
+    except PermissionError:
+        # TV5-12: well-formed body but bad token still produces one
+        # rate-limited audit row before re-raising.
+        svc.record_auth_failure(telemetry.source_id, "invalid_token", request_id=request_id, client_ip=client_ip)
+        raise
 
 
 @router.get("/live/receipts/{receipt_id}")
