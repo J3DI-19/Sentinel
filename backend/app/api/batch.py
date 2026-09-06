@@ -16,6 +16,7 @@ from app.analysis.schemas import (
     Incident,
     TimelineEntry,
 )
+from app.core.errors import DatabaseUnavailableError
 from app.evidence.schemas import EvidenceSource
 from app.investigation.schemas import (
     AnalysisSnapshotPublic,
@@ -34,14 +35,18 @@ from app.investigation.schemas import (
 router=APIRouter(tags=["batch-investigation"])
 
 class CaseCreate(BaseModel):
-    name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",max_length=120)
+    model_config = ConfigDict(str_strip_whitespace=True)
+    name:str=Field(min_length=1,max_length=200); description:str=Field(default="",max_length=2000); owner:str=Field(default="Investigator",min_length=1,max_length=120)
 class CommitRequest(BaseModel): allow_partial:bool=False
 class ReanalysisRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 class ErrorPublic(BaseModel):
     code:str; message:str; retryable:bool; request_id:str; details:Any|None=None
 
-def service(request:Request): return request.app.state.batch_service
+def service(request:Request):
+    value = request.app.state.batch_service
+    if value is None: raise DatabaseUnavailableError()
+    return value
 def page(items:list[dict], total:int, page_number:int, page_size:int): return {"items":items,"page":page_number,"page_size":page_size,"total":total}
 def public_import(job:dict)->dict:
     return {"import_id":job["import_id"],"case_id":job["case_id"],"evidence_id":job["evidence_id"],"filename":job["filename"],"source_type":job["source_type"],"state":job["status"],"progress":{"mode":"indeterminate"},"validation":json.loads(job["validation_json"]) if job["validation_json"] else None,"error":json.loads(job["error_json"]) if job["error_json"] else None,"created_at":job["created_at"],"updated_at":job["updated_at"]}
@@ -122,21 +127,21 @@ def cancel(import_id:UUID,request:Request) -> ImportPublic: return public_import
 
 @router.get("/cases/{case_id}/evidence")
 def evidence(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100),source:EvidenceSource|None=None) -> PageResponse[EvidencePublic]:
-    service(request).get_case(case_id); db=service(request).db; where="case_id=?"; values:list[Any]=[case_id]
+    service(request).get_case(case_id); db=service(request).db; where="case_id=? AND committed_at IS NOT NULL"; values:list[Any]=[case_id]
     if source: where += " AND source_type=?"; values.append(source.value)
     total=db.execute(f"SELECT COUNT(*) FROM evidence_metadata WHERE {where}",values).fetchone()[0]
     rows=[public_evidence(r) for r in db.execute(f"SELECT * FROM evidence_metadata WHERE {where} ORDER BY received_at DESC,id DESC LIMIT ? OFFSET ?",(*values,page_size,(page_number-1)*page_size)).fetchall()]
     return page(rows,total,page_number,page_size)
 @router.get("/evidence/{evidence_id}")
 def evidence_detail(evidence_id:UUID,request:Request) -> EvidenceDetailPublic:
-    db=service(request).db; row=db.execute("SELECT * FROM evidence_metadata WHERE evidence_id=?",(str(evidence_id),)).fetchone()
+    db=service(request).db; row=db.execute("SELECT * FROM evidence_metadata WHERE evidence_id=? AND committed_at IS NOT NULL",(str(evidence_id),)).fetchone()
     if not row: raise KeyError("evidence_not_found")
     result=public_evidence(row); result["issues"]=[public_issue(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
 
 @router.get("/cases/{case_id}/evidence/{evidence_id}")
 def case_evidence_detail(case_id:int,evidence_id:UUID,request:Request) -> EvidenceDetailPublic:
     service(request).get_case(case_id); db=service(request).db
-    row=db.execute("SELECT * FROM evidence_metadata WHERE case_id=? AND evidence_id=?",(case_id,str(evidence_id))).fetchone()
+    row=db.execute("SELECT * FROM evidence_metadata WHERE case_id=? AND evidence_id=? AND committed_at IS NOT NULL",(case_id,str(evidence_id))).fetchone()
     if not row: raise KeyError("evidence_not_found")
     result=public_evidence(row); result["issues"]=[public_issue(r) for r in db.execute("SELECT level,error_code,message,row_number,field_name,rejected_value FROM evidence_validation_issues WHERE evidence_metadata_id=?",(row["id"],)).fetchall()]; return result
 
@@ -181,7 +186,9 @@ def artifacts(case_id:int,kind:str,request:Request,page_number:int,page_size:int
 def reanalyze(case_id:int,request:Request,body:ReanalysisRequest|None=None) -> ReanalysisPublic:
     result=service(request).reanalyze(case_id)
     row=service(request).db.execute("SELECT analysis_id,case_id,status,result_json,created_at FROM analysis_runs WHERE analysis_id=?",(result["analysis_id"],)).fetchone()
-    return analysis_snapshot(row,is_latest=True,reused_existing=result["reused_existing"])
+    payload=analysis_snapshot(row,is_latest=True,reused_existing=result["reused_existing"])
+    payload["outcome"]=result["outcome"]
+    return payload
 
 @router.get("/cases/{case_id}/analyses")
 def analyses(case_id:int,request:Request,page_number:int=Query(1,alias="page",ge=1),page_size:int=Query(25,ge=1,le=100)) -> PageResponse[AnalysisSnapshotPublic]:

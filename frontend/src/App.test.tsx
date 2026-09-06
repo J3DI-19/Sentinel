@@ -117,15 +117,15 @@ describe("Traceveil investigation interface", () => {
     window.history.replaceState({}, "", "/cases/1/findings");
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Findings" })).toBeInTheDocument();
-    expect(screen.getByText("No findings")).toBeInTheDocument();
+    expect(screen.getByText("No analysis has run")).toBeInTheDocument();
     expect(screen.queryByText("Risk model")).not.toBeInTheDocument();
   });
 
-  it("keeps connected analytics backend-authored and outside the deferred live-capture scope", async () => {
+  it("redirects the legacy analytics view into persisted visuals", async () => {
     window.history.replaceState({}, "", "/cases/1/analytics");
     const { unmount } = render(<App />);
-    expect(await screen.findByRole("heading", { name: "Analytics" })).toBeInTheDocument();
-    expect(screen.getByText(/Persisted batch investigation/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Visuals" })).toBeInTheDocument();
+    expect(screen.getByText(/Connected records and visual summaries/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Live capture" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Live Monitor" })).toBeInTheDocument();
     unmount();

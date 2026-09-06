@@ -4,6 +4,7 @@ export type ServiceStatus = {
   available?: boolean;
   model?: string;
   model_installed?: boolean;
+  message?: string;
 };
 
 async function getHealth(path: string): Promise<ServiceStatus> {

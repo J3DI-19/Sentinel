@@ -981,6 +981,12 @@ export interface components {
              */
             default_device_criticality: number;
             /**
+             * Incident Reference Policy Version
+             * @default 1.0
+             * @constant
+             */
+            incident_reference_policy_version: "1.0";
+            /**
              * Label Repetition Reference
              * @default 4
              */
@@ -1016,10 +1022,10 @@ export interface components {
             risk_weights?: components["schemas"]["RiskWeights"];
             /**
              * Rule Set Version
-             * @default 1.0
-             * @constant
+             * @default 1.1
+             * @enum {string}
              */
-            rule_set_version: "1.0";
+            rule_set_version: "1.0" | "1.1";
             /**
              * Scoring Version
              * @default 1.0
@@ -1071,10 +1077,10 @@ export interface components {
             input_event_count: number;
             /**
              * Rule Set Version
-             * @default 1.0
-             * @constant
+             * @default 1.1
+             * @enum {string}
              */
-            rule_set_version: "1.0";
+            rule_set_version: "1.0" | "1.1";
             /** Timeline */
             timeline?: components["schemas"]["TimelineEntry"][];
         };
@@ -1339,7 +1345,7 @@ export interface components {
              * Series
              * @enum {string}
              */
-            series: "event_type" | "origin" | "source_label" | "finding_severity" | "risk_band" | "activity_minute";
+            series: "event_type" | "origin" | "source_label" | "attack_class" | "finding_severity" | "risk_band" | "activity_minute";
             /** Subgroup */
             subgroup?: string | null;
             /** Value */
@@ -1790,8 +1796,18 @@ export interface components {
             alert_ids?: string[];
             /** Case Id */
             case_id: number;
+            /**
+             * Correlation Edge Count
+             * @default 0
+             */
+            correlation_edge_count: number;
             /** Correlation Edge Ids */
             correlation_edge_ids?: string[];
+            /**
+             * Correlation Edges Truncated
+             * @default false
+             */
+            correlation_edges_truncated: boolean;
             /** Ended At */
             ended_at: string | null;
             /** Event Ids */
@@ -1973,6 +1989,11 @@ export interface components {
             is_latest: boolean;
             /** Maximum Risk */
             maximum_risk: number;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "created" | "reused";
             /** Reused Existing */
             reused_existing: boolean;
             /** Status */

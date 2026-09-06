@@ -10,10 +10,10 @@ export const batchApi = {
   listCases(signal?: AbortSignal) {
     return apiClient.request<ApiCasePage>(`/cases${serializeQuery({ page: 1, page_size: 100 })}`, { signal });
   },
-  createCase(name: string, description = "", signal?: AbortSignal) {
+  createCase(name: string, description = "", owner = "Investigator", signal?: AbortSignal) {
     return apiClient.request<ApiCase>("/cases", {
       method: "POST", signal, headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, owner }),
     });
   },
 };

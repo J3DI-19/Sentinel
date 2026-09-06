@@ -61,6 +61,7 @@ class AnalysisService:
                 filter_material,
                 *(str(event_id) for event_id in event_ids),
             ),
+            rule_set_version=self.config.rule_set_version,
             case_id=case_id,
             configuration=self.config,
             input_event_count=len(events),

@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import sqlite3
 
 from fastapi import FastAPI
 from fastapi import Request
@@ -14,6 +15,7 @@ from app.services.batch import BatchInvestigationService
 from app.services.phase3 import Phase3Service
 from app.analysis.service import AnalysisService
 from app.core.config import get_settings
+from app.core.errors import DatabaseUnavailableError
 from app.db.sqlite import SQLiteRepository
 from app.evidence.service import EvidenceValidationService
 from app.normalization.service import NormalizationService
@@ -23,20 +25,33 @@ from app.normalization.service import NormalizationService
 async def lifespan(app: FastAPI):
     settings = get_settings()
     repository = SQLiteRepository(settings.database_url)
-    repository.initialize()
     app.state.repository = repository
-    app.state.evidence_validation_service = EvidenceValidationService(
-        repository,
-        max_file_size_bytes=settings.max_evidence_file_bytes,
-        max_issues=settings.max_validation_issues,
-    )
-    app.state.normalization_service = NormalizationService()
-    app.state.analysis_service = AnalysisService()
-    app.state.batch_service = BatchInvestigationService(repository, settings.evidence_storage_path, settings.max_evidence_file_bytes, settings.max_validation_issues)
-    app.state.phase3_service = Phase3Service(repository, app.state.batch_service, settings)
+    app.state.repository_error = None
+    app.state.evidence_validation_service = None
+    app.state.normalization_service = None
+    app.state.analysis_service = None
+    app.state.batch_service = None
+    app.state.phase3_service = None
+    try:
+        repository.initialize()
+    except (sqlite3.Error, OSError):
+        repository.close()
+        app.state.repository_error = "Database initialization failed."
+    else:
+        app.state.evidence_validation_service = EvidenceValidationService(
+            repository,
+            max_file_size_bytes=settings.max_evidence_file_bytes,
+            max_issues=settings.max_validation_issues,
+        )
+        app.state.normalization_service = NormalizationService()
+        app.state.analysis_service = AnalysisService()
+        app.state.batch_service = BatchInvestigationService(repository, settings.evidence_storage_path, settings.max_evidence_file_bytes, settings.max_validation_issues)
+        app.state.phase3_service = Phase3Service(repository, app.state.batch_service, settings)
     yield
-    app.state.phase3_service.shutdown()
-    app.state.batch_service.shutdown()
+    if app.state.phase3_service is not None:
+        app.state.phase3_service.shutdown()
+    if app.state.batch_service is not None:
+        app.state.batch_service.shutdown()
     repository.close()
 
 
@@ -48,6 +63,8 @@ def create_app() -> FastAPI:
         request_id=request.headers.get("x-request-id") or str(uuid4())
         request.state.request_id = request_id
         try: response=await call_next(request)
+        except DatabaseUnavailableError: response=JSONResponse(status_code=503,content={"code":"database_unavailable","message":"The evidence database is unavailable. Try again after restoring the database connection.","retryable":True,"request_id":request_id,"details":None})
+        except sqlite3.Error: response=JSONResponse(status_code=503,content={"code":"database_unavailable","message":"The evidence database is unavailable. Try again after restoring the database connection.","retryable":True,"request_id":request_id,"details":None})
         except KeyError as exc: response=JSONResponse(status_code=404,content={"code":str(exc.args[0]),"message":"Requested resource was not found.","retryable":False,"request_id":request_id,"details":None})
         except ValueError as exc: response=JSONResponse(status_code=409,content={"code":str(exc),"message":str(exc).replace("_"," "),"retryable":False,"request_id":request_id,"details":None})
         except PermissionError as exc: response=JSONResponse(status_code=401,content={"code":str(exc),"message":"Live source authentication failed.","retryable":False,"request_id":request_id,"details":None})

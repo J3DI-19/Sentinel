@@ -15,6 +15,7 @@ def build_chart_points(
             "event_type": event.event_type,
             "origin": event.provenance.origin.value,
             "source_label": event.source_label,
+            "attack_class": event.attributes.get("attack_type"),
             "observed_at": event.observed_at,
         }
         for event in events
@@ -26,6 +27,9 @@ def build_chart_points(
         labelled = frame.dropna(subset=["source_label"])
         if not labelled.empty:
             points.extend(_count_series(labelled, "source_label", "source_label"))
+        classified = frame.dropna(subset=["attack_class"])
+        if not classified.empty:
+            points.extend(_count_series(classified, "attack_class", "attack_class"))
         timed = frame.dropna(subset=["observed_at"]).copy()
         if not timed.empty:
             timed["minute"] = pd.to_datetime(timed["observed_at"], utc=True).dt.floor("min")

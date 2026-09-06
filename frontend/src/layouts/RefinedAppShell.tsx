@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useSystemHealth } from "../health/SystemHealthContext";
 
 interface RouteState { path: string; search: string; navigate: (path: string) => void; }
 
@@ -74,6 +75,7 @@ function Breadcrumbs({ path, navigate }: { path: string; navigate: (path: string
 }
 
 export function AppShell({ children, route }: { children: ReactNode; route: RouteState }) {
+  const health = useSystemHealth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [search, setSearch] = useState("");
@@ -125,7 +127,7 @@ export function AppShell({ children, route }: { children: ReactNode; route: Rout
             <span className="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input ref={searchRef} value={search} onFocus={() => setSearchOpen(true)} onChange={event => { setSearch(event.target.value); setSearchOpen(true); }} placeholder="Search cases, evidence, devices…" aria-label="Global search"/><kbd>Ctrl/⌘ K</kbd>
             {searchOpen && <div className="command-results" role="listbox">{results.length ? results.map(item => <button role="option" aria-selected="false" key={`${item.kind}-${item.label}`} onMouseDown={event => event.preventDefault()} onClick={() => selectTarget(item.path)}><span><b>{item.label}</b><small>{item.detail}</small></span><em>{item.kind}</em></button>) : <div className="command-empty">No matching cases, evidence, devices, or findings.</div>}</div>}
           </div>
-          <button className="health-indicator" onClick={() => route.navigate("/status")} aria-label="Platform health: healthy" title="View system status"><i/><span>Systems healthy</span></button>
+          <button className={`health-indicator health-${health.state}`} onClick={() => route.navigate("/status")} aria-label={`Platform health: ${health.state.replaceAll("-", " ")}`} title="View system status"><i/><span>{{ checking: "Checking systems", operational: "Core systems ready", "database-unavailable": "Database unavailable", "backend-unavailable": "Backend unavailable" }[health.state]}</span></button>
         </div>
       </header>
       <main className="content" onClick={() => searchOpen && setSearchOpen(false)}>{children}</main>

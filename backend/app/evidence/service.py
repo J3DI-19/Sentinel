@@ -136,7 +136,7 @@ class EvidenceValidationService:
                 issues.append(
                     self._issue(
                         "DUPLICATE_EVIDENCE",
-                        f"The same evidence bytes were already registered as {duplicate}",
+                        f"The same evidence bytes were previously registered for validation as {duplicate}",
                         level=IssueLevel.WARNING,
                     )
                 )

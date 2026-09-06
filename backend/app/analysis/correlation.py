@@ -10,6 +10,7 @@ from app.analysis.schemas import (
     CorrelationEdge,
     CorrelationReason,
     DetectionFinding,
+    INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT,
     Incident,
 )
 from app.normalization.schemas import CanonicalEntity, CanonicalEvent
@@ -90,6 +91,21 @@ def build_incidents(
             for edge in correlations
             if edge.source_event_id in component and edge.target_event_id in component
         ]
+        component_edge_ids = [
+            edge.edge_id
+            for edge in sorted(
+                component_edges,
+                key=lambda edge: (
+                    edge.difference_seconds,
+                    str(edge.source_event_id),
+                    str(edge.target_event_id),
+                    str(edge.edge_id),
+                ),
+            )
+        ]
+        retained_edge_ids = component_edge_ids[
+            :INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT
+        ]
         observed = [
             event_by_id[event_id].observed_at
             for event_id in component_ids
@@ -104,8 +120,10 @@ def build_incidents(
                 event_ids=component_ids,
                 finding_ids=finding_ids,
                 alert_ids=unique_sorted_uuids(alert.alert_id for alert in component_alerts),
-                correlation_edge_ids=unique_sorted_uuids(
-                    edge.edge_id for edge in component_edges
+                correlation_edge_ids=retained_edge_ids,
+                correlation_edge_count=len(component_edge_ids),
+                correlation_edges_truncated=(
+                    len(component_edge_ids) > len(retained_edge_ids)
                 ),
                 started_at=min(observed) if observed else None,
                 ended_at=max(observed) if observed else None,

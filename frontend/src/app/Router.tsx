@@ -7,6 +7,7 @@ import { SystemStatusPage } from "../pages/SystemStatusPage";
 import { SettingsWorkspacePage } from "../pages/SettingsWorkspacePage";
 import { ConnectedCaseWorkspaceV3Page } from "../pages/ConnectedCaseWorkspaceV3Page";
 import { ConnectedAssistantPage } from "../pages/ConnectedAssistantPage";
+import { SystemHealthProvider } from "../health/SystemHealthContext";
 
 export function Router() {
   const route=useLocationPath(); let page;
@@ -16,9 +17,9 @@ export function Router() {
   else if(/^\/cases\/\d+(?:\/|$)/.test(route.path)) page=<ConnectedCaseWorkspaceV3Page path={route.path} search={route.search} navigate={route.navigate}/>;
   else if(route.path.startsWith("/cases/")) page=<div className="state-box" role="alert"><strong>Legacy demonstration case unavailable</strong><p>Production routes only display persisted numeric case IDs. Select a connected case from the register.</p><button onClick={()=>route.navigate("/cases")}>Open cases</button></div>;
   else if(route.path==="/live") page=<ConnectedLiveOperationsPage navigate={route.navigate} search={route.search}/>;
-  else if(route.path==="/import") page=<ImportEvidencePage/>;
+  else if(route.path==="/import") page=<ImportEvidencePage search={route.search} navigate={route.navigate}/>;
   else if(route.path==="/status") page=<SystemStatusPage/>;
   else if(route.path==="/settings") page=<SettingsWorkspacePage/>;
   else page=<div className="not-found"><span>404</span><h1>Investigation view not found</h1><button onClick={()=>route.navigate("/")}>Return to overview</button></div>;
-  return <AppShell route={route}>{page}</AppShell>;
+  return <SystemHealthProvider><AppShell route={route}>{page}</AppShell></SystemHealthProvider>;
 }

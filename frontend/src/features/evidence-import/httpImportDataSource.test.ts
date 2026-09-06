@@ -4,8 +4,8 @@ import { inspectEvidenceFile } from "./fileValidation";
 import { HttpImportDataSource } from "./httpImportDataSource";
 import type { ImportConfiguration } from "./types";
 
-const configuration: ImportConfiguration = { caseId: "7", source: "simulation", timezone: "UTC", timestampField: "auto", duplicatePolicy: "skip_exact_hashes" };
-const report = { metadata: { evidence_id: "evidence-1", source_type: "simulation", dataset_profile: "simulation@1.0" }, total_records: 2, accepted_records: 1, rejected_records: 1, issues: [{ level: "error", code: "INVALID_TIMESTAMP", message: "Invalid timestamp", row_number: 3, field: "timestamp" }] };
+const configuration: ImportConfiguration = { caseId: "7", source: "simulated", timezone: "UTC", timestampField: "auto", duplicatePolicy: "skip_exact_hashes" };
+const report = { metadata: { evidence_id: "evidence-1", source_type: "simulated", dataset_profile: "simulated@1.0" }, total_records: 2, accepted_records: 1, rejected_records: 1, issues: [{ level: "error", code: "INVALID_TIMESTAMP", message: "Invalid timestamp", row_number: 3, field: "timestamp" }] };
 const job = (state: string, validation: typeof report | null = report) => ({ import_id: "import-1", state, validation, error: null });
 
 function adapter(...responses: unknown[]) {
@@ -17,8 +17,8 @@ describe("HTTP import data source", () => {
   it("maps validation problems and explicitly approves a partial commit", async () => {
     const { source, request } = adapter(job("awaiting_commit"), job("partial_success"));
     const result = await source.validate(inspectEvidenceFile(new File(["data"], "events.csv")), configuration, new AbortController().signal);
-    expect(result).toMatchObject({ acceptedRecords: 1, rejectedRecords: 1, detectedSchema: "simulation@1.0" });
-    expect(result.problems[0]).toMatchObject({ scope: "row", code: "INVALID_TIMESTAMP", row: 3 });
+    expect(result).toMatchObject({ acceptedRecords: 1, rejectedRecords: 1, detectedSchema: "simulated@1.0" });
+    expect(result.problems[0]).toMatchObject({ scope: "row", code: "INVALID_TIMESTAMP", row: 3, column: "timestamp", correction: expect.stringContaining("timestamp") });
     await expect(source.commit(result.validationId, configuration, new AbortController().signal)).resolves.toMatchObject({ state: "partial-success" });
     expect(JSON.parse(request.mock.calls[1][1].body)).toEqual({ allow_partial: true });
   });

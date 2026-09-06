@@ -189,6 +189,12 @@
             "title": "Default Device Criticality",
             "type": "integer"
           },
+          "incident_reference_policy_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Incident Reference Policy Version",
+            "type": "string"
+          },
           "label_repetition_reference": {
             "default": 4,
             "maximum": 1000.0,
@@ -237,8 +243,11 @@
             "$ref": "#/components/schemas/RiskWeights"
           },
           "rule_set_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Rule Set Version",
             "type": "string"
           },
@@ -347,8 +356,11 @@
             "type": "integer"
           },
           "rule_set_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Rule Set Version",
             "type": "string"
           },
@@ -938,6 +950,7 @@
           "owner": {
             "default": "Investigator",
             "maxLength": 120,
+            "minLength": 1,
             "title": "Owner",
             "type": "string"
           }
@@ -1083,6 +1096,7 @@
               "event_type",
               "origin",
               "source_label",
+              "attack_class",
               "finding_severity",
               "risk_band",
               "activity_minute"
@@ -2427,6 +2441,12 @@
             "title": "Case Id",
             "type": "integer"
           },
+          "correlation_edge_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Correlation Edge Count",
+            "type": "integer"
+          },
           "correlation_edge_ids": {
             "items": {
               "format": "uuid",
@@ -2435,6 +2455,11 @@
             "maxItems": 4096,
             "title": "Correlation Edge Ids",
             "type": "array"
+          },
+          "correlation_edges_truncated": {
+            "default": false,
+            "title": "Correlation Edges Truncated",
+            "type": "boolean"
           },
           "ended_at": {
             "anyOf": [
@@ -2961,6 +2986,14 @@
             "title": "Maximum Risk",
             "type": "integer"
           },
+          "outcome": {
+            "enum": [
+              "created",
+              "reused"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
           "reused_existing": {
             "title": "Reused Existing",
             "type": "boolean"
@@ -2982,7 +3015,8 @@
           "incident_count",
           "maximum_risk",
           "is_latest",
-          "reused_existing"
+          "reused_existing",
+          "outcome"
         ],
         "title": "ReanalysisPublic",
         "type": "object"
