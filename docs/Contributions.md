@@ -1,70 +1,129 @@
 # Team Ownership & Contributions
 
-**Last Updated:** 2026-09-06
+**Last updated:** 2026-09-09
 
-This document outlines the agreed project responsibilities and the reviewed contribution history, reconciled with the overall completion report.
+**Repository snapshot:** `42efe68` on branch `J3DI`
+
+**Commit count:** 51
+
+This record combines author names that use the same verified email identity. In
+particular, `J3DI` and `J3DI-19` are reported together as J3DI.
 
 ```mermaid
-pie title Project Work Breakdown (Based on Commits)
-    "J3DI" : 34
+pie title Commit Authorship at the Recorded Snapshot
+    "J3DI" : 39
     "Aarya" : 10
-    "Ayra" : 6
-    "Remaining (Est.)" : 63
+    "Ayra" : 2
 ```
 
-> **Note:** The remaining work is an estimate based on the current completion rate (60 out of 136 roadmap items completed across 50 total commits).
-
 ## J3DI
+
 **Role:** Project Lead
-**Assigned Steps:** 01, 02, 09, 10
-**Total Commits:** 34
 
-**Allocated Project-wide Ownership:**
-- Documentation, planning, and team coordination
-- Merging, review, and integration oversight
-- Final polish and repository management
+**Assigned steps:** 01, 02, 09, 10, plus cross-cutting integration and delivery
 
-**Verified Contribution Record:**
-- **Leadership:** Served as the overall project lead from initiation through completion. Owned implementation planning, work sequencing, roadmap management, and delivery oversight.
-- **Foundation & Architecture:** Established the repository, React/Vite frontend, FastAPI backend, SQLite, Ollama configuration, and the entire frontend architecture (dashboards, timelines, graphs, etc.).
-- **Integration & Polish:** Coordinated the three-phase integration, dataset-scope corrections, and handled branch synchronization and final documentation.
+**Verified commits:** 39
 
-**Major Commits:**
-- `4f00e8f` (2026-09-02): Complete Phase 2 recovery workflows
-- `7ecdc12` (2026-09-01): Complete Phase 1 usability workflows
-- `d08598e` (2026-08-15): Complete end-to-end investigation integration
-- `8e6500c` (2026-07-23): Refine Traceveil investigation frontend
-- `72339f4` (2026-07-19): Initialize Sentinel Step 1 foundation
+### Allocated project-wide ownership
+
+- Documentation, planning, roadmap management, and team coordination
+- Repository foundation, frontend architecture, merging, and integration review
+- Final product polish, evaluation-data readiness, and release management
+
+### Verified contribution record
+
+- **Leadership:** Led implementation planning, work sequencing, roadmap
+  management, review preparation, and end-to-end delivery oversight.
+- **Foundation and frontend:** Established the repository, React/Vite frontend,
+  FastAPI backend, SQLite integration, Ollama configuration, application shell,
+  dashboards, case workspaces, timelines, graphs, and investigation views.
+- **Evidence-analysis improvements:** Added explicit classification provenance,
+  normalized attack taxonomy, label-free HAI and IoT-23 detection, metric and
+  network behavioural rules, risk transparency, bounded incident grouping,
+  activity-window attribution, and safe cross-dataset convergence.
+- **Dataset workflows:** Added curated HAI, IoT-23, TON_IoT, CASAS, and simulation
+  samples; contract fixtures; checksums; preparation tooling; and a physical
+  device inventory that distinguishes sensors, appliances, network flows, and
+  cameras.
+- **Investigation usability:** Added dense-timeline pagination, spike-cause
+  explanations, incident context, entity inventory, classification/risk
+  explainers, reliable route transitions, and improved mixed-case analysis.
+- **Case explanation UX:** Added automatically maintained, beginner-friendly
+  dataset descriptions, preserved investigator-written text, concise hover text
+  in case management, and a full responsive description panel in Case Overview.
+
+### Most recent verified commits
+
+- `42efe68` (2026-09-09) — **Add dataset-aware case descriptions.** Added the
+  plain-language source catalog, automatic description creation/backfill,
+  mixed-source explanation logic, compact hover presentation, the Case Overview
+  information panel, and regression tests.
+- `c4ec731` (2026-09-09) — **Improve evidence analysis and dataset workflows.**
+  Added label-free HAI/IoT-23 workflows, curated samples, device documentation,
+  classification provenance, behavioural rules, bounded incident sessions,
+  anomaly attribution, cross-source analysis improvements, frontend explainers,
+  timeline scaling, start-up tooling, and supporting tests/documentation.
+
+### Earlier major commits
+
+- `4f00e8f` (2026-09-02) — Complete Phase 2 recovery workflows
+- `7ecdc12` (2026-09-01) — Complete Phase 1 usability workflows
+- `d08598e` (2026-08-15) — Complete end-to-end investigation integration
+- `8e6500c` (2026-07-23) — Refine Traceveil investigation frontend
+- `72339f4` (2026-07-19) — Initialize Sentinel Step 1 foundation
 
 ---
 
 ## Aarya
+
 **Role:** Contributor
-**Assigned Steps:** 03, 04, 06, 08
-**Total Commits:** 10
 
-**Verified Contribution Record:**
-- **Evidence Validation:** Implemented evidence schemas, profiles, hashing, validation rules, persistence/migrations, dataset fixtures, and live telemetry contracts.
-- **Canonical Normalization:** Built versioned canonical events, deterministic IDs, provenance tracking, simulation/network adapters, and integrity checks.
-- **Deterministic Analytics:** Implemented analytics filters, sorting, rules, baselines, bounded risk scoring, correlation, incident grouping, and live alerts.
+**Assigned steps:** 03, 04, 06, 08
 
-**Major Commits:**
-- `77ed34e` (2026-09-01): feat: complete step 8 investigation workflows
-- `df03b84` (2026-08-21): feat: integrate step 8 investigation APIs
-- `b4d2337` (2026-08-11): Step 6 - Deterministic Analytics
-- `72ad28c` (2026-08-07): Step 4 - Canonical Normalization
-- `66b43fe` (2026-08-06): Step 3 - Evidence Validation
+**Verified commits:** 10
+
+### Verified contribution record
+
+- **Evidence validation:** Implemented evidence schemas, profiles, hashing,
+  validation rules, persistence/migrations, dataset fixtures, and live telemetry
+  contracts.
+- **Canonical normalization:** Built versioned canonical events, deterministic
+  IDs, provenance tracking, simulation/network adapters, and integrity checks.
+- **Deterministic analytics:** Implemented filters, sorting, initial detection
+  rules, baselines, bounded risk scoring, correlation, incident grouping, and
+  live alerts.
+
+### Major commits
+
+- `77ed34e` (2026-09-01) — Complete Step 8 investigation workflows
+- `df03b84` (2026-08-21) — Integrate Step 8 investigation APIs
+- `b4d2337` (2026-08-11) — Step 6 deterministic analytics
+- `72ad28c` (2026-08-07) — Step 4 canonical normalization
+- `66b43fe` (2026-08-06) — Step 3 evidence validation
 
 ---
 
 ## Ayra
+
 **Role:** Contributor
-**Assigned Steps:** 05, 07, 11, 12
-**Total Commits:** 6
 
-**Verified Contribution Record:**
-- **Step 5 - Live IoT Integration:** Contributed directly to Step 5 (authenticated HTTP intake, sessions, etc.), including subsequent integration fixes and CI/CD corrections.
+**Assigned steps:** 05, 07, 11, 12
 
-**Major Commits:**
-- `3118068` (2026-09-06): Step5-Ayra
-- `8b79d0a` (2026-09-02): Step 5
+**Verified commits:** 2
+
+### Verified contribution record
+
+- **Live IoT integration:** Contributed authenticated HTTP intake, session and
+  telemetry integration work, follow-up fixes, and CI/CD corrections for Step 5.
+
+### Major commits
+
+- `3118068` (2026-09-06) — Step 5 contribution
+- `8b79d0a` (2026-09-02) — Step 5 foundation
+
+## Attribution note
+
+Counts above come from `git shortlog -sne HEAD` at `42efe68`. Feature ownership
+is based on the committed diff and the agreed assigned steps; a checked roadmap
+item records delivery ownership and does not erase earlier foundational work by
+another contributor.
