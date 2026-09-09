@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.analysis.aggregates import build_chart_points
+from app.analysis.aggregates import build_activity_windows, build_chart_points
 from app.analysis.config import AnalysisConfig
 from app.analysis.correlation import build_incidents, correlate
 from app.analysis.detection import detect
@@ -49,6 +49,7 @@ class AnalysisService:
             findings=findings,
             alerts=alerts,
             correlations=correlations,
+            config=self.config,
         )
         event_ids = [event.event_id for event in selected]
         filter_material = specification.model_dump_json()
@@ -76,6 +77,7 @@ class AnalysisService:
             timeline=build_timeline(selected, findings, alerts),
             graph=build_graph(selected, findings),
             chart_points=build_chart_points(selected, findings),
+            activity_windows=build_activity_windows(selected, findings, incidents),
         )
 
     def _build_live_alerts(self, findings, event_by_id) -> list[Alert]:

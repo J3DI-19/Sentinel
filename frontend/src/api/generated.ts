@@ -125,6 +125,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cases/{case_id}/activity-windows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Activity Windows */
+        get: operations["activity_windows_api_v1_cases__case_id__activity_windows_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cases/{case_id}/aggregates": {
         parameters: {
             query?: never;
@@ -157,6 +174,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cases/{case_id}/alerts/{alert_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Alert Workflow */
+        patch: operations["update_alert_workflow_api_v1_cases__case_id__alerts__alert_id__patch"];
         trace?: never;
     };
     "/api/v1/cases/{case_id}/analyses": {
@@ -477,6 +511,23 @@ export interface paths {
         };
         /** List Timeline */
         get: operations["list_timeline_api_v1_cases__case_id__timeline_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cases/{case_id}/timeline/windows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Timeline Windows */
+        get: operations["timeline_windows_api_v1_cases__case_id__timeline_windows_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -864,6 +915,59 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityClassificationCount */
+        ActivityClassificationCount: {
+            /** Count */
+            count: number;
+            provenance: components["schemas"]["ClassificationSource"];
+            /** Value */
+            value: string;
+        };
+        /** ActivityWindowExplanation */
+        ActivityWindowExplanation: {
+            /**
+             * Activity Explanation Version
+             * @default 1.0
+             * @constant
+             */
+            activity_explanation_version: "1.0";
+            /** Baseline Count */
+            baseline_count: number;
+            /**
+             * Cause Status
+             * @enum {string}
+             */
+            cause_status: "source_classified" | "rule_context" | "undetermined";
+            /** Deviation Ratio */
+            deviation_ratio?: number | null;
+            /** Event Count */
+            event_count: number;
+            /** Explanation */
+            explanation: string;
+            /** Finding Ids */
+            finding_ids?: string[];
+            /** Incident Ids */
+            incident_ids?: string[];
+            /** Is Volume Anomaly */
+            is_volume_anomaly: boolean;
+            /** Source Classifications */
+            source_classifications?: components["schemas"]["ActivityClassificationCount"][];
+            /** Top Devices */
+            top_devices: {
+                [key: string]: number;
+            };
+            /** Top Event Types */
+            top_event_types: {
+                [key: string]: number;
+            };
+            /** Window Id */
+            window_id: string;
+            /**
+             * Window Start
+             * Format: date-time
+             */
+            window_start: string;
+        };
         /** Alert */
         Alert: {
             /**
@@ -888,11 +992,21 @@ export interface components {
              * Format: uuid
              */
             finding_id: string;
+            /** Notification Error */
+            notification_error?: string | null;
+            /**
+             * Notification Status
+             * @default not_requested
+             * @enum {string}
+             */
+            notification_status: "not_requested" | "delivered" | "delivery_failed";
             /** Risk Score */
             risk_score: number;
             /** Rule Id */
             rule_id: string;
             severity: components["schemas"]["Severity"];
+            /** Status Updated At */
+            status_updated_at?: string | null;
             /** Title */
             title: string;
             /**
@@ -900,9 +1014,40 @@ export interface components {
              * Format: date-time
              */
             triggered_at: string;
+            /** Workflow Actor */
+            workflow_actor?: string | null;
+            /**
+             * Workflow Status
+             * @default pending
+             * @enum {string}
+             */
+            workflow_status: "pending" | "acknowledged" | "resolved" | "suppressed";
+        };
+        /** AlertWorkflowUpdate */
+        AlertWorkflowUpdate: {
+            /**
+             * Actor
+             * @default Investigator
+             */
+            actor: string;
+            /** Notification Error */
+            notification_error?: string | null;
+            /** Notification Status */
+            notification_status?: ("not_requested" | "delivered" | "delivery_failed") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "acknowledged" | "resolved" | "suppressed" | "pending";
         };
         /** AnalysisConfig */
         AnalysisConfig: {
+            /**
+             * Activity Explanation Version
+             * @default 1.0
+             * @constant
+             */
+            activity_explanation_version: "1.0";
             /**
              * Authentication Failure Threshold
              * @default 10
@@ -945,6 +1090,12 @@ export interface components {
              */
             baseline_version: "1.0";
             /**
+             * Classification Taxonomy Version
+             * @default 1.1
+             * @enum {string}
+             */
+            classification_taxonomy_version: "1.0" | "1.1";
+            /**
              * Configuration Version
              * @default 1.0
              * @constant
@@ -952,10 +1103,10 @@ export interface components {
             configuration_version: "1.0";
             /**
              * Correlation Version
-             * @default 1.0
-             * @constant
+             * @default 1.1
+             * @enum {string}
              */
-            correlation_version: "1.0";
+            correlation_version: "1.0" | "1.1";
             /**
              * Correlation Window Seconds
              * @default 120
@@ -976,10 +1127,26 @@ export interface components {
              */
             dataset_benign_labels: string[];
             /**
+             * Dataset Label Max Events Per Finding
+             * @default 512
+             */
+            dataset_label_max_events_per_finding: number;
+            /**
              * Default Device Criticality
              * @default 50
              */
             default_device_criticality: number;
+            /**
+             * Incident Grouping Version
+             * @default 1.0
+             * @constant
+             */
+            incident_grouping_version: "1.0";
+            /**
+             * Incident Max Trigger Span Seconds
+             * @default 120
+             */
+            incident_max_trigger_span_seconds: number;
             /**
              * Incident Reference Policy Version
              * @default 1.0
@@ -1010,6 +1177,26 @@ export interface components {
              */
             malicious_labels: string[];
             /**
+             * Network Failure Threshold
+             * @default 20
+             */
+            network_failure_threshold: number;
+            /**
+             * Network Fanout Threshold
+             * @default 20
+             */
+            network_fanout_threshold: number;
+            /**
+             * Network Port Scan Threshold
+             * @default 15
+             */
+            network_port_scan_threshold: number;
+            /**
+             * Network Window Seconds
+             * @default 60
+             */
+            network_window_seconds: number;
+            /**
              * Request Rate Multiplier
              * @default 3
              */
@@ -1022,19 +1209,26 @@ export interface components {
             risk_weights?: components["schemas"]["RiskWeights"];
             /**
              * Rule Set Version
+             * @default 1.4
+             * @enum {string}
+             */
+            rule_set_version: "1.0" | "1.1" | "1.2" | "1.3" | "1.4";
+            /**
+             * Scoring Version
              * @default 1.1
              * @enum {string}
              */
-            rule_set_version: "1.0" | "1.1";
+            scoring_version: "1.0" | "1.1";
             /**
-             * Scoring Version
-             * @default 1.0
-             * @constant
+             * Telemetry Rate Change Multiplier
+             * @default 5
              */
-            scoring_version: "1.0";
+            telemetry_rate_change_multiplier: number;
         };
         /** AnalysisResult */
         AnalysisResult: {
+            /** Activity Windows */
+            activity_windows?: components["schemas"]["ActivityWindowExplanation"][];
             /** Alerts */
             alerts?: components["schemas"]["Alert"][];
             /**
@@ -1077,10 +1271,10 @@ export interface components {
             input_event_count: number;
             /**
              * Rule Set Version
-             * @default 1.1
+             * @default 1.4
              * @enum {string}
              */
-            rule_set_version: "1.0" | "1.1";
+            rule_set_version: "1.0" | "1.1" | "1.2" | "1.3" | "1.4";
             /** Timeline */
             timeline?: components["schemas"]["TimelineEntry"][];
         };
@@ -1281,7 +1475,7 @@ export interface components {
          * CanonicalSourceType
          * @enum {string}
          */
-        CanonicalSourceType: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "simulated" | "ton_iot_network" | "ciciot2023_network" | "generic" | "live_telemetry";
+        CanonicalSourceType: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "simulated" | "ton_iot_network" | "ciciot2023_network" | "generic" | "live_telemetry" | "hai_ics_blind" | "iot23_zeek_blind";
         /** CaseCreate */
         CaseCreate: {
             /**
@@ -1351,6 +1545,11 @@ export interface components {
             /** Value */
             value: number;
         };
+        /**
+         * ClassificationSource
+         * @enum {string}
+         */
+        ClassificationSource: "dataset_label" | "deterministic_rule" | "behavioral_anomaly" | "investigator_assigned" | "ai_suggestion";
         /** CommitRequest */
         CommitRequest: {
             /**
@@ -1379,9 +1578,9 @@ export interface components {
             /**
              * Correlation Version
              * @default 1.0
-             * @constant
+             * @enum {string}
              */
-            correlation_version: "1.0";
+            correlation_version: "1.0" | "1.1";
             /** Difference Seconds */
             difference_seconds: number;
             /**
@@ -1408,7 +1607,7 @@ export interface components {
          * CorrelationReason
          * @enum {string}
          */
-        CorrelationReason: "shared_device" | "shared_actor" | "shared_target" | "shared_network_address";
+        CorrelationReason: "shared_device" | "shared_actor" | "shared_target" | "shared_network_address" | "shared_service";
         /** DashboardSummaryPublic */
         DashboardSummaryPublic: {
             /** Active Cases */
@@ -1424,12 +1623,25 @@ export interface components {
         DetectionFinding: {
             /** Case Id */
             case_id: number;
+            classification?: components["schemas"]["FindingClassification"] | null;
+            /**
+             * Classification Confidence
+             * @default 100
+             */
+            classification_confidence: number;
             /** Condition Trace */
             condition_trace: components["schemas"]["ConditionTrace"][];
             /** Confidence */
             confidence: number;
+            /** Entity Id */
+            entity_id?: string | null;
             /** Event Ids */
             event_ids: string[];
+            /**
+             * Evidence Confidence
+             * @default 100
+             */
+            evidence_confidence: number;
             /** Evidence Ids */
             evidence_ids: string[];
             /**
@@ -1550,6 +1762,8 @@ export interface components {
             committed_at?: string | null;
             /** Dataset Profile */
             dataset_profile: string;
+            /** Duplicate Of Evidence Id */
+            duplicate_of_evidence_id?: string | null;
             /**
              * Evidence Id
              * Format: uuid
@@ -1622,6 +1836,8 @@ export interface components {
             committed_at?: string | null;
             /** Dataset Profile */
             dataset_profile: string;
+            /** Duplicate Of Evidence Id */
+            duplicate_of_evidence_id?: string | null;
             /**
              * Evidence Id
              * Format: uuid
@@ -1654,7 +1870,7 @@ export interface components {
          * EvidenceSource
          * @enum {string}
          */
-        EvidenceSource: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "ton_iot_network" | "ciciot2023_network" | "simulated" | "generic";
+        EvidenceSource: "casas" | "casas_smart_home" | "ton_iot_telemetry" | "ton_iot_fridge_telemetry" | "simulation" | "ton_iot_network" | "ciciot2023_network" | "simulated" | "generic" | "hai_ics_blind" | "iot23_zeek_blind";
         /** EvidenceValidationIssue */
         EvidenceValidationIssue: {
             /** Code */
@@ -1682,6 +1898,30 @@ export interface components {
             status: components["schemas"]["ValidationStatus"];
             /** Total Records */
             total_records: number;
+        };
+        /** FindingClassification */
+        FindingClassification: {
+            /** Category */
+            category: string;
+            /** Confidence */
+            confidence: number;
+            /** Display Name */
+            display_name: string;
+            source: components["schemas"]["ClassificationSource"];
+            /** Source Field */
+            source_field: string;
+            /** Source Value */
+            source_value: string;
+            /** Subcategory */
+            subcategory: string;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Taxonomy Version
+             * @default 1.1
+             * @enum {string}
+             */
+            taxonomy_version: "1.0" | "1.1";
         };
         /** GraphData */
         GraphData: {
@@ -1792,8 +2032,18 @@ export interface components {
         };
         /** Incident */
         Incident: {
+            /**
+             * Alert Count
+             * @default 0
+             */
+            alert_count: number;
             /** Alert Ids */
             alert_ids?: string[];
+            /**
+             * Alert Ids Truncated
+             * @default false
+             */
+            alert_ids_truncated: boolean;
             /** Case Id */
             case_id: number;
             /**
@@ -1810,10 +2060,40 @@ export interface components {
             correlation_edges_truncated: boolean;
             /** Ended At */
             ended_at: string | null;
+            /**
+             * Entity Count
+             * @default 0
+             */
+            entity_count: number;
+            /** Entity Ids */
+            entity_ids?: string[];
             /** Event Ids */
             event_ids: string[];
+            /**
+             * Evidence Count
+             * @default 0
+             */
+            evidence_count: number;
+            /**
+             * Finding Count
+             * @default 0
+             */
+            finding_count: number;
             /** Finding Ids */
             finding_ids: string[];
+            /**
+             * Finding Ids Truncated
+             * @default false
+             */
+            finding_ids_truncated: boolean;
+            /**
+             * Grouping Policy
+             * @default transitive_component
+             * @enum {string}
+             */
+            grouping_policy: "transitive_component" | "finding_centered_bounded_session";
+            /** Inactivity Window Seconds */
+            inactivity_window_seconds?: number | null;
             /**
              * Incident Id
              * Format: uuid
@@ -1827,8 +2107,17 @@ export interface components {
             incident_version: "1.0";
             /** Maximum Risk */
             maximum_risk: number;
+            /** Maximum Trigger Span Seconds */
+            maximum_trigger_span_seconds?: number | null;
+            severity?: components["schemas"]["Severity"] | null;
+            /** Severity Counts */
+            severity_counts?: {
+                [key: string]: number;
+            };
             /** Started At */
             started_at: string | null;
+            /** Tags */
+            tags?: string[];
         };
         /**
          * IssueLevel
@@ -2031,19 +2320,35 @@ export interface components {
             /** Weighted Points */
             weighted_points: number;
         };
+        /** RiskPenalty */
+        RiskPenalty: {
+            /** Explanation */
+            explanation: string;
+            /** Points */
+            points: number;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "unknown_identity" | "missing_observed_time" | "generic_unverified_label" | "limited_baseline";
+        };
         /** RiskScore */
         RiskScore: {
             band: components["schemas"]["RiskBand"];
+            /** Base Score */
+            base_score?: number | null;
             /** Factors */
             factors: components["schemas"]["RiskFactor"][];
+            /** Penalties */
+            penalties?: components["schemas"]["RiskPenalty"][];
             /** Score */
             score: number;
             /**
              * Scoring Version
-             * @default 1.0
-             * @constant
+             * @default 1.1
+             * @enum {string}
              */
-            scoring_version: "1.0";
+            scoring_version: "1.0" | "1.1";
         };
         /** RiskWeights */
         RiskWeights: {
@@ -2120,6 +2425,37 @@ export interface components {
          * @enum {string}
          */
         TimelineEntryType: "event" | "alert" | "finding";
+        /** TimelineWindowPage */
+        TimelineWindowPage: {
+            /** Items */
+            items: components["schemas"]["TimelineWindowPublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Record Total */
+            record_total: number;
+            /** Total */
+            total: number;
+        };
+        /** TimelineWindowPublic */
+        TimelineWindowPublic: {
+            activity_explanation?: components["schemas"]["ActivityWindowExplanation"] | null;
+            /** Category Counts */
+            category_counts: {
+                [key: string]: number;
+            };
+            /** Ended At */
+            ended_at: string | null;
+            /** Key */
+            key: string;
+            /** Peak Severity */
+            peak_severity: string | null;
+            /** Record Count */
+            record_count: number;
+            /** Started At */
+            started_at: string | null;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -2450,6 +2786,39 @@ export interface operations {
             };
         };
     };
+    activity_windows_api_v1_cases__case_id__activity_windows_get: {
+        parameters: {
+            query?: {
+                analysis_id?: string | null;
+            };
+            header?: never;
+            path: {
+                case_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     aggregates_api_v1_cases__case_id__aggregates_get: {
         parameters: {
             query?: {
@@ -2492,6 +2861,7 @@ export interface operations {
                 start_time?: string | null;
                 end_time?: string | null;
                 analysis_id?: string | null;
+                window_key?: string | null;
             };
             header?: never;
             path: {
@@ -2508,6 +2878,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponse_Alert_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_alert_workflow_api_v1_cases__case_id__alerts__alert_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: number;
+                alert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertWorkflowUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Alert"];
                 };
             };
             /** @description Validation Error */
@@ -2868,6 +3274,7 @@ export interface operations {
                 start_time?: string | null;
                 end_time?: string | null;
                 analysis_id?: string | null;
+                window_key?: string | null;
             };
             header?: never;
             path: {
@@ -2976,6 +3383,7 @@ export interface operations {
                 start_time?: string | null;
                 end_time?: string | null;
                 analysis_id?: string | null;
+                window_key?: string | null;
             };
             header?: never;
             path: {
@@ -3243,6 +3651,7 @@ export interface operations {
                 start_time?: string | null;
                 end_time?: string | null;
                 analysis_id?: string | null;
+                window_key?: string | null;
             };
             header?: never;
             path: {
@@ -3259,6 +3668,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponse_TimelineEntry_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    timeline_windows_api_v1_cases__case_id__timeline_windows_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                analysis_id?: string | null;
+            };
+            header?: never;
+            path: {
+                case_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimelineWindowPage"];
                 };
             };
             /** @description Validation Error */

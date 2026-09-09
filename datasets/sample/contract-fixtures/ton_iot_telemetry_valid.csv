@@ -1,0 +1,3 @@
+ts,label,type,device_id,temperature,humidity
+2020-04-01T00:00:00Z,normal,fridge,fridge-1,4.2,42
+2020-04-01T00:01:00Z,backdoor,fridge,fridge-1,12.8,45

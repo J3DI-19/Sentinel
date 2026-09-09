@@ -6,6 +6,8 @@ import type { EvidenceSource, ImportConfiguration, ImportDataError, ImportValida
 export const EVIDENCE_SOURCES: { id: EvidenceSource; label: string; abbreviation: string; description: string }[] = [
   { id: "casas_smart_home", label: "CASAS", abbreviation: "CA", description: "Primary Milan smart-home telemetry source" },
   { id: "ton_iot_fridge_telemetry", label: "TON_IoT Telemetry", abbreviation: "TI", description: "Primary fridge telemetry source" },
+  { id: "hai_ics_blind", label: "HAI ICS · Blind", abbreviation: "HA", description: "Label-free industrial process telemetry" },
+  { id: "iot23_zeek_blind", label: "IoT-23 · Blind", abbreviation: "I2", description: "Label-free Zeek network connections" },
   { id: "simulated", label: "Simulation", abbreviation: "SI", description: "Controlled Traceveil test scenarios" },
   { id: "generic", label: "Generic Upload", abbreviation: "UP", description: "CSV or JSON evidence; CICIoT is secondary compatibility" },
 ];
@@ -13,6 +15,8 @@ export const EVIDENCE_SOURCES: { id: EvidenceSource; label: string; abbreviation
 const SOURCE_FORMATS: Record<EvidenceSource, { profile: string; tier: string; columns: string[]; note: string }> = {
   casas_smart_home: { profile: "casas_milan@1.0", tier: "Primary profile", columns: ["timestamp", "sensor_id", "sensor_message"], note: "The activity column is optional." },
   ton_iot_fridge_telemetry: { profile: "ton_iot_fridge_telemetry@1.0", tier: "Primary profile", columns: ["date", "time", "fridge_temperature", "temp_condition", "label", "type"], note: "Use the pinned TON_IoT fridge telemetry projection." },
+  hai_ics_blind: { profile: "hai_ics_blind@1.0", tier: "Blind behavioral evaluation", columns: ["timestamp", "device_id"], note: "Numeric sensor and actuator columns are analyzed. Ground-truth label and attack columns are rejected." },
+  iot23_zeek_blind: { profile: "iot23_zeek_blind@1.0", tier: "Blind behavioral evaluation", columns: ["ts", "device_id", "id.orig_h", "id.resp_h", "proto"], note: "Zeek connection fields are preserved. label and detailed-label columns are rejected." },
   simulated: { profile: "simulated@1.0", tier: "Controlled simulation", columns: ["timestamp", "device_id", "event_type"], note: "Optional device and network fields are retained when present." },
   generic: { profile: "generic@1.0", tier: "Compatibility profile", columns: [], note: "No dataset-specific columns are required; structural CSV or JSON checks still apply. TON_IoT network and CICIoT2023 remain compatibility paths." },
 };
@@ -20,11 +24,13 @@ const SOURCE_FORMATS: Record<EvidenceSource, { profile: string; tier: string; co
 export function SourceFormatGuide({ source }: { source: EvidenceSource }) {
   const format = SOURCE_FORMATS[source];
   return <section className="source-format-guide" aria-labelledby="source-format-title">
-    <div><span id="source-format-title">Supported evidence format</span><b>{format.profile}</b><em>{format.tier}</em></div>
+    <div><span id="source-format-title">Supported evidence format</span><b>{format.profile}</b><em>{format.tier}</em>{source.endsWith("_blind") && <strong className="blind-evaluation-badge">Blind analysis · labels prohibited</strong>}</div>
     <p>Upload CSV, a JSON record array, or a JSON object containing a <code>records</code> array.</p>
     {format.columns.length > 0 && <p><strong>Required columns:</strong> {format.columns.map(column => <code key={column}>{column}</code>)}</p>}
     <small>{format.note}</small>
     {source === "simulated" && <a href="/examples/simulated-evidence.csv" download>Download synthetic example CSV</a>}
+    {source === "hai_ics_blind" && <a href="/examples/hai-ics-blind-sample.csv" download>Download real label-free HAI sample (300 rows)</a>}
+    {source === "iot23_zeek_blind" && <a href="/examples/iot23-zeek-blind-sample.csv" download>Download real label-free IoT-23 sample (1,000 rows)</a>}
   </section>;
 }
 

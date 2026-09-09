@@ -245,10 +245,20 @@ class EvidenceValidationService:
     ) -> list[EvidenceValidationIssue]:
         columns = {str(column).strip().casefold() for record in records for column in record}
         missing = [column for column in profile.required_columns if column.casefold() not in columns]
-        return [
+        issues = [
             self._issue("MISSING_REQUIRED_COLUMN", f"Required column {column!r} is missing", field=column)
             for column in missing
         ]
+        issues.extend(
+            self._issue(
+                "GROUND_TRUTH_COLUMN_FORBIDDEN",
+                f"Ground-truth column {column!r} is forbidden by blind profile {profile.name}",
+                field=column,
+            )
+            for column in profile.forbidden_columns
+            if column.casefold() in columns
+        )
+        return issues
 
     def _validate_records(
         self, records: list[dict[str, Any]], profile: DatasetProfile
