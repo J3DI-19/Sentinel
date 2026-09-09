@@ -157,6 +157,15 @@ class SQLiteRepository:
                 case_id INTEGER NOT NULL, alert_id TEXT NOT NULL, first_seen_at TEXT NOT NULL,
                 PRIMARY KEY (case_id, alert_id)
             );
+            CREATE TABLE IF NOT EXISTS alert_workflow (
+                case_id INTEGER NOT NULL, alert_id TEXT NOT NULL,
+                status TEXT NOT NULL, actor TEXT NOT NULL,
+                notification_status TEXT NOT NULL DEFAULT 'not_requested',
+                notification_error TEXT,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (case_id, alert_id),
+                FOREIGN KEY (case_id) REFERENCES cases(id)
+            );
             CREATE TABLE IF NOT EXISTS audit_events (
                 audit_id TEXT PRIMARY KEY, case_id INTEGER, action TEXT NOT NULL, subject_type TEXT NOT NULL,
                 subject_id TEXT, actor TEXT NOT NULL, request_id TEXT, details_json TEXT NOT NULL,
@@ -209,6 +218,7 @@ class SQLiteRepository:
         )
         self._migrate_evidence_metadata()
         self._migrate_cases()
+        self._migrate_alert_workflow()
         self.connection.commit()
 
     def _migrate_evidence_metadata(self) -> None:
@@ -257,6 +267,13 @@ class SQLiteRepository:
         columns = {"description": "TEXT NOT NULL DEFAULT ''", "case_type": "TEXT NOT NULL DEFAULT 'batch'", "status": "TEXT NOT NULL DEFAULT 'active'", "owner": "TEXT NOT NULL DEFAULT 'Investigator'", "updated_at": "TEXT"}
         for name, definition in columns.items():
             if name not in existing: self.connection.execute(f"ALTER TABLE cases ADD COLUMN {name} {definition}")
+
+    def _migrate_alert_workflow(self) -> None:
+        if self.connection is None: raise RuntimeError("repository is not initialized")
+        existing = {row["name"] for row in self.connection.execute("PRAGMA table_info(alert_workflow)").fetchall()}
+        columns = {"notification_status": "TEXT NOT NULL DEFAULT 'not_requested'", "notification_error": "TEXT"}
+        for name, definition in columns.items():
+            if name not in existing: self.connection.execute(f"ALTER TABLE alert_workflow ADD COLUMN {name} {definition}")
 
     def is_available(self) -> bool:
         if self.connection is None:

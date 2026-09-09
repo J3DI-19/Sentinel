@@ -25,11 +25,14 @@ class AnalysisConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     configuration_version: Literal["1.0"] = "1.0"
-    rule_set_version: Literal["1.0", "1.1"] = "1.1"
+    rule_set_version: Literal["1.0", "1.1", "1.2", "1.3", "1.4"] = "1.4"
     baseline_version: Literal["1.0"] = "1.0"
-    scoring_version: Literal["1.0"] = "1.0"
-    correlation_version: Literal["1.0"] = "1.0"
+    scoring_version: Literal["1.0", "1.1"] = "1.1"
+    correlation_version: Literal["1.0", "1.1"] = "1.1"
+    incident_grouping_version: Literal["1.0"] = "1.0"
     incident_reference_policy_version: Literal["1.0"] = "1.0"
+    classification_taxonomy_version: Literal["1.0", "1.1"] = "1.1"
+    activity_explanation_version: Literal["1.0"] = "1.0"
     authentication_failure_threshold: int = Field(default=10, ge=2, le=1000)
     authentication_window_seconds: int = Field(default=60, ge=1, le=86400)
     label_repetition_reference: int = Field(default=4, ge=1, le=1000)
@@ -40,7 +43,14 @@ class AnalysisConfig(BaseModel):
     baseline_max_samples: int = Field(default=20, ge=2, le=10000)
     baseline_sigma: float = Field(default=3.0, ge=0.1, le=20)
     baseline_minimum_delta: float = Field(default=1.0, ge=0)
+    telemetry_rate_change_multiplier: float = Field(default=5.0, ge=1.0, le=1000)
+    network_window_seconds: int = Field(default=60, ge=1, le=86400)
+    network_fanout_threshold: int = Field(default=20, ge=2, le=100000)
+    network_port_scan_threshold: int = Field(default=15, ge=2, le=65536)
+    network_failure_threshold: int = Field(default=20, ge=2, le=100000)
     correlation_window_seconds: int = Field(default=120, ge=1, le=86400)
+    incident_max_trigger_span_seconds: int = Field(default=120, ge=1, le=86400)
+    dataset_label_max_events_per_finding: int = Field(default=512, ge=1, le=4096)
     default_device_criticality: int = Field(default=50, ge=0, le=100)
     critical_device_scores: dict[str, int] = Field(default_factory=dict, max_length=1024)
     malicious_labels: tuple[str, ...] = Field(default=(
@@ -83,6 +93,10 @@ class AnalysisConfig(BaseModel):
     def validate_versions_and_windows(self) -> AnalysisConfig:
         if self.baseline_max_samples < self.baseline_min_samples:
             raise ValueError("baseline_max_samples must be at least baseline_min_samples")
+        if self.incident_max_trigger_span_seconds < self.correlation_window_seconds:
+            raise ValueError(
+                "incident_max_trigger_span_seconds must be at least correlation_window_seconds"
+            )
         if any(not 0 <= score <= 100 for score in self.critical_device_scores.values()):
             raise ValueError("critical device scores must be between 0 and 100")
         return self

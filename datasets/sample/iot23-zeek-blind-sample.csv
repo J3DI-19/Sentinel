@@ -1,0 +1,1001 @@
+ts,device_id,device_name,device_type,uid,id.orig_h,id.orig_p,id.resp_h,id.resp_p,proto,service,duration,orig_bytes,resp_bytes,orig_pkts,resp_pkts,conn_state,capture_scenario
+1540469302.538640,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGm6jB4dXK71ZDWUDh,192.168.1.132,58687,216.239.35.4,123,udp,-,0.114184,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540469197.400159,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CnaDAG3n5r8eiG4su2,192.168.1.132,1900,239.255.255.250,1900,udp,-,160.367579,7536,0,24,0,S0,CTU-Honeypot-Capture-4-1
+1540469385.734089,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CUrxU238nt0m6yTgKf,192.168.1.132,32893,216.239.35.8,123,udp,-,0.016986,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540469831.302625,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGQf8t1kjdxB5PHXL4,192.168.1.132,53395,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540469831.265405,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CUo9DH2QDnCaBIGjkg,192.168.1.132,52801,192.168.1.1,53,udp,dns,0.036724,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540469418.379528,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAvXOZ3htimWEtglii,192.168.1.132,1900,239.255.255.250,1900,udp,-,384.518261,15072,0,48,0,S0,CTU-Honeypot-Capture-4-1
+1540470081.850824,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CfJsUD2NGQvnK2p7Vd,192.168.1.132,58124,216.239.35.12,123,udp,-,0.270332,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540470187.222098,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CVwKZS98dRvk1jeH2,192.168.1.132,35313,216.239.35.0,123,udp,-,0.111429,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540470355.430009,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CzbHG4aoHRooWvyMg,192.168.1.132,46064,216.239.35.4,123,udp,-,0.114433,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540470419.608808,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbTB0B2ZnnDWLAIml3,192.168.1.132,45230,216.239.35.8,123,udp,-,0.016984,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540470731.346472,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CKT1nF2pKxpwesvEtj,192.168.1.132,53396,2.16.60.82,443,tcp,-,0.003497,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540470731.305747,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C2Lv0t2TFb4oOybzrh,192.168.1.132,48230,192.168.1.1,53,udp,dns,0.040227,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540471110.727073,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CaBoMhYTG8hXEYKUl,192.168.1.132,49002,216.239.35.12,123,udp,-,0.270346,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540471275.097352,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CNKSzj2AzuaCQBuSsj,192.168.1.132,46411,216.239.35.0,123,udp,-,0.109684,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540471418.303992,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CQeo6C4faCIKjIhMM3,192.168.1.132,49057,216.239.35.4,123,udp,-,0.114426,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540471494.493815,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CDoMg14pwYZ0Rylhf1,192.168.1.132,42282,216.239.35.8,123,udp,-,0.016980,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540469863.253209,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CP01y62UX7tbTa1x39,192.168.1.132,1900,239.255.255.250,1900,udp,-,1633.044330,60288,0,192,0,S0,CTU-Honeypot-Capture-4-1
+1540471631.533708,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAkyqq4QzwUJQDuxnc,192.168.1.132,56406,2.16.60.139,443,tcp,-,0.003498,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540471631.350066,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1NlJjzoaDWwde1ak,192.168.1.132,34110,192.168.1.1,53,udp,dns,0.183145,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472191.611346,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cv5jrH2pHRn5GLjwy2,192.168.1.132,52937,216.239.35.12,123,udp,-,0.272344,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472314.983162,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ce0eby5SunbIYssC6,192.168.1.132,53418,216.239.35.0,123,udp,-,0.109436,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540471557.061917,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAb9Gv4xgifq99dLkc,192.168.1.132,1900,239.255.255.250,1900,udp,-,766.048560,28260,0,90,0,S0,CTU-Honeypot-Capture-4-1
+1540472384.714259,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CYBsqO1jX0dBXEeQUi,192.168.1.132,1900,239.255.255.250,1900,udp,-,50.851218,3768,0,12,0,S0,CTU-Honeypot-Capture-4-1
+1540472524.852647,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C0wssT3JKSiAqhCZw,192.168.1.132,56806,52.209.221.67,80,tcp,http,0.088446,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540472524.944342,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CZAnC51NxxuVdfhg28,192.168.1.132,60404,52.215.95.120,80,tcp,http,0.109187,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540472524.797195,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CROWuH3A0maFhUNqHl,192.168.1.132,40730,192.168.1.1,53,udp,dns,0.050455,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472524.848149,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CpMGWx1WZnjO78jNT2,192.168.1.132,50152,192.168.1.1,53,udp,dns,0.003998,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472524.942095,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C6MXM823vAYEWDE1wi,192.168.1.132,42585,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472524.943343,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C52U38ISU4nIzZmwd,192.168.1.132,49327,192.168.1.1,53,udp,dns,0.000500,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472531.582530,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C29JTF1UOZjbQoRx3,192.168.1.132,53406,2.16.60.82,443,tcp,-,0.003499,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540472531.535825,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTtK543h1wuw8BOjx,192.168.1.132,41945,192.168.1.1,53,udp,dns,0.046210,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472494.191783,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAOq8i3svbVXkWbZD3,192.168.1.132,60468,216.239.35.4,123,udp,-,0.114417,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472539.348081,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C3yNIb4bmZB9PGimj8,192.168.1.132,47872,216.239.35.8,123,udp,-,0.017238,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472502.078251,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CZa3qT1YOqrDnum2ud,192.168.1.132,1900,239.255.255.250,1900,udp,-,50.868027,3768,0,12,0,S0,CTU-Honeypot-Capture-4-1
+1540473275.464119,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C505sa1jNFFexpP6a3,192.168.1.132,40117,216.239.35.12,123,udp,-,0.269349,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540473431.620666,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cx8IgN3iIIlwEhtIg3,192.168.1.132,56414,2.16.60.139,443,tcp,-,0.003495,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540473431.583954,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cv2jEb1aOYScmCnL5g,192.168.1.132,44519,192.168.1.1,53,udp,dns,0.036214,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540472614.499427,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C025uM1dmPB9pqTkP9,192.168.1.132,1900,239.255.255.250,1900,udp,-,1480.810378,52752,0,168,0,S0,CTU-Honeypot-Capture-4-1
+1540474331.823843,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CaUj5SqM6MzuzRMn2,192.168.1.132,53408,2.16.60.82,443,tcp,-,0.003496,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540474331.623219,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CRpfqB3kixgb3iGKY2,192.168.1.132,35624,192.168.1.1,53,udp,dns,0.200137,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540474466.832336,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1SR67La2smGPXQgl,192.168.1.132,37547,216.239.35.0,123,udp,-,0.109694,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540474595.043308,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C9rfg3DPGazGisG8f,192.168.1.132,42661,216.239.35.4,123,udp,-,0.116179,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540474660.224139,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C4ZMI03YRLJpGsS1Gk,192.168.1.132,58337,216.239.35.8,123,udp,-,0.016732,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540475231.950154,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CB0DUp1dWFoiXeHlk6,192.168.1.132,53409,2.16.60.82,443,tcp,-,3.000292,0,0,6,2,SF,CTU-Honeypot-Capture-4-1
+1540475231.829978,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CaL5Zl1IYbzg8TOvN1,192.168.1.132,37762,192.168.1.1,53,udp,dns,0.119679,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540474155.445242,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTIWJf3d4syOW81YAb,192.168.1.132,1900,239.255.255.250,1900,udp,-,1032.879228,37680,0,120,0,S0,CTU-Honeypot-Capture-4-1
+1540475249.018951,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Chp7Wb6fF9MF6uU2k,192.168.1.132,1900,239.255.255.250,1900,udp,-,50.830580,3768,0,12,0,S0,CTU-Honeypot-Capture-4-1
+1540475357.340566,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CG5S7F4VEBuoeB9Xs9,192.168.1.132,60830,216.239.35.12,123,udp,-,0.270102,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540475359.960583,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cnb06s1Znjnung2qr1,192.168.1.132,1900,239.255.255.250,1900,udp,-,322.370929,13188,0,42,0,S0,CTU-Honeypot-Capture-4-1
+1540476124.983569,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C9jU4h471UjRdSSze7,192.168.1.132,56812,52.209.221.67,80,tcp,http,0.089448,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540476125.075766,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CajqPf45nI4XZfNi5g,192.168.1.132,60410,52.215.95.120,80,tcp,http,0.114934,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540476124.798177,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cgy2EYobRk1smi0hl,192.168.1.132,44113,192.168.1.1,53,udp,dns,0.180398,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476124.979321,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CybtIqpihamUF9ei8,192.168.1.132,55180,192.168.1.1,53,udp,dns,0.003752,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476125.073768,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C8WJCQ1wdWmWNRp7V2,192.168.1.132,52508,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476125.074767,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ce9nf72uGYrBAnGtGh,192.168.1.132,57276,192.168.1.1,53,udp,dns,0.000750,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476135.012856,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CtywZo2EMLbcogHDwk,192.168.1.132,53412,2.16.60.82,443,tcp,-,0.003496,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540476134.950397,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CI6HqI2pPt4MYd9lj,192.168.1.132,50702,192.168.1.1,53,udp,dns,0.061961,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476614.709889,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1ozz8kKX3LS4aswk,192.168.1.132,58852,216.239.35.0,123,udp,-,0.109678,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476757.919723,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C8fHZ41GZZozesCiqj,192.168.1.132,48147,216.239.35.4,123,udp,-,0.114433,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540476804.080158,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CqdhaF5xvBFSNGHk1,192.168.1.132,45244,216.239.35.8,123,udp,-,0.016723,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540477035.058426,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cs1K323K1jOQi2kUT9,192.168.1.132,56420,2.16.60.139,443,tcp,-,0.003248,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540477035.015706,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C2KkwA4bb6Zm15LMAi,192.168.1.132,52447,192.168.1.1,53,udp,dns,0.042224,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540475744.953356,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CmSPZM1VeGjyWUKnSc,192.168.1.132,1900,239.255.255.250,1900,udp,-,1643.646987,58404,0,186,0,S0,CTU-Honeypot-Capture-4-1
+1540477474.197539,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CqoVrQ2jIdhoxyJ3vi,192.168.1.132,33243,216.239.35.12,123,udp,-,0.269861,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540477502.399210,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cln7FX3jEFbLoh5V76,192.168.1.132,1900,239.255.255.250,1900,udp,-,109.999279,5652,0,18,0,S0,CTU-Honeypot-Capture-4-1
+1540477935.096245,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CquRBf3qPSLrfDZME5,192.168.1.132,56602,2.16.60.139,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540477935.060518,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CaJTGK251IMHxhAlL5,192.168.1.132,46059,192.168.1.1,53,udp,dns,0.034980,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540478671.568043,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7JXdX2wP6TZ9dU1L6,192.168.1.132,45914,216.239.35.0,123,udp,-,0.109194,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540478835.206048,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cb6hEU29Q51Uh5o4b,192.168.1.132,53596,2.16.60.82,443,tcp,-,0.003498,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540478835.098119,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ct5dAw3Xi2Hdys9A96,192.168.1.132,52404,192.168.1.1,53,udp,dns,0.107433,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540478897.777652,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CrS9pI2Df9e3pVlaH,192.168.1.132,52156,216.239.35.8,123,udp,-,0.016983,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540478909.806048,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CMvpwu3AlLojqV6xC6,192.168.1.132,47693,216.239.35.4,123,udp,-,0.114429,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479532.019680,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CB7ALp4YViqgQDMZI3,192.168.1.132,46724,216.239.35.12,123,udp,-,0.269841,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479724.840014,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cx7C0rBT2nl5Kjzw8,192.168.1.132,60596,52.215.95.120,80,tcp,http,0.093946,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540479724.936960,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGTOJt2xNQkobSwysb,192.168.1.132,57000,52.209.221.67,80,tcp,http,0.126426,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540479724.795308,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CwqJ5D3zVGg6IPW4Ne,192.168.1.132,57927,192.168.1.1,53,udp,dns,0.039463,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479724.835267,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C6PJkt3yXlV49l8yrf,192.168.1.132,43483,192.168.1.1,53,udp,dns,0.004250,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479724.934961,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CJvZrS2myol5OtCqt,192.168.1.132,47067,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479724.935959,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1UiiY12fggmaaXaJ4,192.168.1.132,51670,192.168.1.1,53,udp,dns,0.000500,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540479735.255579,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CCX7ye2aClx8tifQvl,192.168.1.132,53599,2.16.60.82,443,tcp,-,0.003250,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540479735.208374,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cj88eQ2LLHagBCKrxh,192.168.1.132,59133,192.168.1.1,53,udp,dns,0.046721,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540480635.309043,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cs4qk62UTBa3GY4gwl,192.168.1.132,56607,2.16.60.139,443,tcp,-,0.003745,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540480635.257336,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CU8GGT1Vu2qt0wFT7g,192.168.1.132,50151,192.168.1.1,53,udp,dns,0.051225,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540480739.387242,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CKqaWQ15Z1dHj0zB83,192.168.1.132,54251,216.239.35.0,123,udp,-,0.109680,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540480974.597440,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CNlitm1jg4l6KNuTik,192.168.1.132,37639,216.239.35.8,123,udp,-,0.016990,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540481064.704348,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C171Dq4TLzzeKADiDg,192.168.1.132,54182,216.239.35.4,123,udp,-,0.114424,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540481535.351819,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPzhwSyOPMNESW6d3,192.168.1.132,53601,2.16.60.82,443,tcp,-,0.003247,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540481535.310853,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CT0eAm3Xg44YRX9sH,192.168.1.132,38186,192.168.1.1,53,udp,dns,0.040470,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540481638.915048,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,ClBXJo3oiO0YR0tWAj,192.168.1.132,41893,216.239.35.12,123,udp,-,0.272601,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540482435.551159,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbVqMk2OM7jVeueEE5,192.168.1.132,53602,2.16.60.82,443,tcp,-,0.003501,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540482435.354029,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CH2TLa13mJl9yC5SNe,192.168.1.132,41753,192.168.1.1,53,udp,dns,0.196634,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540482803.287863,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cq4mKCnC3Lf9tGgJe,192.168.1.132,41445,216.239.35.0,123,udp,-,0.109685,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483123.497131,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CqJFee3vA7vjnERW99,192.168.1.132,36649,216.239.35.8,123,udp,-,0.016989,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483150.540470,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CecO7k9WA7LfLfqvg,192.168.1.132,53816,216.239.35.4,123,udp,-,0.114182,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483324.998282,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CVCoG14pyysFPa2kQi,192.168.1.132,60602,52.215.95.120,80,tcp,http,0.094447,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540483325.095726,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CdV7FS1hOxkGuHkTbc,192.168.1.132,57006,52.209.221.67,80,tcp,http,0.113685,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540483327.011386,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CSiLuw4nkxF0s73csc,192.168.1.132,60787,130.211.67.12,80,tcp,http,0.210379,1595,177,8,7,SF,CTU-Honeypot-Capture-4-1
+1540483324.792410,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ci3Bs7hzpaHFrCNNg,192.168.1.132,43664,192.168.1.1,53,udp,dns,0.200631,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483324.993536,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CATNYt2MrpvQjeSp56,192.168.1.132,56163,192.168.1.1,53,udp,dns,0.004000,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483325.093728,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C151Up1xUqLv8B0Hbb,192.168.1.132,37627,192.168.1.1,53,udp,dns,0.000500,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483325.094727,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CWQP8Y2iiMWt523Gdb,192.168.1.132,33707,192.168.1.1,53,udp,dns,0.000750,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483326.813508,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CNemLr3mI0LX4Fuim3,192.168.1.132,60441,192.168.1.1,53,udp,dns,0.197378,41,124,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483335.594244,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CkLEmT1fURC8GHJ2ke,192.168.1.132,53606,2.16.60.82,443,tcp,-,0.003497,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540483335.554268,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7iIFeFqYItiy7AMh,192.168.1.132,47242,192.168.1.1,53,udp,dns,0.039479,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540483717.755425,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C3gdCK101egCcEBl3b,192.168.1.132,53489,216.239.35.12,123,udp,-,0.272087,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540484235.635954,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C3xu7H3dfM6erO2dWg,192.168.1.132,53607,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540484235.596728,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGbbxX37ZJ3wKecWQ6,192.168.1.132,42648,192.168.1.1,53,udp,dns,0.038729,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540484958.127107,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CgSR2z419FlNGaLdw4,192.168.1.132,50380,216.239.35.0,123,udp,-,0.109672,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540485135.742827,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPg9Qe2aCDKzySLPTb,192.168.1.132,53608,2.16.60.82,443,tcp,-,0.003496,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540485135.637638,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CzNTXM3U1imdcnKmJd,192.168.1.132,45769,192.168.1.1,53,udp,dns,0.104447,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540485255.336405,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CESr2KLztxpxppQUj,192.168.1.132,45150,216.239.35.8,123,udp,-,0.016983,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540485292.390032,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cw1ZIN1i0desF1jJL5,192.168.1.132,51218,216.239.35.4,123,udp,-,0.116177,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540485837.604468,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbvTSQXNjKuylVQBc,192.168.1.132,35257,216.239.35.12,123,udp,-,0.270104,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486035.853935,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTg5GP1RFoDc9qCMa6,192.168.1.132,53609,2.16.60.82,443,tcp,-,0.003248,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540486035.746003,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CM6UQ44dK8eiArSrN7,192.168.1.132,54613,192.168.1.1,53,udp,dns,0.107436,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486924.852768,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAZatg2a0heEfxcKb,192.168.1.132,57012,52.209.221.67,80,tcp,http,0.089197,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540486924.944965,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CXhlOUOXoJ7S8zmf3,192.168.1.132,60610,52.215.95.120,80,tcp,http,0.109936,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540486924.791074,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cvaokoc1T25YZj28i,192.168.1.132,34147,192.168.1.1,53,udp,dns,0.055701,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486924.847270,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,ChMH0e2fvN8cUweIX9,192.168.1.132,49089,192.168.1.1,53,udp,dns,0.004751,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486924.942967,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CvDnkN1kkQfHKzi8s4,192.168.1.132,53949,192.168.1.1,53,udp,dns,0.000498,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486924.943965,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CEZ7x546yFc9rzEhe,192.168.1.132,35538,192.168.1.1,53,udp,dns,0.000500,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540486935.979179,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CJooLB4mbw1ZjTlno4,192.168.1.132,56619,2.16.60.139,443,tcp,-,0.003497,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540486935.857266,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cv9J6UW3Zde0Tx5oj,192.168.1.132,51998,192.168.1.1,53,udp,dns,0.121426,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540487125.974934,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbrrPu3Fxo0qv6g9Rb,192.168.1.132,33185,216.239.35.0,123,udp,-,0.109928,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540487336.184154,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPNbNp2gKV9loYbdS,192.168.1.132,35056,216.239.35.8,123,udp,-,0.016972,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540487463.301452,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ch8wqd4nHOjfUQlK35,192.168.1.132,39474,216.239.35.4,123,udp,-,0.114174,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540487836.017758,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CL13nO3UWBsaZjrmIf,192.168.1.132,56620,2.16.60.139,443,tcp,-,0.004245,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540487835.982788,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CyY73x2rHmtpzjkgRe,192.168.1.132,41437,192.168.1.1,53,udp,dns,0.034488,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540487907.515523,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGsXjp1bTQH2GJXZm,192.168.1.132,35296,216.239.35.12,123,udp,-,0.269845,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540488736.141826,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CdPBh22yxj50qLVxea,192.168.1.132,53614,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540488736.020914,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,COabwz2zNQqJyJT5Rj,192.168.1.132,54529,192.168.1.1,53,udp,dns,0.120428,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540489209.887181,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CERiia6NZwi9zpFb6,192.168.1.132,41959,216.239.35.0,123,udp,-,0.109433,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540489443.097729,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CsIx2M3kgMHJdqycQe,192.168.1.132,47864,216.239.35.8,123,udp,-,0.016987,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540489636.347724,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7jwUioCNPyLt3ZDh,192.168.1.132,53615,2.16.60.82,443,tcp,-,0.003496,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540489636.146094,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CFCRdlgSVQoe116B9,192.168.1.132,42329,192.168.1.1,53,udp,dns,0.201136,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540489596.215077,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,COp5my136JURdYPJ67,192.168.1.132,51766,216.239.35.4,123,udp,-,0.114680,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490044.429854,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CtrCsa4POTtyZycUlg,192.168.1.132,36828,216.239.35.12,123,udp,-,0.269593,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490524.903913,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7a0fo4aeQEAcR6ELg,192.168.1.132,57018,52.209.221.67,80,tcp,http,0.088448,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540490524.995609,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CHQW2S1g0RRUqhlf1e,192.168.1.132,60616,52.215.95.120,80,tcp,http,0.117684,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540490524.793988,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ccg0Dq1BituP0Mc8p1,192.168.1.132,57901,192.168.1.1,53,udp,dns,0.104681,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490524.899415,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1hPAj4B3gxSoZcZAf,192.168.1.132,48314,192.168.1.1,53,udp,dns,0.004001,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490524.993612,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C2OhoL3ohg094dUg84,192.168.1.132,53697,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490524.994611,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CzNN9B3s4yN48s6WQ9,192.168.1.132,39510,192.168.1.1,53,udp,dns,0.000500,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540490536.458332,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CxVm4N1PbGn0oQmOCe,192.168.1.132,56625,2.16.60.139,443,tcp,-,0.003497,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540490536.350648,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CpKVzJ3HcLpDnibefi,192.168.1.132,45663,192.168.1.1,53,udp,dns,0.107187,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540491436.497405,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C01r7XD1pGjqxMXv7,192.168.1.132,56626,2.16.60.139,443,tcp,-,0.003499,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540491382.794088,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbBRSA38Lg82lIoH61,192.168.1.132,58235,216.239.35.0,123,udp,-,0.111674,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540491436.460685,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CpT6pa41CehhfUWQL,192.168.1.132,50794,192.168.1.1,53,udp,dns,0.036223,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540491498.006042,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C0rbZf11OXwLj4JRyb,192.168.1.132,38244,216.239.35.8,123,udp,-,0.016984,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540491670.122798,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CSwgVt1dqVze1DaRW5,192.168.1.132,44717,216.239.35.4,123,udp,-,0.114192,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540492115.335041,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ck4YJ43NRAwLCAANha,192.168.1.132,34847,216.239.35.12,123,udp,-,0.270346,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540492336.607562,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CBpp572MJBNktVasdj,192.168.1.132,56627,2.16.60.139,443,tcp,-,0.003748,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540492336.500130,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAnb8Q2ItaI9ME5aug,192.168.1.132,53880,192.168.1.1,53,udp,dns,0.106937,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540493236.807231,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CbIOyt28u3GAtpNKDa,192.168.1.132,56628,2.16.60.139,443,tcp,-,0.003747,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540493236.610852,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cbsgks8N9wwpIBkVl,192.168.1.132,41079,192.168.1.1,53,udp,dns,0.195890,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540494124.922315,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CCzkuS2hJQ2TDX3I98,192.168.1.132,57024,52.209.221.67,80,tcp,http,0.089698,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540494125.015012,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1aDm42J0BOHj0bs5h,192.168.1.132,60622,52.215.95.120,80,tcp,http,0.110187,1847,791,7,6,SF,CTU-Honeypot-Capture-4-1
+1540494124.793403,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CA00aD3nUtVufsN6t2,192.168.1.132,50618,192.168.1.1,53,udp,dns,0.123928,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540494124.917818,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CKVnM93xVCeeiYRdtf,192.168.1.132,36405,192.168.1.1,53,udp,dns,0.004001,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540494125.013015,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CXCPyS344OpJEioD7e,192.168.1.132,41441,192.168.1.1,53,udp,dns,0.000498,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540494125.014013,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CCukMi3OFHDo0HDz54,192.168.1.132,53363,192.168.1.1,53,udp,dns,0.000500,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540494137.013174,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C8rQlWYJfwp4Un1v5,192.168.1.132,53624,2.16.60.82,443,tcp,-,0.003502,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540494136.809802,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C5OtqJ1lyDaZzV3x2k,192.168.1.132,51795,192.168.1.1,53,udp,dns,0.202885,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540495037.065967,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7Xwkt2nphv9FsBitc,192.168.1.132,53625,2.16.60.82,443,tcp,-,0.003248,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540495037.016265,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CrlMS91o2NDZeFUHh6,192.168.1.132,55342,192.168.1.1,53,udp,dns,0.049207,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540495592.708382,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CYoJHf4WPs9xD5UXU9,192.168.1.132,55750,216.239.35.0,123,udp,-,0.109190,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540495731.916034,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cf2q3R28et2kiDbo96,192.168.1.132,58381,216.239.35.8,123,udp,-,0.017487,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540495937.186049,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cbcupy3wc2cxkaHQJk,192.168.1.132,53626,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540495937.068377,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CG9z8640T2qmbsGu71,192.168.1.132,54946,192.168.1.1,53,udp,dns,0.117194,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540495928.034032,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CIn10p3kA9eE2rJ8p4,192.168.1.132,38620,216.239.35.4,123,udp,-,0.114179,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540496407.247167,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CfYgBy2cwgDYIpx4Ql,192.168.1.132,42028,216.239.35.12,123,udp,-,0.269345,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540496837.244573,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CDt4Qz1kPwifIh2bCl,192.168.1.132,56634,2.16.60.139,443,tcp,-,0.003246,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540496837.188614,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CnvdL13TIcOojSWwfc,192.168.1.132,51254,192.168.1.1,53,udp,dns,0.055462,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497724.871129,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CG5VXMR4xMjAr5ual,192.168.1.132,60627,52.215.95.120,80,tcp,http,0.093956,1847,1539,7,5,SF,CTU-Honeypot-Capture-4-1
+1540497724.968073,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cfx22u2YL8jtUqIFAa,192.168.1.132,57031,52.209.221.67,80,tcp,http,0.114934,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540497724.795178,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C98iFt1VjbbEQeO1Ca,192.168.1.132,58803,192.168.1.1,53,udp,dns,0.071206,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497724.866881,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CXrRnr3E16NjCZujRi,192.168.1.132,57214,192.168.1.1,53,udp,dns,0.003751,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497724.966075,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C0eNVZhuoomxaiwTh,192.168.1.132,46909,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497724.967074,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CO7VDx26UILVaD09Ia,192.168.1.132,40893,192.168.1.1,53,udp,dns,0.000749,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497737.379759,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CNuAbv4lQw04mxqo3g,192.168.1.132,56637,2.16.60.139,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540497737.248344,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CK0Vz61kKI90RCtZ44,192.168.1.132,53167,192.168.1.1,53,udp,dns,0.130919,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540497701.944687,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,ConecaEMF5PhSgMI,192.168.1.132,68,192.168.1.1,67,udp,dhcp,0.000994,300,300,1,1,SF,CTU-Honeypot-Capture-4-1
+1540498637.425980,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cn4oI31r8Zi0ldvrd1,192.168.1.132,53631,2.16.60.82,443,tcp,-,0.003497,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540498637.383261,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CLIf5W1TULZqO5H1u1,192.168.1.132,56283,192.168.1.1,53,udp,dns,0.042223,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540499537.484682,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C1WzDv3WrzCPLqp9l,192.168.1.132,56639,2.16.60.139,443,tcp,-,0.003496,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540499537.428722,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CeO83opsIRRWFl9gh,192.168.1.132,44611,192.168.1.1,53,udp,dns,0.055463,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540499775.616933,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CQhTtC2FdbNHngF8qg,192.168.1.132,42834,216.239.35.0,123,udp,-,0.109427,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540499962.824698,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CZ2qdOBiVMb7NiwEk,192.168.1.132,33678,216.239.35.8,123,udp,-,0.016990,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540500244.936926,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CKpTj31B1E9DXZm6ya,192.168.1.132,54989,216.239.35.4,123,udp,-,0.114186,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540500437.593858,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CP466V3XjgmsBHzxs5,192.168.1.132,56640,2.16.60.139,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540500437.487425,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cm4JPdgrPT9jjXqXa,192.168.1.132,47854,192.168.1.1,53,udp,dns,0.105937,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540500740.151208,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CNpz3hl07JCUcp8A8,192.168.1.132,47662,216.239.35.12,123,udp,-,0.270089,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540501325.004914,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CVcdav2p9LU9ziPEAh,192.168.1.132,57036,52.209.221.67,80,tcp,http,0.093195,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540501325.101113,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C37aa4k8gxiLE1Un5,192.168.1.132,60634,52.215.95.120,80,tcp,http,0.109432,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540501324.794306,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CrF7nG4YrvXTLvGcB5,192.168.1.132,56514,192.168.1.1,53,udp,dns,0.205372,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540501325.000416,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,COXcAo1fgiDBb73kJ3,192.168.1.132,60357,192.168.1.1,53,udp,dns,0.004001,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540501325.099110,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CyCYIy3eKNFnGR1Gq3,192.168.1.132,56564,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540501325.100108,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C634Ia4VbZNN4fSMm8,192.168.1.132,36648,192.168.1.1,53,udp,dns,0.000501,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540501337.793850,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CQjGcd1YRdbQlaHK9g,192.168.1.132,53636,2.16.60.82,443,tcp,-,0.003496,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540501337.595476,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cffi2vVsBq2yE1IQg,192.168.1.132,54450,192.168.1.1,53,udp,dns,0.197895,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540502237.855061,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cg3BKk3x3MJI7ALvlj,192.168.1.132,53637,2.16.60.82,443,tcp,-,0.003248,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540502237.795608,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cy3wo82CUVGEhPPM37,192.168.1.132,59920,192.168.1.1,53,udp,dns,0.058969,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540503138.049506,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CB7Lz42c6upevBWUs4,192.168.1.132,53638,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540503137.857636,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CplBko2bWDek6uksii,192.168.1.132,40574,192.168.1.1,53,udp,dns,0.191390,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504038.160202,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPjp2h1nGt9TUcuNJ5,192.168.1.132,53639,2.16.60.82,443,tcp,-,0.003497,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540504038.054265,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CZxZMN1oRs6eWMcK14,192.168.1.132,39569,192.168.1.1,53,udp,dns,0.105690,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504082.520712,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C7zxtObNnUDaD0tbe,192.168.1.132,52089,216.239.35.0,123,udp,-,0.109438,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504178.724448,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Crehw62PqXqIpjZew9,192.168.1.132,35116,216.239.35.8,123,udp,-,0.016967,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504492.838790,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPRpKm2rt7kCZxHfq9,192.168.1.132,49306,216.239.35.4,123,udp,-,0.114172,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504925.006577,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CtHBi12fX8jwrgNUij,192.168.1.132,57042,52.209.221.67,80,tcp,http,0.088947,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540504925.098524,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPMajE4RHvz2lDYShl,192.168.1.132,60640,52.215.95.120,80,tcp,http,0.105689,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540504924.794704,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CDMc0W0GJpkYJqLIb,192.168.1.132,44540,192.168.1.1,53,udp,dns,0.207130,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504925.002330,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cqq8pt30uEv9eqIDe4,192.168.1.132,59261,192.168.1.1,53,udp,dns,0.003750,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504925.096525,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAZOn54GdW0Prb0xX3,192.168.1.132,47007,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504925.097524,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CA3Rty4f7GnLQpxhrj,192.168.1.132,60273,192.168.1.1,53,udp,dns,0.000501,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504938.361218,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CvSaDNDmzrU8bPOu,192.168.1.132,53642,2.16.60.82,443,tcp,-,0.003498,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540504938.163091,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C5CppTptIv1qmX998,192.168.1.132,46299,192.168.1.1,53,udp,dns,0.197633,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540504901.054732,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cfrac130p65vCsyCia,192.168.1.132,46638,216.239.35.12,123,udp,-,0.269842,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540505838.490338,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,ChjgSB3e2swmkiL2Wj,192.168.1.132,56650,2.16.60.139,443,tcp,-,0.011244,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540505838.364420,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CHvI2f3ubcESIAXVde,192.168.1.132,47555,192.168.1.1,53,udp,dns,0.125422,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540506738.545466,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGDpRf160VFfRsbK9e,192.168.1.132,53644,2.16.60.82,443,tcp,-,0.011493,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540506738.497002,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CgdzJd1JoDqpTjVV04,192.168.1.132,45191,192.168.1.1,53,udp,dns,0.047968,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540507638.752086,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CnAqup3ceSo525BWP6,192.168.1.132,56652,2.16.60.139,443,tcp,-,0.011492,0,0,4,3,SF,CTU-Honeypot-Capture-4-1
+1540507638.549455,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CiDPtDoLDOy0JzMCa,192.168.1.132,37403,192.168.1.1,53,udp,dns,0.202141,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508266.420664,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C4SQjG2cUpPdXyWUk6,192.168.1.132,42652,216.239.35.0,123,udp,-,0.109682,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508404.630657,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CHGs5T3aTn6UPuTlrc,192.168.1.132,52600,216.239.35.8,123,udp,-,0.016987,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508524.931122,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C5mIg23XNIiyCvNQVl,192.168.1.132,60645,52.215.95.120,80,tcp,http,0.088698,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540508525.023069,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CyrIq30SFEsG9d2jj,192.168.1.132,57049,52.209.221.67,80,tcp,http,0.113184,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540508524.789975,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C5W5gO2xRPGto6EX31,192.168.1.132,45544,192.168.1.1,53,udp,dns,0.132166,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508524.922627,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTfK8118moAfx2Ziul,192.168.1.132,55030,192.168.1.1,53,udp,dns,0.007998,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508525.020822,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CvqL4j49km1ot7PGC5,192.168.1.132,54122,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508525.021819,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CQdWTe4lag8Y5AYrZg,192.168.1.132,51430,192.168.1.1,53,udp,dns,0.000750,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508538.812188,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CvRBv92hKVDNFP6FU3,192.168.1.132,56655,2.16.60.139,443,tcp,-,0.011745,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540508538.756742,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Ctlyu61dnmvmg4UIRb,192.168.1.132,34704,192.168.1.1,53,udp,dns,0.054950,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540508810.747558,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CpPoO33vnTHugF8Uzg,192.168.1.132,35755,216.239.35.4,123,udp,-,0.116676,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540509210.960160,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CdQzwLNCbaPFoO32f,192.168.1.132,47364,216.239.35.12,123,udp,-,0.269354,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540509438.871339,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CMII4j3n5MlqItut73,192.168.1.132,56656,2.16.60.139,443,tcp,-,0.011492,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540509438.819134,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CvagEl1SuGRIBFfHS6,192.168.1.132,50691,192.168.1.1,53,udp,dns,0.051709,34,281,1,1,SF,CTU-Honeypot-Capture-4-1
+1540510339.081178,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTQAP3219nGxRTjF59,192.168.1.132,53650,2.16.60.82,443,tcp,-,0.011510,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540510338.879057,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CoJZUF1toE2n4CX0Ek,192.168.1.132,47021,192.168.1.1,53,udp,dns,0.201640,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540511239.137920,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CucjdBf0HtCabLUTh,192.168.1.132,56658,2.16.60.139,443,tcp,-,0.011742,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540511239.087956,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cx4uEB4T7eVk1wAy69,192.168.1.132,39168,192.168.1.1,53,udp,dns,0.049719,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512125.001086,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CPC6fV3iUxLyABUFUi,192.168.1.132,57054,52.209.221.67,80,tcp,http,0.088198,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540512125.092534,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C6kNSd4e8JSs6NKBN9,192.168.1.132,60652,52.215.95.120,80,tcp,http,0.111434,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540512127.299028,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CZWSWi9nxd3GZds4i,192.168.1.132,60836,130.211.67.12,80,tcp,http,0.224122,1595,177,7,7,SF,CTU-Honeypot-Capture-4-1
+1540512124.791464,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C0DTvA2PxYUPAuTa7d,192.168.1.132,55939,192.168.1.1,53,udp,dns,0.200629,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512124.992842,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CL5E7OkUXLiTD9al6,192.168.1.132,54662,192.168.1.1,53,udp,dns,0.007748,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512125.090285,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CKc0Oi2ecVfuMuILm2,192.168.1.132,57452,192.168.1.1,53,udp,dns,0.000500,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512125.091534,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CL23EKvqtOCPotlY,192.168.1.132,43735,192.168.1.1,53,udp,dns,0.000501,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512127.167618,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CY1rT44jIZmsn7ucke,192.168.1.132,36769,192.168.1.1,53,udp,dns,0.130914,41,124,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512139.195757,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CDNSl01RsJnS5bOPc3,192.168.1.132,53655,2.16.60.82,443,tcp,-,0.011495,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540512139.147043,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cs8BwU3qarzjrYQn2d,192.168.1.132,35268,192.168.1.1,53,udp,dns,0.048223,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512550.333642,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CQc2Z2DjpezYoolJl,192.168.1.132,41909,216.239.35.0,123,udp,-,0.109684,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512609.502185,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CFm1Y828IVEMgmy25c,192.168.1.132,58364,216.239.35.8,123,udp,-,0.016739,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540512955.615507,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C2uQMR1CUbAofPoYQ6,192.168.1.132,34286,216.239.35.4,123,udp,-,0.114436,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540513039.256097,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CVULm537oXUvXxiq19,192.168.1.132,56663,2.16.60.139,443,tcp,-,0.011243,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540513039.203388,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cgi7FZ2j8iEXSfyL8g,192.168.1.132,43517,192.168.1.1,53,udp,dns,0.052213,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540513561.830757,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CqKACi1Jp3ZVSp8xr2,192.168.1.132,56890,216.239.35.12,123,udp,-,0.272081,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540513939.308267,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CGkFIc4WyTKH5KyFs5,192.168.1.132,56664,2.16.60.139,443,tcp,-,0.011492,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540513939.261554,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CHn6DM2wyXbIMlM4Ig,192.168.1.132,52749,192.168.1.1,53,udp,dns,0.046466,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540514622.892352,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CsTyo528ZzJOdbD15k,192.168.1.132,60840,130.211.67.12,80,tcp,http,0.241862,9995,177,12,12,SF,CTU-Honeypot-Capture-4-1
+1540514622.891375,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CI1qp71cDmd0ZuaD4j,192.168.1.132,47284,192.168.1.1,53,udp,dns,0.000479,41,57,1,1,SF,CTU-Honeypot-Capture-4-1
+1540514839.363353,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cx3BL4tL9nrA4xZx,192.168.1.132,53659,2.16.60.82,443,tcp,-,0.011743,0,0,5,3,SF,CTU-Honeypot-Capture-4-1
+1540514839.314640,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cp9RbK3stbvmMmcaN2,192.168.1.132,39877,192.168.1.1,53,udp,dns,0.048468,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540515724.848363,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C5n2tP3bULpFkNfEH3,192.168.1.132,57062,52.209.221.67,80,tcp,http,0.093695,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540515724.945057,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CtAgbP8GhitppIqfd,192.168.1.132,60660,52.215.95.120,80,tcp,http,0.112435,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540515724.788672,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CqUDIf2b9QSOs3S36e,192.168.1.132,46467,192.168.1.1,53,udp,dns,0.054699,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540515724.843866,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Crz6nd30dvbokQi63f,192.168.1.132,49998,192.168.1.1,53,udp,dns,0.004000,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540515724.943060,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CggUEofeedV8SxZ2j,192.168.1.132,41869,192.168.1.1,53,udp,dns,0.000499,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540515724.944058,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CVJ4nY3Slo8XwgiPFa,192.168.1.132,38817,192.168.1.1,53,udp,dns,0.000502,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540515739.484238,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CMA5m94kTyKtcRcEoj,192.168.1.132,53662,2.16.60.82,443,tcp,-,0.011492,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540515739.368825,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CuEBlB2uLDkJ7FQ7Ic,192.168.1.132,35128,192.168.1.1,53,udp,dns,0.114935,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540516639.636561,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTjJCp1twF2tOigPNh,192.168.1.132,56670,2.16.60.139,443,tcp,-,0.011742,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540516639.490416,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CWBH7o4CvGq5S9jm3f,192.168.1.132,32812,192.168.1.1,53,udp,dns,0.145668,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540516854.198046,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CrgNab4jC6S7ygUmx1,192.168.1.132,51087,216.239.35.8,123,udp,-,0.017238,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540516894.255680,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CTXyvI252h7Q990Azi,192.168.1.132,60296,216.239.35.0,123,udp,-,0.109682,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540517160.465462,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CewQ6QyUOyaIlHvUg,192.168.1.132,35370,216.239.35.4,123,udp,-,0.113933,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540517539.692153,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CpTCZf3Hwpwflj0Bo5,192.168.1.132,56671,2.16.60.139,443,tcp,-,0.011492,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540517539.643701,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cv6egkNELJwFxPWCe,192.168.1.132,35145,192.168.1.1,53,udp,dns,0.047963,34,311,1,1,SF,CTU-Honeypot-Capture-4-1
+1540517691.682822,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CYdrFo1z6ifUjrMadh,192.168.1.132,40144,216.239.35.12,123,udp,-,0.269841,48,48,1,1,SF,CTU-Honeypot-Capture-4-1
+1540518439.810900,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CYHdME1HqX2lPDWb31,192.168.1.132,58542,2.21.172.138,443,tcp,-,0.012992,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540518439.701726,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CUJ9T915hMDar3Iayh,192.168.1.132,60611,192.168.1.1,53,udp,dns,0.108678,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1540519324.912822,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C8HO1Whj0ObSEwagl,192.168.1.132,60665,52.215.95.120,80,tcp,http,0.092946,1847,1539,7,7,SF,CTU-Honeypot-Capture-4-1
+1540519325.009016,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,C8k0ZJ3nN2F72zMFkk,192.168.1.132,57069,52.209.221.67,80,tcp,http,0.117683,1847,791,6,6,SF,CTU-Honeypot-Capture-4-1
+1540519324.791648,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CtY0ZJ21c49XqbYg36,192.168.1.132,38980,192.168.1.1,53,udp,dns,0.115680,37,179,1,1,SF,CTU-Honeypot-Capture-4-1
+1540519324.908075,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Co0xcV3SYfelefkUo2,192.168.1.132,33729,192.168.1.1,53,udp,dns,0.004249,37,442,1,1,SF,CTU-Honeypot-Capture-4-1
+1540519325.007018,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,Cla0qN30VOOhuUZKcf,192.168.1.132,50609,192.168.1.1,53,udp,dns,0.000500,37,100,1,1,SF,CTU-Honeypot-Capture-4-1
+1540519325.008017,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CJ8usB3rJe3RW61YH,192.168.1.132,34137,192.168.1.1,53,udp,dns,0.000502,37,132,1,1,SF,CTU-Honeypot-Capture-4-1
+1540519339.878053,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CxOa6847RJlDHPEL21,192.168.1.132,53668,2.16.60.82,443,tcp,-,0.011744,0,0,4,2,SF,CTU-Honeypot-Capture-4-1
+1540519339.819843,iot23-philips-hue-01,Philips Hue smart LED lamp,smart_light,CAsfrbcohbMpNNeNg,192.168.1.132,46841,192.168.1.1,53,udp,dns,0.057713,34,297,1,1,SF,CTU-Honeypot-Capture-4-1
+1537522822.965530,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJAF5z3MDFg4XVDXB,0.0.0.0,68,255.255.255.255,67,udp,dhcp,8.322388,600,0,2,0,S0,CTU-Honeypot-Capture-5-1
+1537522897.732295,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcYEFX3Qj9xdNX1ZCa,192.168.2.1,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537522897.732374,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CF6fCK1nFqvI1XxGM1,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537522897.732507,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C2dlio3MkdwWJ80y04,169.254.15.115,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537522899.498805,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,COrF0t2uLErai9nfH5,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.555587,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523028.266738,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Chy9eO1eUnF3e4DRpi,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.101145,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523212.430714,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CGfuuW3iRmQNGTxkEk,192.168.2.1,5353,224.0.0.251,5353,udp,dns,7.005272,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537523212.430804,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CTxFWS3JaR54AhWU0h,169.254.15.115,5353,224.0.0.251,5353,udp,dns,7.005263,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537523212.430823,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CAha9O35bVA8FACXxe,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,7.005255,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537523154.948270,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsBodU1e1VE3u0Vk98,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.007533,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523282.482698,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CgCX302gGHXHLJEwb,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.591687,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523411.814564,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CE0nOjUQdvAHiW6O2,0.0.0.0,68,255.255.255.255,67,udp,dhcp,61.018114,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523549.357457,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrZmX42rcVaIRmylO4,192.168.2.3,43216,176.32.98.203,80,tcp,http,0.356214,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537523549.696574,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CT9yHm4yFFcGqsSV55,192.168.2.3,40621,93.184.216.34,80,tcp,-,0.332740,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523549.939362,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CZIEEo18Q2lzPpCEHc,192.168.2.3,40623,93.184.216.34,80,tcp,-,0.300101,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523550.139896,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CpTNNy36sGjGpbFVmb,192.168.2.3,40624,93.184.216.34,80,tcp,-,0.310657,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523549.331991,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCJan22xKwNonoPtH7,192.168.2.3,59744,192.168.2.1,53,udp,dns,0.011518,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.337398,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJ8RGg3rePbJUyWHJa,192.168.2.3,55971,192.168.2.1,53,udp,dns,0.015621,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.337702,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CDHcFZ1ER7Kej3pvq2,192.168.2.3,41548,192.168.2.1,53,udp,dns,0.015581,40,104,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523554.108827,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CIKnJb4EmQL9QDiR8k,192.168.2.3,33413,13.32.118.129,443,tcp,ssl,0.273075,684,72877,54,56,RSTO,CTU-Honeypot-Capture-5-1
+1537523551.589071,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cc5PQFR39JLU3bqaj,192.168.2.3,54908,52.46.157.6,443,tcp,ssl,2.843592,2651,3769,14,10,SF,CTU-Honeypot-Capture-5-1
+1537523549.545469,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cf0pSM3aoWjqr6tkXa,192.168.2.3,1112,192.168.2.1,53,udp,dns,0.012246,33,49,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.696578,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsOMII162VJ8sTMPB6,192.168.2.3,16356,192.168.2.1,53,udp,dns,0.189103,37,53,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.739415,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C1PUVU3AW9gZvmDTZ,192.168.2.3,1255,192.168.2.1,53,udp,dns,0.013419,36,68,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.906400,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CMB6jh2FP55bt3juYb,192.168.2.3,12231,192.168.2.1,53,udp,dns,0.016521,41,57,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.914329,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CDsU0j4smRMoUvsymi,192.168.2.3,39474,192.168.2.1,53,udp,dns,0.011252,33,49,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523550.122889,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cs24S01m8M6JQAoHmh,192.168.2.3,57819,192.168.2.1,53,udp,dns,0.013156,33,49,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523550.167997,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCNTSU2MAjId0jFFae,192.168.2.3,60048,192.168.2.1,53,udp,dns,0.013290,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523551.167183,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8iBd2454E9urYfcba,192.168.2.3,43654,192.168.2.1,53,udp,dns,0.118298,37,53,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523552.006119,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8STjU35XgHkrzGDmk,192.168.2.3,10862,192.168.2.1,53,udp,dns,0.049276,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523552.429655,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJSu5z4LEuXpqzCmcg,192.168.2.3,42964,192.168.2.1,53,udp,dns,0.010914,48,64,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523552.851677,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C2fr9QG4JiM5dhpU3,192.168.2.3,31664,192.168.2.1,53,udp,dns,0.012875,44,82,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523553.896372,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdG4y83Y1CK1aOy1Yg,192.168.2.3,60994,192.168.2.1,53,udp,dns,0.010121,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523553.988502,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cc6wCQ3PNrDxRxpZPh,192.168.2.3,7587,192.168.2.1,53,udp,dns,0.024474,47,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523554.526469,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CGzQlOdKv3fB3Yx3,192.168.2.3,64769,192.168.2.1,53,udp,dns,0.011901,37,77,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523559.833908,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ckig3H3sjisdcsAzkj,192.168.2.3,45033,176.32.98.203,80,tcp,http,0.365520,157,371,4,4,SF,CTU-Honeypot-Capture-5-1
+1537523555.786898,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CLKvVF1Wiwz93Sqn8f,192.168.2.3,4362,192.168.2.1,53,udp,dns,0.011024,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523559.805035,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CpaqKs4GdgoI7bngIe,192.168.2.3,9161,192.168.2.1,53,udp,dns,0.000775,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523560.061327,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C4Hlnv4VK1j1OGpna,192.168.2.3,1330,192.168.2.1,53,udp,dns,0.011530,32,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523564.395944,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrX4le4jRkIQYG8tbe,192.168.2.3,45407,52.119.196.25,443,tcp,ssl,2.056099,2241,5477,16,13,SF,CTU-Honeypot-Capture-5-1
+1537523549.913557,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCycDD3fIlTbovU6Mj,192.168.2.3,38715,54.239.27.11,443,tcp,ssl,19.529914,3536,5516,26,22,SF,CTU-Honeypot-Capture-5-1
+1537523569.438981,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Chk7KCwfiWwLyRuvl,192.168.2.3,38719,54.239.27.11,443,tcp,ssl,2.583787,3624,5516,24,23,SF,CTU-Honeypot-Capture-5-1
+1537523569.438974,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CFaohnkVC8o13k7Oj,192.168.2.3,26518,192.168.2.1,53,udp,dns,0.013578,38,54,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.066996,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CjKeZc5L7G2Gi3J7e,192.168.2.3,5353,224.0.0.251,5353,udp,dns,38.595360,3888,0,29,0,S0,CTU-Honeypot-Capture-5-1
+1537523549.487078,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrapdF3jsXByGllvU,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,38.175279,1818,0,17,0,S0,CTU-Honeypot-Capture-5-1
+1537523548.856511,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CaCceb4pNJvXW0Wpi5,::,135,ff02::1:ff27:561e,136,icmp,-,-,-,-,1,0,OTH,CTU-Honeypot-Capture-5-1
+1537523548.856516,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CgQ9Qx3uxeeE5RHBt7,::,143,ff02::16,0,icmp,-,0.004340,40,0,2,0,OTH,CTU-Honeypot-Capture-5-1
+1537523548.881175,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C5oyxh1Kt1zrnW4p65,192.168.2.3,68,192.168.2.1,67,udp,dhcp,0.004204,0,600,0,2,SHR,CTU-Honeypot-Capture-5-1
+1537523549.364508,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C9fMT47Zju8ez4tPg,192.168.2.3,37852,78.108.145.1,123,udp,-,0.018262,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.364515,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CixnZF4hn3eTK6aQq7,192.168.2.3,55506,78.108.145.1,123,udp,-,0.023151,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523549.487076,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsTv7EaW6dWj8Wblh,192.168.2.3,8,192.168.2.1,0,icmp,-,0.055415,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537523549.773559,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CU66t5UJdvM0rhAn7,192.168.2.3,53862,72.21.192.213,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523549.776194,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CBK7m92Phb3O75iUg9,192.168.2.3,59979,72.21.192.213,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523603.668966,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CSksLA2nDDu4uby0Fa,192.168.2.3,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523603.668967,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cb9PSB5YpnoX9j6x5,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523548.865809,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CfbrbP3GfMZFafFU07,fe80::4eef:c0ff:fe27:561e,133,ff02::2,134,icmp,-,7.550691,24,0,3,0,OTH,CTU-Honeypot-Capture-5-1
+1537523552.867811,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CGTkrg3QacXtWyvPgg,192.168.2.3,34333,176.32.101.122,443,tcp,ssl,72.484195,7385,5380,16,14,RSTR,CTU-Honeypot-Capture-5-1
+1537523555.804430,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CM97uj3IwoFQWl2Bd4,192.168.2.3,60004,54.239.31.37,443,tcp,ssl,69.633449,6965,5131,24,21,RSTR,CTU-Honeypot-Capture-5-1
+1537523548.861004,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cm7MOb4IDb3a4xpNV7,fe80::4eef:c0ff:fe27:561e,143,ff02::16,0,icmp,-,23.370275,100,0,5,0,OTH,CTU-Honeypot-Capture-5-1
+1537523560.199015,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8CTdr4x34KJ6WfAT,192.168.2.3,50862,52.119.196.25,443,tcp,ssl,72.433771,1418,5131,11,10,RSTR,CTU-Honeypot-Capture-5-1
+1537523628.167727,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCZhBu1k3Del4mxHJg,192.168.2.1,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523628.167763,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C1UGR4PQx0zAPrMFc,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523628.167769,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNkYIR2hlu4JFsyDI2,169.254.15.115,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523566.496428,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CfLP7m17FFd0J8Fszd,192.168.2.3,39905,52.119.196.25,443,tcp,ssl,68.396072,4207,9458,16,18,RSTR,CTU-Honeypot-Capture-5-1
+1537523635.665874,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C0IRqN13XS6QoEHW19,192.168.2.3,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523635.665875,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCk72F2wU0qm5pG4Zb,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523647.208848,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cn0rRz3TcuXOTUIpwh,192.168.2.3,32998,54.239.29.194,443,tcp,ssl,0.674159,1289,6224,13,13,SF,CTU-Honeypot-Capture-5-1
+1537523551.378558,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdGvHE4J4YIVtnu9hh,192.168.2.3,43982,52.46.157.6,443,tcp,ssl,97.036123,2603,3842,12,11,RSTR,CTU-Honeypot-Capture-5-1
+1537523643.959187,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CF9S4T379Sm2y5rAv5,192.168.2.3,43870,192.168.2.1,53,udp,dns,0.013741,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523647.161066,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CgUKKB1RKsjVxEEAV2,192.168.2.3,40286,192.168.2.1,53,udp,dns,0.044944,37,53,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523541.023501,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CbMjdr2yPuZ0l6Rq9l,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.447015,3603,0,12,0,S0,CTU-Honeypot-Capture-5-1
+1537523550.185739,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJJOGq42QqBaaBpBR9,192.168.2.3,48275,176.32.98.106,443,tcp,ssl,123.033629,10345,17343,31,29,RSTR,CTU-Honeypot-Capture-5-1
+1537523552.479475,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CoMcJ8KwCk90a1VJf,192.168.2.3,46363,176.32.98.108,443,tcp,ssl,144.999440,8176,5893,20,15,RSTR,CTU-Honeypot-Capture-5-1
+1537523699.677555,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CRwgajnbXC865E2j7,192.168.2.3,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523699.677884,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJp0sebFro1oS48og,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523553.909819,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CFbpRD18O5iE5gYFe2,192.168.2.3,43036,52.46.133.19,443,tcp,ssl,183.995564,19447,8767,41,30,RSTR,CTU-Honeypot-Capture-5-1
+1537523668.206958,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CnE4Od26Ra9JiKpAAf,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.150210,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523791.044133,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CPF4fb2BLEazNFdZve,192.168.2.3,4892,192.168.2.1,53,udp,dns,0.011258,37,53,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523850.493248,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CMcL041K4LNdTjmd4g,192.168.2.3,40631,93.184.216.34,80,tcp,-,0.237601,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523850.613090,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJOXZn2AKum822MYFd,192.168.2.3,40632,93.184.216.34,80,tcp,-,0.247405,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523850.738720,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CqKF1B11QpKaNmt1rl,192.168.2.3,40633,93.184.216.34,80,tcp,-,0.243230,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523549.487071,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CvHclT2klh3h9euwAb,192.168.2.3,52984,52.216.16.8,80,tcp,http,301.532260,146,775,10,5,SF,CTU-Honeypot-Capture-5-1
+1537523549.992842,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cm4iZS3DMF29Hl34X,192.168.2.3,33043,52.119.164.214,443,tcp,ssl,9.028916,1090,6429,14,13,S3,CTU-Honeypot-Capture-5-1
+1537523549.973209,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C5KyfE1dfzdBtacei4,192.168.2.3,52496,52.119.164.214,443,tcp,ssl,9.175136,1093,7397,15,14,S3,CTU-Honeypot-Capture-5-1
+1537523550.119413,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CoFAut14qCO1WFO0s9,192.168.2.3,48278,52.119.164.214,443,tcp,ssl,9.102421,1090,6429,14,13,S3,CTU-Honeypot-Capture-5-1
+1537523850.469459,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CEfFtD1FN446qIPjBb,192.168.2.3,7396,192.168.2.1,53,udp,dns,0.000619,33,49,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523552.058663,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHNt44MhXhWfThiRb,192.168.2.3,41838,52.46.129.109,443,tcp,ssl,8.802702,2506,5330,15,14,S3,CTU-Honeypot-Capture-5-1
+1537523851.030807,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C2JpBokxgFzmvIxGb,192.168.2.3,13118,192.168.2.1,53,udp,dns,0.011442,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523857.814189,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNJPI9btLsvxBZgQ2,192.168.2.3,52984,52.216.16.8,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537523861.410206,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdZbAQ3wwmtnO5A0yf,192.168.2.3,45229,52.94.241.86,80,tcp,http,0.237910,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537523861.410214,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CRma4Z3UogS9Vrq5Pc,192.168.2.3,58536,52.94.241.86,80,tcp,http,0.297082,157,371,5,4,SF,CTU-Honeypot-Capture-5-1
+1537523864.866906,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrZxGJ33UeSb43hvA4,192.168.2.3,52984,52.216.16.8,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537523861.365403,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcDTey12S4qsmrBKK7,192.168.2.3,33851,192.168.2.1,53,udp,dns,0.010620,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523861.376833,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHnXMP1MUrmSVZOiqi,192.168.2.3,46586,192.168.2.1,53,udp,dns,0.000605,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523878.966502,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cv4TcZ1gc372tvwkCf,192.168.2.3,52984,52.216.16.8,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537523850.438898,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCZ8n62P1ZkxIpuyC,192.168.2.3,8,192.168.2.1,0,icmp,-,0.017713,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537523851.342532,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CllV1S1jaj49suguo6,192.168.2.3,38154,72.21.192.213,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523851.355053,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Chz6Zm1C8E6mOpZYD8,192.168.2.3,51315,72.21.192.213,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537523907.163989,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cz4nWK2XDvcghCLtqa,192.168.2.3,52984,52.216.16.8,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537523796.969349,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CxPjVk3JgKyOoaO4g,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.349602,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537523643.976296,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHxxzr4b6auakBJHZc,192.168.2.3,34920,52.46.129.41,443,tcp,ssl,8.910511,11065,4865,24,19,S3,CTU-Honeypot-Capture-5-1
+1537523925.256531,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cr9psD1xagQF9cr8wc,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.957043,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524043.918133,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CLpzbr3ZdCZWzzIU4h,192.168.2.3,33043,52.119.164.214,443,tcp,-,0.176464,31,0,2,1,RSTR,CTU-Honeypot-Capture-5-1
+1537524043.918142,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C7qsif3NtdvXkpf8Jg,192.168.2.3,48278,52.119.164.214,443,tcp,-,0.185046,31,0,2,1,RSTR,CTU-Honeypot-Capture-5-1
+1537524044.626932,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C2kh0m4QmeLs91Nw17,192.168.2.3,34920,52.46.129.41,443,tcp,-,0.114456,53,0,2,1,RSTR,CTU-Honeypot-Capture-5-1
+1537524043.923374,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNcEm33qyNjKIZ2o3j,192.168.2.3,49686,192.168.2.1,53,udp,dns,0.011373,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537523791.063589,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,ChTjP14BZtCr5xO031,192.168.2.3,37475,205.251.243.55,443,tcp,ssl,1.161052,3219,5271,18,15,S1,CTU-Honeypot-Capture-5-1
+1537523554.541256,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrGqFe2ATWpJNiuPBg,192.168.2.3,47125,172.217.23.238,80,tcp,http,240.072298,176,83,5,4,S3,CTU-Honeypot-Capture-5-1
+1537523554.795151,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CPEQ8k2iycK30H7fDi,192.168.2.3,48817,13.32.118.129,443,tcp,ssl,245.988358,673,336516351,123657,239484,S3,CTU-Honeypot-Capture-5-1
+1537524121.553249,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcHuZ21Rk06vp7Ghmd,169.254.15.115,5353,224.0.0.251,5353,udp,dns,7.006697,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537524121.553166,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsAJzi1sERnqbherhd,192.168.2.1,5353,224.0.0.251,5353,udp,dns,7.006537,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537524121.553268,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CeCIHsLaiSujUrHV9,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,7.006526,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537524150.986322,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C7XJjC1ktuNOSlVcec,192.168.2.3,40634,93.184.216.34,80,tcp,-,0.249356,0,0,4,3,SF,CTU-Honeypot-Capture-5-1
+1537524151.117090,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8UIrfqYyUqh8uNH9,192.168.2.3,40635,93.184.216.34,80,tcp,-,0.240893,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537523851.049889,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CE4A3d3rahnJctNs7a,192.168.2.3,60226,52.216.104.139,80,tcp,http,300.343867,146,775,12,7,SF,CTU-Honeypot-Capture-5-1
+1537524151.247629,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CvUBU2e4iYaRTCZ1h,192.168.2.3,40636,93.184.216.34,80,tcp,-,0.253883,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524151.394259,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cx86mb4KHhWrcDzPwl,192.168.2.3,10872,192.168.2.1,53,udp,dns,0.022490,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524151.695632,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CQAeCs30BJMkmdiWp,192.168.2.3,47996,192.168.2.1,53,udp,dns,0.011272,36,68,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524151.701132,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CnmVTW8fDMoXioRi8,192.168.2.3,1051,192.168.2.1,53,udp,dns,0.005843,36,68,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524157.004042,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CEcUJeKZ1DEkJ3yP3,192.168.2.3,60226,52.216.104.139,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524162.623540,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CWtigp2Toin8haz5jk,192.168.2.3,60226,52.216.104.139,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524054.199033,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CYIzgj3Rjys82e691c,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.330210,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524173.845932,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ctzjd140oNyDT0FRMj,192.168.2.3,60226,52.216.104.139,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524196.284443,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CgJmqk4l837xKtC2gb,192.168.2.3,60226,52.216.104.139,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524150.960407,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cu0lwvOBXIjiAq1Kl,192.168.2.3,8,192.168.2.1,0,icmp,-,0.017387,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537524151.709761,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CyeCsG4UJYSZTzoDX,192.168.2.3,53041,207.171.178.6,123,udp,-,0.192012,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524151.714813,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CnYZEP2tYlcD7BqY7j,192.168.2.3,41130,207.171.178.6,123,udp,-,0.194384,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524241.244060,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ct2rQk3kR4B5RQp83f,192.168.2.3,60226,52.216.104.139,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524274.282810,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CWHQUh1SZH2FMfeWu4,192.168.2.3,26096,192.168.2.1,53,udp,dns,0.010912,41,57,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524181.979394,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHA0F11hUNOIeSnP3h,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.780831,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524043.939827,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cm9UDg2c4yKzE0nN6l,192.168.2.3,58974,72.21.207.87,443,tcp,ssl,299.896211,13395,4865,27,20,SF,CTU-Honeypot-Capture-5-1
+1537524343.837576,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CSpDXr4alS5W2xzv48,192.168.2.3,19423,192.168.2.1,53,udp,dns,0.010136,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524343.867152,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C5RvjtgVhGIaqgoK5,192.168.2.3,34788,52.94.228.52,443,tcp,ssl,59.252172,16824,4865,27,21,RSTR,CTU-Honeypot-Capture-5-1
+1537524310.697963,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C11Htg3D1vTLLcueQ2,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.676946,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524451.509013,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C850C91q1wUQn4EAF2,192.168.2.3,40637,93.184.216.34,80,tcp,-,0.238593,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524451.629006,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdugxT26lDUMlrrbS4,192.168.2.3,40638,93.184.216.34,80,tcp,-,0.240306,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524151.451438,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CTUd5Y1vxiRlX44IJk,192.168.2.3,49214,52.216.227.176,80,tcp,http,300.428794,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537524451.751438,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CfOHFx3zkY0QXPwLZ2,192.168.2.3,40639,93.184.216.34,80,tcp,-,0.364352,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524451.879929,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CxT49O2UlPhbawlkWj,192.168.2.3,3063,192.168.2.1,53,udp,dns,0.013047,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524457.324143,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CEOyqM3mt0ePwtiZMk,192.168.2.3,49214,52.216.227.176,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524462.330250,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CKqjO925LujkxeKBWf,192.168.2.3,59013,52.94.241.86,80,tcp,http,0.227328,157,371,4,4,SF,CTU-Honeypot-Capture-5-1
+1537524462.783710,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,ConJuQ1a8lY4yTMx6c,192.168.2.3,49214,52.216.227.176,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524462.314863,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Camc9g4Xjp4NtYCJLh,192.168.2.3,33457,192.168.2.1,53,udp,dns,0.013023,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524473.684842,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C29UT24VwzcW1OL6Yf,192.168.2.3,49214,52.216.227.176,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524495.484203,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CH5jutLvIDLNH50v7,192.168.2.3,49214,52.216.227.176,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524451.465640,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdB7vV3wZJhvuqikT7,192.168.2.3,8,192.168.2.1,0,icmp,-,0.035211,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537524452.299606,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJR8lH3EJwG9YE709k,192.168.2.3,40065,207.171.178.6,123,udp,-,0.190866,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524452.304549,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CIPxti3YWAKCGjgpn3,192.168.2.3,37809,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537524539.164212,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CN7YyU3taEx2VUEmB8,192.168.2.3,49214,52.216.227.176,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524437.723070,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CG6xPg1dvIxUbXrKid,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.359848,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524274.316767,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C6PQgN380y2VnxHNi3,192.168.2.3,56916,52.119.162.179,443,tcp,ssl,8.929202,1094,5864,15,15,S3,CTU-Honeypot-Capture-5-1
+1537524566.604557,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CCWpio4JlI4dx8ySvg,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.858140,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524688.198396,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CbVIpZ2oUEUWDWk6Dc,192.168.2.1,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537524688.198472,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CAsYrZXME6i1xn3fi,169.254.15.115,5353,224.0.0.251,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537524688.198484,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CfOhxf3lzYHLZJHPpk,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537524743.915017,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CLR8YxXUdo3ZfjFc5,192.168.2.3,38511,192.168.2.1,53,udp,dns,0.013883,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524752.002508,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CzxWPv4aEAEMEuW5Ni,192.168.2.3,40640,93.184.216.34,80,tcp,-,0.239358,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524752.121608,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CATezZ1KjapWcoUByh,192.168.2.3,40641,93.184.216.34,80,tcp,-,0.244650,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524451.916815,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CekrDayyOl1C2IB52,192.168.2.3,52889,52.216.165.251,80,tcp,http,300.489266,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537524752.244680,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C0lK0H1ffCEKbCEow6,192.168.2.3,40642,93.184.216.34,80,tcp,-,0.287392,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524752.406088,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CwE2613KaroY5cOlL6,192.168.2.3,31895,192.168.2.1,53,udp,dns,0.017694,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524761.904357,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CeVF093SkLDnIn3AZi,192.168.2.3,52889,52.216.165.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524762.734781,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNFIEs1ZYuiZ3EiOOd,192.168.2.3,33102,176.32.98.203,80,tcp,http,0.228038,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537524762.720878,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CKa7wz3D02KLEFrNA5,192.168.2.3,27850,192.168.2.1,53,udp,dns,0.011085,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524771.524295,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CN4WAFE9vT1L7k7rj,192.168.2.3,52889,52.216.165.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524790.764181,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CLSZxn4ymX6lhzmWjd,192.168.2.3,52889,52.216.165.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524743.944141,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHUmEe3nh4c50t2T9j,192.168.2.3,50811,52.46.128.105,443,tcp,ssl,48.042781,12910,4865,25,20,RSTR,CTU-Honeypot-Capture-5-1
+1537524751.979239,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CFwr0a4SAgf1n9WEpk,192.168.2.3,8,192.168.2.1,0,icmp,-,0.016492,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537524752.714232,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CRjA5r3h4kUQ5zmZQh,192.168.2.3,49759,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537524752.729403,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CBohwg3aoW5i0gUkoh,192.168.2.3,42404,207.171.178.6,123,udp,-,0.190785,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524695.493239,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcjjXgRYg61oD2oz,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.042529,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537524829.244482,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Chi83t1XLXIKkLoXqj,192.168.2.3,52889,52.216.165.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524823.578997,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CGqqbW1jy553nRDeac,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.470598,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525021.517501,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C62uhb4M5SSDEI1Ssg,192.168.2.1,5353,224.0.0.251,5353,udp,dns,7.009107,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525021.517579,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C0g7Ab2zKYkPqeYRmd,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,7.009115,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525021.517713,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcKz2U1c9tmXLnnx41,169.254.15.115,5353,224.0.0.251,5353,udp,dns,7.008969,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525052.486908,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CvdxrX3MnS1sYIC3Vc,192.168.2.3,40643,93.184.216.34,80,tcp,-,0.245414,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525052.637647,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CTk8Re3dcgqRpOHYEe,192.168.2.3,40644,93.184.216.34,80,tcp,-,0.254768,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537524752.426528,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CD6tSSCHNblMpaUIl,192.168.2.3,46657,52.216.160.251,80,tcp,http,300.479358,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537525052.777803,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C11XNk1loWy6NOAnb,192.168.2.3,40645,93.184.216.34,80,tcp,-,0.241876,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525052.905878,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CP4VX71kdUmt6g1bBb,192.168.2.3,59614,192.168.2.1,53,udp,dns,0.032497,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525053.209972,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CmVTRU3JZ6PC6IE5c4,192.168.2.3,32969,192.168.2.1,53,udp,dns,0.012627,36,68,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525058.514743,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CKW7Mq4n4oONlYYV0l,192.168.2.3,46657,52.216.160.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525063.292047,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C1NzA732uFzUxnWfy,192.168.2.3,36407,72.21.214.79,80,tcp,http,0.260110,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537525064.124396,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CkumKP3Z7QMnzXWbbc,192.168.2.3,46657,52.216.160.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537524951.553243,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CF3Idf1ta1GDb7sPza,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.077532,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525063.275811,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CWXDlL17SduuRg2WXg,192.168.2.3,43636,192.168.2.1,53,udp,dns,0.013781,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525075.364294,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CeZT6v2H9yA8QFoFp7,192.168.2.3,46657,52.216.160.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525097.804413,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CmDLhs2JUxQIHl1AFg,192.168.2.3,46657,52.216.160.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525052.468903,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CaiIDl14htBoGYDzo9,192.168.2.3,8,192.168.2.1,0,icmp,-,0.014787,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537525053.245647,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CusbWu4rMd3zApq7yd,192.168.2.3,51751,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537525053.247396,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C2WMQs2WmUtOWNzUa6,192.168.2.3,44043,207.171.178.6,123,udp,-,0.194712,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537524842.055030,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNvsJA2LZjtGhsGt1,192.168.2.3,37475,205.251.243.55,443,tcp,-,0.125938,259,110,2,2,OTH,CTU-Honeypot-Capture-5-1
+1537525142.684473,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,ChezcWeqiuP5oorg4,192.168.2.3,46657,52.216.160.251,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537523571.372642,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CX18Ca29rUiXGPj134,192.168.2.3,38721,54.239.27.11,443,tcp,ssl,1322.836876,8023,10166,45,37,S1,CTU-Honeypot-Capture-5-1
+1537525080.137035,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CUAMnv16RU9ZuccOAj,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.590312,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525244.057448,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CMlq273vb73hnf5dfb,192.168.2.3,27787,192.168.2.1,53,udp,dns,0.013280,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525206.891047,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cjh0Ov2YQK0ihaEWO4,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.314890,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525353.071737,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CvN2064o73ShgSm8t3,192.168.2.3,40646,93.184.216.34,80,tcp,-,0.241322,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525353.193519,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cl4zxh3KEntekCbHa,192.168.2.3,40647,93.184.216.34,80,tcp,-,0.241889,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525052.941654,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CRwuzk36JkyW0zJwoh,192.168.2.3,40681,52.216.128.75,80,tcp,http,300.505646,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537525353.317148,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CKsnrZ3Zp2adhsCy37,192.168.2.3,40648,93.184.216.34,80,tcp,-,0.243299,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525353.447763,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cv6b9w11gV3WOZTkb1,192.168.2.3,38372,192.168.2.1,53,udp,dns,0.012586,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525359.374480,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CbwKjx3j2JjX3eYqd6,192.168.2.3,40681,52.216.128.75,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525363.757905,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CFE413otrQfMqIXf8,192.168.2.3,53554,72.21.214.79,80,tcp,http,0.250264,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537525365.304452,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CEkTpe20hahjtm9rMd,192.168.2.3,40681,52.216.128.75,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525363.741280,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CVfQ1m42ARJnmKSJi3,192.168.2.3,47096,192.168.2.1,53,udp,dns,0.014411,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525377.166083,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8EtxWUzM4x5Vwxld,192.168.2.3,40681,52.216.128.75,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525400.924637,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8xxih3ZfIxCXV9jh8,192.168.2.3,40681,52.216.128.75,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525353.025166,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C35Z5W1INStVydTvl2,192.168.2.3,8,192.168.2.1,0,icmp,-,0.016615,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537525353.738987,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C11rtG3ydGmEKJVs3k,192.168.2.3,55783,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537525353.755598,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdivMyGw7Q5jUMKR3,192.168.2.3,55470,207.171.178.6,123,udp,-,0.194881,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525448.445121,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C9a4Bx1BhQZemKufm,192.168.2.3,40681,52.216.128.75,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525335.943512,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Czun5R7SM9W74MCa3,0.0.0.0,68,255.255.255.255,67,udp,dhcp,59.430869,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525244.074864,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CZiAUH3S2ou6rjCtP5,192.168.2.3,36878,52.94.232.206,443,tcp,ssl,8.759049,3669,4865,16,14,S3,CTU-Honeypot-Capture-5-1
+1537525464.205759,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CmzASQ1RN3sDoTbfj3,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.232436,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525643.922722,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ch7U5CdioaDJYh7H4,192.168.2.3,36878,52.94.232.206,443,tcp,-,0.112920,53,0,2,1,RSTR,CTU-Honeypot-Capture-5-1
+1537525643.922730,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CSlp6t1VLlOrZ3TsRh,192.168.2.3,6000,192.168.2.1,53,udp,dns,0.013093,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525653.563958,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CGYrDP1P93JVStcPf2,192.168.2.3,40649,93.184.216.34,80,tcp,-,0.239277,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525653.687436,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,COcwEXBHLytfgzwFb,192.168.2.3,40650,93.184.216.34,80,tcp,-,0.242570,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525353.481512,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CR99cp2NRMZSb2yUVc,192.168.2.3,34516,52.216.133.59,80,tcp,http,300.493854,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537525653.808495,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNPF3D3fFkAcKUbvD1,192.168.2.3,40651,93.184.216.34,80,tcp,-,0.246877,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525653.951503,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CuDn984NtnRmXUZPOf,192.168.2.3,60162,192.168.2.1,53,udp,dns,0.011667,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525659.423236,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNrY4EVNj6zHU0OB7,192.168.2.3,34516,52.216.133.59,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525664.232035,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cgpegk34RendDyGQX1,192.168.2.3,36435,72.21.214.79,80,tcp,http,0.238896,135,238,4,4,SF,CTU-Honeypot-Capture-5-1
+1537525664.233099,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CKzoDI1VNZ1Gj2cWQi,192.168.2.3,51205,72.21.214.79,80,tcp,http,0.240237,157,371,4,4,SF,CTU-Honeypot-Capture-5-1
+1537525664.883564,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CYePPd3Mo4eBJdapz8,192.168.2.3,34516,52.216.133.59,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525664.218270,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CrCXvK1BaOwTpIMB1b,192.168.2.3,15062,192.168.2.1,53,udp,dns,0.009575,40,56,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525675.803112,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cr9qDO1SjmCaZ83aLi,192.168.2.3,34516,52.216.133.59,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525697.643748,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C51AmAmaJpfMQhAog,192.168.2.3,34516,52.216.133.59,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525593.084667,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CjxRFvhShJRLuHot5,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.276186,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525653.537914,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CShy0K7HIji34FOvj,192.168.2.3,8,192.168.2.1,0,icmp,-,0.021156,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537525654.220309,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C6gPR2doSd16MMShb,192.168.2.3,34186,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537525654.230579,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CnEkpz3AioLn2lZIk5,192.168.2.3,37951,207.171.178.6,123,udp,-,-,-,-,1,0,S0,CTU-Honeypot-Capture-5-1
+1537525741.243139,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cu1kBQ1u4LQQ2Uc8Cg,192.168.2.3,34516,52.216.133.59,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525819.478343,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CW9G3So6ysUVTmR4d,192.168.2.1,5353,224.0.0.251,5353,udp,dns,0.101131,639,0,2,0,S0,CTU-Honeypot-Capture-5-1
+1537525819.478346,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cwtpuq1cyI61KApxGl,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,0.101212,639,0,2,0,S0,CTU-Honeypot-Capture-5-1
+1537525819.478473,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNsUas4Ek1isnEUv6g,169.254.15.115,5353,224.0.0.251,5353,udp,dns,0.101074,792,0,2,0,S0,CTU-Honeypot-Capture-5-1
+1537525719.813195,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cau7FK7lV7Tq81sN1,0.0.0.0,68,255.255.255.255,67,udp,dhcp,61.135330,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525918.489220,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CexkE624JrThECiCJb,192.168.2.1,5353,224.0.0.251,5353,udp,dns,7.005609,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525918.489296,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CkrSzk3sb32mWuaTA8,169.254.15.115,5353,224.0.0.251,5353,udp,dns,7.005607,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525918.489308,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CJaCsm1Lo0y7gDUofa,fe80::80e6:50ff:fe12:1464,5353,ff02::fb,5353,udp,dns,7.005606,804,0,4,0,S0,CTU-Honeypot-Capture-5-1
+1537525643.942646,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CHdkFr2IO660T6A6k2,192.168.2.3,54617,54.239.31.37,443,tcp,ssl,8.800505,10217,4865,23,20,S3,CTU-Honeypot-Capture-5-1
+1537525954.055989,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C1Zsmji1qYRLmhgHh,192.168.2.3,40652,93.184.216.34,80,tcp,-,0.260344,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525954.222251,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CFazIN2cpqjPyAK4ri,192.168.2.3,40653,93.184.216.34,80,tcp,-,0.241357,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525653.971963,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CVgrCC232LTdAKOxA5,192.168.2.3,49305,52.216.161.3,80,tcp,http,300.502970,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537525954.345298,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CqczhoXjy9mVzxOXi,192.168.2.3,40654,93.184.216.34,80,tcp,-,0.246033,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525954.475462,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C0r0pa1oQuCkjs1krj,192.168.2.3,1332,192.168.2.1,53,udp,dns,0.021153,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525954.765339,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CgWAhD4LQg7XQMMUQ1,192.168.2.3,55146,192.168.2.1,53,udp,dns,0.010439,36,68,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525960.083426,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C95o254pmhnLX4TI0k,192.168.2.3,49305,52.216.161.3,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525849.608531,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C4M4Cl4u8tldRNiPYg,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.869465,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537525965.703036,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C1egiiqtFecMck928,192.168.2.3,49305,52.216.161.3,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525976.924073,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsPzp2anOesEqihx1,192.168.2.3,49305,52.216.161.3,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525999.404400,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ca0z3mvmkWKmRb9G8,192.168.2.3,49305,52.216.161.3,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537525954.027101,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8AbDkJJcIoStP872,192.168.2.3,8,192.168.2.1,0,icmp,-,0.015672,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537525954.800486,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CSbanh2AP9wggDCQM2,192.168.2.3,55840,207.171.178.6,123,udp,-,0.191154,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525954.809947,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cb5kbvzYbYStOUjb1,192.168.2.3,45915,207.171.178.6,123,udp,-,0.191421,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526043.928383,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cihh4k1CKDnOshDy93,192.168.2.3,54617,54.239.31.37,443,tcp,-,0.113245,53,0,2,1,RSTR,CTU-Honeypot-Capture-5-1
+1537526044.283214,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CyaRTVIqn4VR17Eib,192.168.2.3,49305,52.216.161.3,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526043.928390,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C3ntVA4QzooLUjZJU4,192.168.2.3,59594,192.168.2.1,53,udp,dns,0.016309,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537525977.404521,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CDTkw51IKk1zReHYic,0.0.0.0,68,255.255.255.255,67,udp,dhcp,58.543924,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537526043.968131,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CuCNyC49SbkJcfw5Xk,192.168.2.3,44663,52.94.229.76,443,tcp,ssl,51.453795,27361,4865,36,25,RSTR,CTU-Honeypot-Capture-5-1
+1537525864.266408,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CiOhnt4fTVhW6PbYIk,192.168.2.3,38721,54.239.27.11,443,tcp,-,0.121012,241,92,2,1,OTH,CTU-Honeypot-Capture-5-1
+1537526104.528272,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CR3fZl3ezHQwOicxml,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.357420,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537526254.586150,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Clum5g4hEhWuOidpCk,192.168.2.3,40655,93.184.216.34,80,tcp,-,0.241427,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537526254.705897,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcT0zj3iMK5TLQPqaa,192.168.2.3,40656,93.184.216.34,80,tcp,-,0.238960,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537525954.504121,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8RdTR272SYyMYmMWl,192.168.2.3,32914,52.216.86.83,80,tcp,http,300.450301,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537526254.827556,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cks5O82SKudjqi7e7d,192.168.2.3,40657,93.184.216.34,80,tcp,-,0.239545,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537526254.953362,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CahmENqrU7GXK9uek,192.168.2.3,27017,192.168.2.1,53,udp,dns,0.012289,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526260.565308,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CiYlQxQhl60V3VA6b,192.168.2.3,32914,52.216.86.83,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526266.183651,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CxfZtZ1MkyclvifKNc,192.168.2.3,32914,52.216.86.83,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526277.403546,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CsCCbX1VDIjKDK3yId,192.168.2.3,32914,52.216.86.83,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526299.883484,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CIWLNn3nIgRjfEVEV7,192.168.2.3,32914,52.216.86.83,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526254.567361,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Ce9jQdHZw3716jgJ8,192.168.2.3,8,192.168.2.1,0,icmp,-,0.015593,560,560,10,10,OTH,CTU-Honeypot-Capture-5-1
+1537526255.291295,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CdLlDgHjhL6ie6rpb,192.168.2.3,50811,207.171.178.6,123,udp,-,0.193710,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526255.294307,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cob5nW2cR3N4lGJQXb,192.168.2.3,32847,207.171.178.6,123,udp,-,0.192879,48,48,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526344.763157,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CeF6Ex2UVrBzmftu99,192.168.2.3,32914,52.216.86.83,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526343.963756,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cx7fat4W4kfSk31pMl,192.168.2.3,49743,192.168.2.1,53,udp,dns,0.011512,46,62,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526233.823594,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cw2Pvt2ihmbajWZW5c,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.330057,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537526423.111953,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CZ6j6v3ZHf3WFqqgz5,192.168.2.3,33306,13.32.118.138,443,tcp,ssl,0.185994,717,5321,12,12,RSTR,CTU-Honeypot-Capture-5-1
+1537526423.046270,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CNnHbv3FnUuv3sqt8c,192.168.2.3,5365,192.168.2.1,53,udp,dns,0.061655,46,110,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526362.915211,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CYK3fW3mpc37vUlKRd,0.0.0.0,68,255.255.255.255,67,udp,dhcp,60.218339,3000,0,10,0,S0,CTU-Honeypot-Capture-5-1
+1537526222.254528,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,COD51S2IHpfmF0E8D9,192.168.2.3,37475,205.251.243.55,443,tcp,-,0.119112,259,110,2,1,OTH,CTU-Honeypot-Capture-5-1
+1537526555.067634,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,C8m2Vh3lnmUyGlgrZ2,192.168.2.3,40658,93.184.216.34,80,tcp,-,0.240256,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537526555.191100,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CcbNgQWtaRDZrGoXk,192.168.2.3,40659,93.184.216.34,80,tcp,-,0.243473,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537526254.984173,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CSNfhbbetjZwzkBAk,192.168.2.3,34434,52.216.232.195,80,tcp,http,300.490965,146,775,11,5,SF,CTU-Honeypot-Capture-5-1
+1537526555.324304,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CMkJ2s3YPRz1bKMVR7,192.168.2.3,40660,93.184.216.34,80,tcp,-,0.241452,0,0,4,2,SF,CTU-Honeypot-Capture-5-1
+1537526555.475699,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CC3BYnrHNHC4VVjcb,192.168.2.3,1817,192.168.2.1,53,udp,dns,0.015111,43,111,1,1,SF,CTU-Honeypot-Capture-5-1
+1537526561.403595,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,Cxwb8eIxo5ODKqD21,192.168.2.3,34434,52.216.232.195,80,tcp,-,-,-,-,1,0,SH,CTU-Honeypot-Capture-5-1
+1537526565.791923,iot23-amazon-echo-01,Amazon Echo smart assistant,smart_assistant,CYPNEI3bwyihdOShdc,192.168.2.3,54924,176.32.98.203,80,tcp,http,0.237609,157,371,4,4,SF,CTU-Honeypot-Capture-5-1
+1562159819.172195,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CUg3u41D8SwgQw1Job,0.0.0.0,68,255.255.255.255,67,udp,dhcp,30.004642,8768,0,16,0,S0,CTU-Honeypot-Capture-7-1
+1562159849.173340,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CUpk9Y381SJuOHyK2d,255.255.255.255,68,192.168.1.1,67,udp,dhcp,0.004564,0,3900,0,13,SHR,CTU-Honeypot-Capture-7-1
+1562159953.959669,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CC5CQA3Ptzma7a0by4,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.948539,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562159998.302954,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C3sgcmfvNzjNoY0Kd,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.768179,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160024.472592,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CJVaCgoBTEsu0jjDi,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,0.000114,451,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562160043.994678,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ClkJUN2T3u1rQok33l,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.756296,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160088.647638,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CzhXjz2LvHq25CHro7,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.715573,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562159952.076414,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C1zaLu61Bo5oe9wJk,::,143,ff02::16,0,icmp,-,180.863984,600,0,14,0,OTH,CTU-Honeypot-Capture-7-1
+1562159952.748410,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CR2oJeDijrObrIjN9,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.816029,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562159953.917233,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ChRng92xzW1js6e2Ik,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,135.000174,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562159953.772457,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CU8YON36dOJ9SJ3VYa,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.487944,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562159952.145222,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C7gDkZ19d7UhgM5Rxc,0.0.0.0,68,255.255.255.255,67,udp,dhcp,178.246691,6900,0,23,0,S0,CTU-Honeypot-Capture-7-1
+1562160302.725297,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cmm6Jp4Y9PM8fhUnp1,192.168.1.158,4096,192.168.1.1,53,udp,dns,2.052335,160,498,4,4,SF,CTU-Honeypot-Capture-7-1
+1562160307.762924,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C32qne49bZy0akUup,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160319.941983,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CgptFR3EW8pPc4QmRi,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160344.164426,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CcZBV32tjGx8FDf467,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160291.851495,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C7zF7p3og92UyWNPe8,::,135,ff02::1:ff67:dff2,136,icmp,-,0.000052,176,0,11,0,OTH,CTU-Honeypot-Capture-7-1
+1562160292.040138,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Ca908W3YrAjYFiUmGh,::,143,ff02::16,0,icmp,-,0.000042,200,0,10,0,OTH,CTU-Honeypot-Capture-7-1
+1562160293.674205,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CC9yzZ07fl3rOTMIg,fe80::6a05:71ff:fe67:dff2,143,ff02::16,0,icmp,-,0.000041,200,0,10,0,OTH,CTU-Honeypot-Capture-7-1
+1562160300.917829,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CHgblw4FHCF7bzKkFa,192.168.1.158,68,192.168.1.1,67,udp,dhcp,0.829530,0,1800,0,6,SHR,CTU-Honeypot-Capture-7-1
+1562160292.338219,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C4lfT92TdIOeiebVU,0.0.0.0,68,255.255.255.255,67,udp,dhcp,9.399944,7428,0,24,0,S0,CTU-Honeypot-Capture-7-1
+1562160302.720838,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C8B5l022V75zPX8lA9,192.168.1.1,8,192.168.1.158,0,icmp,-,0.006710,40,40,2,2,OTH,CTU-Honeypot-Capture-7-1
+1562160302.730042,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ChvhUj1PHAT86ISTWj,192.168.1.158,4097,78.46.102.180,123,udp,-,0.019494,96,96,2,2,SF,CTU-Honeypot-Capture-7-1
+1562160292.326475,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CrmLCrlPS1jQr9pna,fe80::6a05:71ff:fe67:dff2,133,ff02::2,134,icmp,-,13.017631,792,0,99,0,OTH,CTU-Honeypot-Capture-7-1
+1562160392.836431,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CYBMKp4pB8gSrVdQIl,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160434.113480,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CIlMKW3wrntxuK3bA8,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.959121,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160490.503871,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cw8Fcm4zJ6K34shgb5,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000014,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160478.691570,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CTiY9X1eSYGBzAtDBi,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.774344,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160523.967175,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C1zDX73DcQoJ0lEt81,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.893012,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160568.942820,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,COy2ND3Nhm7GFoWnT2,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.180049,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160588.173044,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cth0RR1SELlqe3dVf,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000015,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160432.908425,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C4TsLg32JBkXLnHIdg,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.720015,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562160433.933750,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cco1J82lUAkKOna9F2,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.983429,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562160433.932455,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CkRECc1rF9SsCGTtZ4,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.583945,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562160432.131458,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Ci7keG3lXgguT1JF43,0.0.0.0,68,255.255.255.255,67,udp,dhcp,171.633045,6900,0,23,0,S0,CTU-Honeypot-Capture-7-1
+1562160432.072422,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CBeFI84jFNzboM2oNa,::,143,ff02::16,0,icmp,-,180.707971,580,0,13,0,OTH,CTU-Honeypot-Capture-7-1
+1562160685.866921,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CiUp1B1o5zZVj9AUEb,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160783.585792,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CCc3Sy1qU7bCxK6W1g,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000006,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160880.955853,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CYbQTMGQA7PsOFk29,192.168.4.2,41551,192.168.4.1,80,tcp,-,0.000007,0,0,0,2,SHR,CTU-Honeypot-Capture-7-1
+1562160891.878638,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Ciyf981SRHO3bhQYTe,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000089,495,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562160914.237229,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C5wQm22lC1dlbD9gc8,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.080298,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160958.375114,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CoaglKnqBrhLW79nh,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.104848,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161004.250692,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CGbX5grmRPtAurLE9,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.947094,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161022.545979,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Ca0fVEokTOdzmHThk,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000101,979,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562161049.114337,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CIClGdlS6Ch3OvmN,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.074816,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160912.972423,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CX4PyeJTA7lwwfIpg,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.880125,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562160913.997760,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C70HNT19ubTE76Jum9,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.919120,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562160913.996464,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CdZvK63lw5bkDBgfQl,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.583937,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562160912.191062,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CSvMZfoQvf7b51DHh,0.0.0.0,68,255.255.255.255,67,udp,dhcp,175.769442,7200,0,24,0,S0,CTU-Honeypot-Capture-7-1
+1562160912.124411,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CfAd723AwXS3rpjey6,::,143,ff02::16,0,icmp,-,179.944016,600,0,14,0,OTH,CTU-Honeypot-Capture-7-1
+1562161198.009278,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cg0AkAmG5mOXuOlW9,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000092,561,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562161198.040256,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cas4c24ag6jREfGOSh,fe80::211:32ff:fe8d:ffe2,5353,ff02::fb,5353,udp,dns,0.000052,1316,0,7,0,S0,CTU-Honeypot-Capture-7-1
+1562161393.772828,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CLUgv63LGp4nbeb0Sj,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.022138,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161438.460470,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CIfdh9vGIWwHiPUP1,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.756469,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161483.515777,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CngtZn15OZGgDgHdnh,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.076630,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161529.243724,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,COOtOv3TDj16xHLKO4,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.141261,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161392.524429,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CG0bgj4yO0GxKOL7ja,::,135,ff02::1:ffd5:cdf,136,icmp,-,135.423985,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562161393.917269,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CznoKI2vvp0cobIb9g,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,135.056485,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562161393.548460,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CQBdAs1nwXXK6sRm4e,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,136.351937,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562161392.149216,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C9b52A3QyHTiQGnfOe,0.0.0.0,68,255.255.255.255,67,udp,dhcp,171.314691,6900,0,23,0,S0,CTU-Honeypot-Capture-7-1
+1562161392.080410,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,COyRvc3DFz7h38ji0g,::,143,ff02::16,0,icmp,-,180.411992,600,0,14,0,OTH,CTU-Honeypot-Capture-7-1
+1562161874.062971,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CEVR3R3NsdzjtBzk91,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.094092,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161918.822767,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cae93YKyzPHuiiIBk,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.712268,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161963.733634,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CyC0Xo2qcbpVsYNtQh,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.874202,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162008.946651,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CyQJpaplOnFy3HoA2,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.865345,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562161872.780407,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cm8Omk3DBI4MLQ4xX7,::,135,ff02::1:ffd5:cdf,136,icmp,-,135.007999,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562161873.917340,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C44s1b1NlKxOPRgdH7,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.999865,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562161873.804465,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CuSTrftLmfJddWp7f,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.423971,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562161872.218298,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Czx62I1xWbi419lua5,0.0.0.0,68,255.255.255.255,67,udp,dhcp,173.328155,6000,0,20,0,S0,CTU-Honeypot-Capture-7-1
+1562161872.156428,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CGy9dUBkOlZcCDGt4,::,143,ff02::16,0,icmp,-,180.751970,580,0,13,0,OTH,CTU-Honeypot-Capture-7-1
+1562162354.154502,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CNHOLW3TTtpCbg9yWj,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,1.789118,736,0,5,0,S0,CTU-Honeypot-Capture-7-1
+1562162399.240902,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,COgE8H2PfmceSaKUll,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.849954,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162443.462612,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C3UUed2MPLhSak5iqb,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.780424,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162489.061923,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CHg49X3mJAxO2YECy8,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.969944,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162353.004418,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CTibnd3tfGGrWzzjqg,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.848031,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562162354.029751,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CqX9XZ29Fv4nRPjR1j,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.887392,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562162354.028460,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CcESCC3yf0U8VXvsC1,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.327928,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562162352.142579,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CyRYguPTlFNBfo3p2,0.0.0.0,68,255.255.255.255,67,udp,dhcp,162.155331,6600,0,22,0,S0,CTU-Honeypot-Capture-7-1
+1562162352.080416,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CaMhM34lijQnucVax6,::,143,ff02::16,0,icmp,-,180.283990,580,0,13,0,OTH,CTU-Honeypot-Capture-7-1
+1562162834.367670,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CHwTz634yndMS9rvnc,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.058887,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162879.131585,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C91EPB4ufLDCjb2GL3,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.819744,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162923.944744,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CrQhCs2RiwFTwB6Gmj,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.040004,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162968.951500,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C0BKshIQPepYMpUHg,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.876546,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562162833.100463,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CVs1d63o880gITQSXg,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.687932,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562162834.125802,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CsagGJ3GSNRBdGSCqh,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.791482,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562162834.124507,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cksole3SAIe9Zjmb99,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.423892,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562162832.164818,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CHm9t71IV6rPSsLxOa,0.0.0.0,68,255.255.255.255,67,udp,dhcp,175.549635,6900,0,23,0,S0,CTU-Honeypot-Capture-7-1
+1562162832.096409,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ChLUTJ1LB2irkeHX9d,::,143,ff02::16,0,icmp,-,180.395996,600,0,14,0,OTH,CTU-Honeypot-Capture-7-1
+1562163313.849275,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CUXay1L3jaXBNpu3l,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.942575,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163358.452643,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CVzDpnBUEc0jYt5Gb,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.873750,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163403.425819,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CFMvBu4GRQoyE17WU,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.026406,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163449.223294,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ChJEc92Rw5yEWssAYb,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.164705,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163312.652412,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cbb8Sk2BXAUJXviJTf,::,135,ff02::1:ffd5:cdf,136,icmp,-,135.263999,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562163313.916750,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CWKWJw3FkeQK4h0NYf,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,135.024997,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562163313.676453,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Ctcdic3UAy2xy1Iz31,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,136.127965,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562163312.156981,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CR0z9E4SyM53cXGv65,0.0.0.0,68,255.255.255.255,67,udp,dhcp,168.015512,6000,0,20,0,S0,CTU-Honeypot-Capture-7-1
+1562163312.092427,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CJF7JB4xCKTIj2DMth,::,143,ff02::16,0,icmp,-,180.623973,580,0,13,0,OTH,CTU-Honeypot-Capture-7-1
+1562163624.564393,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ClbMDh4to0TkoGLnqj,fe80::4eef:c0ff:fe27:561e,5353,ff02::fb,5353,udp,dns,0.000076,451,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562163794.164874,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ClUijX2flxVm5utQE8,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.933981,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163839.084532,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,C2JUeA4miclNY1UpIj,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.854194,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163884.135814,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CAEqfK8VwynihQujj,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.163531,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163929.132331,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CZ37v51PXkfIDFnYUg,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.174698,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562163961.465362,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CQtM5g43dRYrAWVo85,192.168.1.158,4096,192.168.1.1,53,udp,dns,0.003738,156,412,4,4,SF,CTU-Honeypot-Capture-7-1
+1562163792.972403,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CnCKfI32EOSCagpFFf,::,135,ff02::1:ffd5:cdf,136,icmp,-,134.848013,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562163793.997752,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CUr1Zx4BvsZhINPA8a,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,134.919447,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562163793.996463,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CXuGjS23YRZ4sIHOYb,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,135.055936,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562163961.471091,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CYCRei2M3ufMTZcb6g,192.168.1.158,4097,151.80.19.218,123,udp,-,0.030243,96,96,2,2,SF,CTU-Honeypot-Capture-7-1
+1562163792.138248,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CmiSMo3P0k7vUWWyTl,0.0.0.0,68,255.255.255.255,67,udp,dhcp,172.789614,6300,0,21,0,S0,CTU-Honeypot-Capture-7-1
+1562163792.072410,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cs0qgO1hLBIA8ZokMg,::,143,ff02::16,0,icmp,-,180.803993,580,0,13,0,OTH,CTU-Honeypot-Capture-7-1
+1562164273.302450,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CjJjSdYBsPXVsGnW7,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.978091,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562164318.974691,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CFmgrR2zfrpYCj3mjg,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.890837,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562164363.249979,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CSxQPMcX74Ku8VtA2,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.869429,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562164409.141280,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CZzQfx3IPDT1Zc79Zh,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.934943,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562164272.091720,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CmibZE3x2uv04bQ5a7,::,135,ff02::1:ffd5:cdf,136,icmp,-,135.856688,96,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562164273.104826,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CTr1AG2Wxt7NvGYyJh,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,135.868948,0,0,4,0,OTH,CTU-Honeypot-Capture-7-1
+1562164273.100443,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CjQWooVzXlGlpwS9a,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,136.447958,400,0,16,0,OTH,CTU-Honeypot-Capture-7-1
+1562164491.981660,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CFs1dW2sfcTCvfu68l,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000093,495,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562164272.166493,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CIrQL81Z78mqEz7MZj,0.0.0.0,68,255.255.255.255,67,udp,dhcp,174.950010,7200,0,24,0,S0,CTU-Honeypot-Capture-7-1
+1562164272.100412,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CRmC6OJWt9AMjF5ra,::,143,ff02::16,0,icmp,-,180.327992,600,0,14,0,OTH,CTU-Honeypot-Capture-7-1
+1562164622.579232,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CaTkXh2seT0NXx4Qtg,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000095,979,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562164753.909988,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CQvPbq1jyfEfb2bLJh,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,4.192472,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562164798.087180,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CgXCDk2L4MsMdYuKo9,fe80::18:e207:b314:641b,5353,ff02::fb,5353,udp,dns,0.000100,561,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562164798.189386,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,ChH89F2587AqrZOgw1,fe80::211:32ff:fe8d:ffe2,5353,ff02::fb,5353,udp,dns,0.000099,1316,0,7,0,S0,CTU-Honeypot-Capture-7-1
+1562164798.255806,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CJsqFF39a49wClB85a,fe80::5bcc:698e:39d5:cdf,5353,ff02::fb,5353,udp,dns,3.799446,876,0,6,0,S0,CTU-Honeypot-Capture-7-1
+1562160304.780374,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cgrd0NaSlBrfvYz9f,192.168.1.158,10366,18.195.134.106,443,tcp,ssl,4537.403134,179107,464134,2702,3137,S1,CTU-Honeypot-Capture-7-1
+1562164752.145405,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CbiAr234EfpzQInxbg,0.0.0.0,68,255.255.255.255,67,udp,dhcp,90.034713,3300,0,11,0,S0,CTU-Honeypot-Capture-7-1
+1562164752.076456,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CqEhZf1lYmVokqECn3,::,143,ff02::16,0,icmp,-,90.399970,340,0,9,0,OTH,CTU-Honeypot-Capture-7-1
+1562164752.588413,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,Cr5vKO1CGfMQwFp22c,::,135,ff02::1:ffd5:cdf,136,icmp,-,89.824030,72,0,3,0,OTH,CTU-Honeypot-Capture-7-1
+1562164753.612461,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CQ5cJ21U9NUbUWIznd,fe80::5bcc:698e:39d5:cdf,143,ff02::16,0,icmp,-,45.215915,200,0,8,0,OTH,CTU-Honeypot-Capture-7-1
+1562164753.917407,iot23-somfy-lock-01,Somfy smart door lock,smart_door_lock,CjD5ve2qwxfFtvd4zl,fe80::5bcc:698e:39d5:cdf,133,ff02::2,134,icmp,-,44.242223,0,0,2,0,OTH,CTU-Honeypot-Capture-7-1
+1545404132.353979,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CnkuiE1ejnVWSFRkzg,192.168.1.195,48986,185.244.25.235,6667,tcp,-,3.107733,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404410.924437,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C9PK3i4DqlOcw7lQ68,192.168.1.195,48998,185.244.25.235,6667,tcp,-,3.097488,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404418.101866,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGx9J93gyPXjG9lx6c,192.168.1.195,48998,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404426.417366,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMPpTV1tD3AWF8wgvf,192.168.1.195,49004,185.244.25.235,6667,tcp,-,3.124484,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404433.622016,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2Se4m4k9b9CZkQKGh,192.168.1.195,49004,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404436.419172,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CgAwrZ3B8zkoGKfKEe,192.168.1.195,49006,185.244.25.235,6667,tcp,-,3.122724,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404443.622072,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cxys8E27ffFNzPl3k,192.168.1.195,49006,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404446.421228,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CdFSQsCVLV7BTAJH5,192.168.1.195,49008,185.244.25.235,6667,tcp,-,3.120734,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404453.621892,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C77qGg4JnSxKC9FZEj,192.168.1.195,49008,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404456.423282,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cmc4LJ3z8Ag9ZwKYhj,192.168.1.195,49010,185.244.25.235,6667,tcp,-,3.118725,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404463.621934,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CfccBV3pAxX7dpIQm2,192.168.1.195,49010,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404466.425338,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CYee9y292pdYQE2S2g,192.168.1.195,49012,185.244.25.235,6667,tcp,-,3.116726,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404474.906275,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CIsnYgS10koPgiJq5,192.168.1.195,49014,185.244.25.235,6667,tcp,-,3.115707,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404482.101919,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CTjzEkchTF8VRPqIg,192.168.1.195,49014,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404484.908314,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ct25lt30GGfcWMYh35,192.168.1.195,49016,185.244.25.235,6667,tcp,-,3.113737,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404492.101968,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5I0Yj2t7IwrCK1Uqc,192.168.1.195,49016,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404494.910368,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CdiKg21PTO0LAFRwVe,192.168.1.195,49018,185.244.25.235,6667,tcp,-,3.111728,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404502.102023,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5k1AB2YWueou6CTWf,192.168.1.195,49018,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404504.912673,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CrSJIt20bDdZqZUYp1,192.168.1.195,49020,185.244.25.235,6667,tcp,-,3.109484,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404512.102083,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CO2dM71oDWUryjUMDj,192.168.1.195,49020,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404514.914728,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CZ4dXoqNzFjTElq94,192.168.1.195,49022,185.244.25.235,6667,tcp,-,3.107231,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404522.102136,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CBknB02HKMWPrPgkph,192.168.1.195,49022,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404524.916784,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C56qfa4TsblBeqwTl5,192.168.1.195,49024,185.244.25.235,6667,tcp,-,3.105229,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404532.101960,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CY18Cw2qu617FpMxsl,192.168.1.195,49024,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404534.918836,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMeP0t2oHP0cRhhA9i,192.168.1.195,49026,185.244.25.235,6667,tcp,-,3.103231,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404542.102011,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C4mdBV3ZZeEkVLM3Xi,192.168.1.195,49026,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404544.920891,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CFTSQF2XHk2oAhhp25,192.168.1.195,49030,185.244.25.235,6667,tcp,-,3.101231,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404552.102054,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C7Ym4S1axtJxMxFCwi,192.168.1.195,49030,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404554.923202,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGqFCZ0JqJyDM8Uqk,192.168.1.195,49034,185.244.25.235,6667,tcp,-,3.098977,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404562.102105,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CAjm603zlpb2l9J1Wk,192.168.1.195,49034,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404564.925249,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CZLVsiyUkkFIYI5rk,192.168.1.195,49036,185.244.25.235,6667,tcp,-,3.096735,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404572.102159,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3mfCx3gvO5JyXUe87,192.168.1.195,49036,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404574.927318,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CrLlx9TLlTq1dMxh6,192.168.1.195,49038,185.244.25.235,6667,tcp,-,3.094737,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404582.102215,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1ov721PgACxgDbiA8,192.168.1.195,49038,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404584.929356,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHpAyr3COAzXf03kf2,192.168.1.195,49040,185.244.25.235,6667,tcp,-,3.092739,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404592.102020,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ctgluo3LYyQVjdFzqi,192.168.1.195,49040,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404603.647442,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKiIBv3jJpBL8G6RX,192.168.1.195,49050,185.244.25.235,6667,tcp,-,3.094738,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404610.822116,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCvkT316ETXqacq5xb,192.168.1.195,49050,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404613.649497,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CPPe5KWPZEdYdQIle,192.168.1.195,49052,185.244.25.235,6667,tcp,-,3.092739,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404620.822165,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C24FyB3fbuN2BeoMnc,192.168.1.195,49052,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404623.651556,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCa9HK15p4O566bci,192.168.1.195,49054,185.244.25.235,6667,tcp,-,3.090486,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404630.822218,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CFgCmROzYedRjiyp6,192.168.1.195,49054,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404633.653635,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CfigIw4QkjMSNBx35g,192.168.1.195,49056,185.244.25.235,6667,tcp,-,3.088476,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404640.822049,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3pIwt1F9bJFnLY1Yk,192.168.1.195,49056,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404645.714235,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CUUCnn2WtsxJZ52MV2,192.168.1.195,49060,185.244.25.235,6667,tcp,-,3.107985,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404652.902142,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CBdqeg2tUll0Dr7ohg,192.168.1.195,49060,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404661.949488,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cl1v7p4KZ9R4Zs9Dxb,192.168.1.195,49072,185.244.25.235,6667,tcp,-,3.112743,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404669.142143,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKBot745Bv2kfX3f1l,192.168.1.195,49072,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404677.247025,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5SnwD8bLTAujLz05,192.168.1.195,49082,185.244.25.235,6667,tcp,-,3.095254,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404685.314180,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2oars3XT9vxKCYaX8,192.168.1.195,49084,185.244.25.235,6667,tcp,-,3.107988,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404692.502101,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Chhy3r4zBhF9L0ERC1,192.168.1.195,49084,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404695.316250,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CluNqF3ksr1jhBHs14,192.168.1.195,49088,185.244.25.235,6667,tcp,-,3.105976,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404702.502152,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CXJRL90r4AVdX3VPk,192.168.1.195,49088,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404409.843814,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C9JNfI2LrTTIXKmW5d,192.168.1.195,48994,185.244.25.235,6667,tcp,irc,1.128098,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404705.318288,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CjhrbhqQGvjXCYZX4,192.168.1.195,49090,185.244.25.235,6667,tcp,-,3.103981,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404712.502208,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CvJIdm4qpdChzKfvvk,192.168.1.195,49090,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404719.418504,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CFO0nq21NVJg4dmuk5,192.168.1.195,49094,185.244.25.235,6667,tcp,-,3.083745,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404424.977436,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CwxrWs2uD0kK3qxdqj,192.168.1.195,49002,185.244.25.235,6667,tcp,irc,1.484655,75,243,7,8,S3,CTU-IoT-Malware-Capture-34-1
+1545404420.926493,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CH6eOnFInFzV9CnWd,192.168.1.195,49000,185.244.25.235,6667,tcp,irc,4.095418,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404726.582175,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5FpDK19zsz5hFvFq8,192.168.1.195,49094,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404729.420308,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CY8eOO34iQsGfUh0Pe,192.168.1.195,49096,185.244.25.235,6667,tcp,-,3.081995,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404736.582243,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CTuT0u1TjQnTQmwXR1,192.168.1.195,49096,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404739.422610,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CFRfcf38wbjoUuvn2a,192.168.1.195,49098,185.244.25.235,6667,tcp,-,3.159700,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404746.662241,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CS2FA23kKBUAFMRita,192.168.1.195,49098,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404757.646478,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CJFj5v2mATzicfvjb,192.168.1.195,49104,185.244.25.235,6667,tcp,-,3.095753,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404764.822149,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CvUiXz23hywlKNS7og,192.168.1.195,49104,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404767.648780,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CLPD4i3fR8sJnYXtM9,192.168.1.195,49106,185.244.25.235,6667,tcp,-,3.093494,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404473.621990,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CY3ZFX2y1lrzmruqP1,192.168.1.195,49012,185.244.25.235,6667,tcp,irc,1.329994,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404774.822195,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cd9pKg11uYu0rtloF,192.168.1.195,49106,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404777.650834,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C0L40U2EwaCTNn4IVb,192.168.1.195,49108,185.244.25.235,6667,tcp,-,3.091487,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404784.822260,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CjowzU2nWE1gVMC1lh,192.168.1.195,49108,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404787.652885,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C49tIS1LqeD8PX3GAc,192.168.1.195,49110,185.244.25.235,6667,tcp,-,3.089256,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404794.822301,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CAteRa3mn8x68tchFk,192.168.1.195,49110,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404797.654944,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CU5gvE33Fl7QWBlZ35,192.168.1.195,49112,185.244.25.235,6667,tcp,-,3.087235,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404805.712351,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CPkFyB3J0OQYhcnxb4,192.168.1.195,49114,185.244.25.235,6667,tcp,-,3.109975,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404812.902252,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CmjIGn17YXrgpSHwGg,192.168.1.195,49114,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404815.714411,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cuuzkp3JCF1sVBsiz2,192.168.1.195,49116,185.244.25.235,6667,tcp,-,3.107967,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404822.902304,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,COi6794oZeXJ0xKS7,192.168.1.195,49116,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404825.716702,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CbPiYr3RyjVF4r7p7k,192.168.1.195,49120,185.244.25.235,6667,tcp,-,3.105494,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404832.902363,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CPEtW74ROHRbcaOjo3,192.168.1.195,49120,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404839.757450,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C7hgdt12ULjfNjmGS5,192.168.1.195,49124,185.244.25.235,6667,tcp,-,3.144719,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404846.982335,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CxhxDi47PqNcyp0y6d,192.168.1.195,49124,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404849.759504,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ce5SKy2Rvs2XYKABKi,192.168.1.195,49126,185.244.25.235,6667,tcp,-,3.142724,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404856.982157,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1Giyu2AzCnmW6cbUf,192.168.1.195,49126,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404859.761554,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CVDYPr4z79bLrJPA1c,192.168.1.195,49128,185.244.25.235,6667,tcp,-,3.140713,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404866.982205,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CBbkWj4O5GwR9sUAvd,192.168.1.195,49128,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404869.763610,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cy87QM3fGYacKN0GFl,192.168.1.195,49130,185.244.25.235,6667,tcp,-,3.138715,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404876.982254,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CV6eLo2xxWFbanksFl,192.168.1.195,49130,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404879.765659,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cdd2mh14vrQmCQulni,192.168.1.195,49132,185.244.25.235,6667,tcp,-,3.136714,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404888.583884,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1vih711UMbO2HfnD4,192.168.1.195,49136,185.244.25.235,6667,tcp,-,3.118474,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404594.931414,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2qPGk4CRLQdpnqCbf,192.168.1.195,49042,185.244.25.235,6667,tcp,irc,1.080627,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404595.966568,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCBGrQ1JQA2LKbh7if,192.168.1.195,49044,185.244.25.235,6667,tcp,irc,1.105621,74,242,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404597.029712,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C4QrYHrCwwI7BG5He,192.168.1.195,49046,185.244.25.235,6667,tcp,irc,4.562408,75,243,9,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404896.755729,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ctn3Rg3m6wjAkpiXoi,192.168.1.195,49142,185.244.25.235,6667,tcp,-,3.106482,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404601.550887,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CdnFaf4rNaurWOpgjf,192.168.1.195,49048,185.244.25.235,6667,tcp,irc,2.141281,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404903.942386,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,ChEcXw1VpQsA8RJVq1,192.168.1.195,49142,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404906.757787,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CFUAHh3LcOBcAC56y7,192.168.1.195,49144,185.244.25.235,6667,tcp,-,3.104485,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404913.942212,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CM3RbR30qBV7zsXSO5,192.168.1.195,49144,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404916.759834,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CNdC0FvKmkZ9WnLOa,192.168.1.195,49146,185.244.25.235,6667,tcp,-,3.102483,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404923.942242,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CYDZEAsIYoh5aBHug,192.168.1.195,49146,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404930.414553,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Caljl120WLIZqBxcud,192.168.1.195,49152,185.244.25.235,6667,tcp,-,3.127730,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404937.622197,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CVBQG53MtH12jJdqXa,192.168.1.195,49152,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404643.655670,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKpleE2ozYjCC8ITP8,192.168.1.195,49058,185.244.25.235,6667,tcp,irc,2.106538,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404940.416608,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMWKbuDM4JzzYmQt8,192.168.1.195,49154,185.244.25.235,6667,tcp,-,3.125718,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404947.622252,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CeO3Sy1XXHqm4xMWg6,192.168.1.195,49154,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404656.756696,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CiqisUwF4iPOrqkve,192.168.1.195,49064,185.244.25.235,6667,tcp,irc,1.085384,74,242,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404655.716305,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CZeayF1JvD2MjoMTQ2,192.168.1.195,49062,185.244.25.235,6667,tcp,irc,1.085865,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404657.801601,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CTFnB43IvwZE17B3pc,192.168.1.195,49066,185.244.25.235,6667,tcp,irc,2.080571,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404659.839439,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHTaOL93Y6RoEM1Ba,192.168.1.195,49068,185.244.25.235,6667,tcp,irc,1.102625,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404955.637432,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWFVZy1STmLpIHVMRf,192.168.1.195,49160,185.244.25.235,6667,tcp,-,3.104984,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404660.893839,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CiWz8O37n9xivuuD17,192.168.1.195,49070,185.244.25.235,6667,tcp,irc,1.108372,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404962.822351,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C70aGe2se9IQSJeG9d,192.168.1.195,49160,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404965.639484,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKS9Fl1ki4ZISDxo3a,192.168.1.195,49162,185.244.25.235,6667,tcp,-,3.102734,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404672.988951,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCNgId2oq1MgYV8F47,192.168.1.195,49076,185.244.25.235,6667,tcp,irc,1.103122,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404671.951549,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CRd3dm3Jm9sPrthV4,192.168.1.195,49074,185.244.25.235,6667,tcp,irc,1.080627,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404674.046099,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CqRg1t38GOv7ZA2Pg6,192.168.1.195,49078,185.244.25.235,6667,tcp,irc,1.136107,75,243,7,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404675.135228,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CN7YPpKaqCg34Lbz6,192.168.1.195,49080,185.244.25.235,6667,tcp,irc,2.111047,75,243,9,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404972.822394,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cs5jpl4mOz9gNbrKtc,192.168.1.195,49162,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404975.641548,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CzGYmP1GsV3gN2yfX7,192.168.1.195,49164,185.244.25.235,6667,tcp,-,3.100741,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404684.422290,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CjFtLbAQBiELhRHml,192.168.1.195,49082,185.244.25.235,6667,tcp,irc,0.939867,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404982.822444,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CainD50BIfhHm8Ryf,192.168.1.195,49164,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404985.643837,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CipRboAat3fZ2YYr4,192.168.1.195,49166,185.244.25.235,6667,tcp,-,3.098492,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404992.822248,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cjdqxbb34C4AfzoQg,192.168.1.195,49166,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404995.645898,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C7RtZa3O8tyzMCtj2,192.168.1.195,49168,185.244.25.235,6667,tcp,-,3.096478,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405002.822302,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C0nJmY3JldZBkcuFfa,192.168.1.195,49168,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405005.647940,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CaSvJb21V1kxVqtPFh,192.168.1.195,49170,185.244.25.235,6667,tcp,-,3.094494,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405012.822352,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CvDJks49BQaCFQZV28,192.168.1.195,49170,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404715.320355,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C0aee825YT1qbZJJ4k,192.168.1.195,49092,185.244.25.235,6667,tcp,irc,4.141877,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405015.649993,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGUvbM3zHGvogQh5Z9,192.168.1.195,49172,185.244.25.235,6667,tcp,-,3.092253,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405022.822407,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CYwSse00qXSUySYui,192.168.1.195,49172,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405025.652044,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQndty1BxEW3pfksC2,192.168.1.195,49176,185.244.25.235,6667,tcp,-,3.090257,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405032.822459,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ctt9g52CR4kqLhwa37,192.168.1.195,49176,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405035.654354,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CyKsfNsaX1T4cA1lg,192.168.1.195,49180,185.244.25.235,6667,tcp,-,3.087983,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405042.822512,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CNGFhij8qQ7fLsZ96,192.168.1.195,49180,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405045.656397,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,ColtU545uTVxqTxmfk,192.168.1.195,49182,185.244.25.235,6667,tcp,-,3.085999,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404749.424662,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C8sZic0yfUJKfUSJe,192.168.1.195,49100,185.244.25.235,6667,tcp,irc,4.087672,75,234,11,7,S3,CTU-IoT-Malware-Capture-34-1
+1545404753.472856,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CeYnkz41qL1G6Qsht9,192.168.1.195,49102,185.244.25.235,6667,tcp,irc,4.219365,75,243,9,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405053.740040,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKgG641JLSA2cqKzji,192.168.1.195,49184,185.244.25.235,6667,tcp,-,3.082245,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405060.902461,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CtusDB1TrciNV9Gsr4,192.168.1.195,49184,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405063.742098,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CN33vN1B7LiEWX9ueg,192.168.1.195,49186,185.244.25.235,6667,tcp,-,3.080240,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405070.902263,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CG6id52ynWO2nto91e,192.168.1.195,49186,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405073.744396,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CzFiGh4rJNr4BKTygl,192.168.1.195,49188,185.244.25.235,6667,tcp,-,3.157950,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405088.488242,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,ChHXLB1BQMwGAruXG5,192.168.1.195,49194,185.244.25.235,6667,tcp,-,3.134220,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405095.702382,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CgSGin4rdVuNRiZWua,192.168.1.195,49194,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405098.491043,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C40VSk48rIFvkCKYhd,192.168.1.195,49196,185.244.25.235,6667,tcp,-,3.131232,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404804.822369,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cdy7bG1MIDpIcEj1x,192.168.1.195,49112,185.244.25.235,6667,tcp,irc,0.929956,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405105.702451,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CsCXvn4IBTufWBgLk4,192.168.1.195,49196,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405108.493097,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWSoBzm94jVqzr9D9,192.168.1.195,49198,185.244.25.235,6667,tcp,-,3.129217,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405115.702489,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGvtUl3I8FuwAd4o3g,192.168.1.195,49198,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405118.494907,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CpAZM31OkE8BvhJn46,192.168.1.195,49200,185.244.25.235,6667,tcp,-,3.127470,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405125.702304,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5yGvh3R2rQEa4ln1k,192.168.1.195,49200,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404835.718760,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CiaLXg2wBrQtc8eAO8,192.168.1.195,49122,185.244.25.235,6667,tcp,irc,4.083416,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405147.843674,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CVyhPIfL449iN31C4,192.168.1.195,49216,185.244.25.235,6667,tcp,irc,1.016172,60,124,5,4,RSTR,CTU-IoT-Malware-Capture-34-1
+1545405148.844855,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGHosV1ipo3MrtWfub,192.168.1.195,49218,185.244.25.235,6667,tcp,irc,1.018420,60,124,5,4,RSTR,CTU-IoT-Malware-Capture-34-1
+1545405167.264358,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CTlM183auuMfk1wbHi,192.168.1.195,49232,185.244.25.235,6667,tcp,-,3.157953,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405174.502499,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CDdDBk2xaCa5HACNya,192.168.1.195,49232,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405177.267659,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CRejqz4m1S7xc4S7Hb,192.168.1.195,49234,185.244.25.235,6667,tcp,-,3.154717,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404886.982299,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHyHzkIaAS9lgffN4,192.168.1.195,49132,185.244.25.235,6667,tcp,irc,2.150024,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405184.502537,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWWYv41TYXbAXq7tP8,192.168.1.195,49234,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405187.274718,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CaGRcN1duhcA3zaQb4,192.168.1.195,49236,185.244.25.235,6667,tcp,-,3.147708,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404895.782285,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C9DqDf4mtNmN40rsa6,192.168.1.195,49136,185.244.25.235,6667,tcp,irc,1.019934,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405194.502353,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CP2KPzmcwKrsz7TG3,192.168.1.195,49236,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405197.278515,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHKRLD2j1Z2vCgpKQ7,192.168.1.195,49238,185.244.25.235,6667,tcp,-,3.143966,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405204.502394,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C4EfqG4b0dFu7hBmV3,192.168.1.195,49238,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405207.280558,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHIXJf4m2KLKjfRwei,192.168.1.195,49240,185.244.25.235,6667,tcp,-,3.141963,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405214.502447,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CnFN501EjMbfEvG2Yg,192.168.1.195,49240,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405217.282358,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWKnRp4UTOtEJbASne,192.168.1.195,49242,185.244.25.235,6667,tcp,-,3.139960,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404926.761637,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CmxFKK1AMj8VCUI6Cd,192.168.1.195,49148,185.244.25.235,6667,tcp,irc,2.080597,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405224.502494,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CSpONE3AALu0zeepF7,192.168.1.195,49242,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404928.800723,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C4Lpk116Hf4qxZxeB7,192.168.1.195,49150,185.244.25.235,6667,tcp,irc,1.661570,75,243,7,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405227.284414,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCyYsV3SsFMj77G6N5,192.168.1.195,49244,185.244.25.235,6667,tcp,-,3.137972,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405234.502323,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGFx9wJttHM22tRT9,192.168.1.195,49244,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405237.289716,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2rbY83MIlLK1NtKFk,192.168.1.195,49246,185.244.25.235,6667,tcp,-,3.132727,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405244.502346,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CjzC1J1WeLLUO67aYc,192.168.1.195,49246,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545404950.418909,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cky5fV34MiyRdRKClk,192.168.1.195,49156,185.244.25.235,6667,tcp,irc,1.083387,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545404951.460813,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cb0PPTPFGHP4HM83,192.168.1.195,49158,185.244.25.235,6667,tcp,irc,4.221601,75,243,9,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405252.412090,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CZYIRN3UX8GZXbwDac,192.168.1.195,49252,185.244.25.235,6667,tcp,-,3.130481,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405259.622493,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CYpJDm2TZ4RRQ2JuG3,192.168.1.195,49252,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405262.414150,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CcKewu1tigPTe3CsTb,192.168.1.195,49254,185.244.25.235,6667,tcp,-,3.128209,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405269.622547,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQCHfi4tJOHhbylun3,192.168.1.195,49254,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405281.534010,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CvOgbp3vROZAPTu5fa,192.168.1.195,49260,185.244.25.235,6667,tcp,-,3.128457,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405288.742386,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHqe9L3XO0hT5d1h8c,192.168.1.195,49260,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405302.799126,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C0ISqQ1jgcBz5KPage,192.168.1.195,49272,185.244.25.235,6667,tcp,-,3.143209,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405315.319741,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CDAnBHg365oZ249E2,192.168.1.195,49278,185.244.25.235,6667,tcp,-,3.102733,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405322.502416,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CS9PyL29Kx3vojScCl,192.168.1.195,49278,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405331.473537,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cqicp8KBFQDNFJ61,192.168.1.195,49286,185.244.25.235,6667,tcp,-,3.108978,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405338.662445,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGEKkI15YFhbBUUpub,192.168.1.195,49286,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405341.482584,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C7pwSS2MChCpmHIx8,192.168.1.195,49288,185.244.25.235,6667,tcp,-,3.099733,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405052.822315,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CEucyH3AvEEe853Mcb,192.168.1.195,49182,185.244.25.235,6667,tcp,irc,0.959951,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405348.662496,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ctpd914kmdfUuq1Mfh,192.168.1.195,49288,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405351.484380,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CX2mgo4N7wn957h7I9,192.168.1.195,49290,185.244.25.235,6667,tcp,-,3.097997,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405358.662307,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,COrjtk2j2LmKaItLdh,192.168.1.195,49290,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405361.498930,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CLzMUN2s7556MibLw5,192.168.1.195,49292,185.244.25.235,6667,tcp,-,3.083488,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405368.662363,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1PY2d1buj5T48kzok,192.168.1.195,49292,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405375.548169,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CVvijQMULG1FSVRE5,192.168.1.195,49296,185.244.25.235,6667,tcp,-,3.114245,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405080.982270,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Crtlum4zr3wa51kpx4,192.168.1.195,49188,185.244.25.235,6667,tcp,irc,1.280022,75,243,7,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405082.214566,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CoftJA2lmNzRwMwOb6,192.168.1.195,49190,185.244.25.235,6667,tcp,irc,2.127790,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405084.302127,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CdUo9mRcuMlE0TaO3,192.168.1.195,49192,185.244.25.235,6667,tcp,irc,4.185616,75,243,10,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405382.742320,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CBT0wc1OGH842mWxMl,192.168.1.195,49296,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405385.549970,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQ0YjO3wvjZSXVbZ39,192.168.1.195,49298,185.244.25.235,6667,tcp,-,3.112482,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405392.742371,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CBqENK3q9zOwrqsRSc,192.168.1.195,49298,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405395.552020,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CoTvgr2tQaXRKLWMje,192.168.1.195,49300,185.244.25.235,6667,tcp,-,3.110483,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405402.742434,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CsxuAi47FskdAJIS0k,192.168.1.195,49300,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405405.554074,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1maaP3wdtqZAbnXRk,192.168.1.195,49302,185.244.25.235,6667,tcp,-,3.108479,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405412.742473,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,COq6iG13gBzRH8o6S6,192.168.1.195,49302,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405424.808597,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CH3ZTl2RM6ihxXqBo8,192.168.1.195,49314,185.244.25.235,6667,tcp,-,3.133715,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405128.500947,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3JeCh4EcK0LlvEtii,192.168.1.195,49202,185.244.25.235,6667,tcp,irc,4.081429,75,243,10,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405132.536900,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,ChLRcy1xvvWgCxVYs1,192.168.1.195,49204,185.244.25.235,6667,tcp,irc,4.085419,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405136.581841,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2npq422zJGyPZwinc,192.168.1.195,49206,185.244.25.235,6667,tcp,irc,2.140532,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405433.627821,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CEYYTL3WlLAVqnxQnb,192.168.1.195,49316,185.244.25.235,6667,tcp,-,3.114725,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405138.677148,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CumaK44X7TZcNx71n,192.168.1.195,49208,185.244.25.235,6667,tcp,irc,4.085218,74,242,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405142.714596,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CaK48V4Z0Qo90vlt3,192.168.1.195,49210,185.244.25.235,6667,tcp,irc,2.037089,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405440.822471,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CJRb492bR6awRDitC1,192.168.1.195,49316,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405146.789774,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQjMONWOkUIWlqWL,192.168.1.195,49214,185.244.25.235,6667,tcp,irc,1.102622,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405144.752435,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CLGzFa2m3rmRjwK96b,192.168.1.195,49212,185.244.25.235,6667,tcp,irc,2.079816,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405443.629631,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CKLL8O3HhvhGCD8K9,192.168.1.195,49318,185.244.25.235,6667,tcp,-,3.112737,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405149.845784,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CR9rBz3HDoPc1Zbqle,192.168.1.195,49220,185.244.25.235,6667,tcp,irc,4.076679,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405450.822523,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CtL4o712bJ5YAX2QR6,192.168.1.195,49318,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405153.880483,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CS5Pts3g96hMmHpyaf,192.168.1.195,49222,185.244.25.235,6667,tcp,irc,4.081939,75,243,10,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405157.921433,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C9Gynj2662FPa2Vd9g,192.168.1.195,49224,185.244.25.235,6667,tcp,irc,2.081064,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405454.668331,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CO7gXZMzxkbqv6AV8,192.168.1.195,49322,185.244.25.235,6667,tcp,-,3.113975,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405161.997360,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CoJygn3vDLL12pevFk,192.168.1.195,49228,185.244.25.235,6667,tcp,irc,1.105120,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405159.959271,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cm9P5L3WLuaXU3GaOi,192.168.1.195,49226,185.244.25.235,6667,tcp,irc,2.083064,74,242,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405163.056756,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3BitX3FeY7n0fX5Xc,192.168.1.195,49230,185.244.25.235,6667,tcp,irc,4.255575,75,243,9,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405461.862480,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cu8TPx2iFsPidQjXIl,192.168.1.195,49322,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405464.670142,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CUX5cr1lKdL1K8pqFj,192.168.1.195,49324,185.244.25.235,6667,tcp,-,3.112231,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405471.862531,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CjXjJX2EoTMBuLAIN8,192.168.1.195,49324,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405482.948713,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CnDpbC1gCPsl7PoCV5,192.168.1.195,49334,185.244.25.235,6667,tcp,-,3.153709,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405491.486598,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CcX1Ww1ZmENu0E1Sbg,192.168.1.195,49336,185.244.25.235,6667,tcp,-,3.095737,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405498.662522,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGvYo94XvlgIzqKC3b,192.168.1.195,49336,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405501.488649,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cv0Qurm3XMiNDk4g9,192.168.1.195,49338,185.244.25.235,6667,tcp,-,3.093742,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405508.662316,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CPL43V2Isx6tBIFkui,192.168.1.195,49338,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405515.669069,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CpZDyPTC8TFFP29b1,192.168.1.195,49342,185.244.25.235,6667,tcp,-,3.153453,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405522.902444,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C9KqoD4cBGIv96U7uh,192.168.1.195,49342,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405525.670869,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CIQSpu4uHUPrpICZz1,192.168.1.195,49344,185.244.25.235,6667,tcp,-,3.151455,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405532.902495,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CUkvZm2vDdp9zlBl4j,192.168.1.195,49344,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405535.675923,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,ClOk5d1l2Xvl3Z0o6b,192.168.1.195,49346,185.244.25.235,6667,tcp,-,3.146449,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405542.902299,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CYepQ14oD3WOso3qWh,192.168.1.195,49346,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405247.291771,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CR5BgTn8IrPSgLSs4,192.168.1.195,49248,185.244.25.235,6667,tcp,irc,4.100650,74,242,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405545.677966,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C2QGQp4xpAwrcIb8O2,192.168.1.195,49348,185.244.25.235,6667,tcp,-,3.144467,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405251.348460,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C17uQq1DzRnLrg6Nqi,192.168.1.195,49250,185.244.25.235,6667,tcp,irc,1.104115,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405552.902367,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C21dTV1oSAhBLTuiFb,192.168.1.195,49348,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405570.121536,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CNi49y3ARt6oIdJWh3,192.168.1.195,49360,185.244.25.235,6667,tcp,-,3.100988,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405272.416204,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CID1VC4qzgeDV9E8f3,192.168.1.195,49256,185.244.25.235,6667,tcp,irc,5.106080,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405277.477805,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C40HFB3J5MECK4vaui,192.168.1.195,49258,185.244.25.235,6667,tcp,irc,4.094684,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405577.302444,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMgECU1xuJfnkOAgBf,192.168.1.195,49360,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405580.123337,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Crv0nX3BTPyRUWCGT9,192.168.1.195,49362,185.244.25.235,6667,tcp,-,3.098996,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405587.302496,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CANAy33rzIYoyOPiHl,192.168.1.195,49362,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405293.636096,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3aCw71XSLuOtUkTS5,192.168.1.195,49264,185.244.25.235,6667,tcp,irc,1.086383,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405291.536045,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CtbzsY3kA96EzvvMo3,192.168.1.195,49262,185.244.25.235,6667,tcp,irc,2.146277,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405590.126654,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cf2llj1vk5kImgnlJi,192.168.1.195,49364,185.244.25.235,6667,tcp,-,3.095724,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405294.673508,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CT773kx7nUW7UqV2h,192.168.1.195,49266,185.244.25.235,6667,tcp,irc,4.088919,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405298.715452,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CCHqvb1qjaeFfjC7nl,192.168.1.195,49268,185.244.25.235,6667,tcp,irc,2.087063,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405597.302309,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMOHwswPeoaeRwCKf,192.168.1.195,49364,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405300.762786,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CW7kVDqfkeJPgq4ib,192.168.1.195,49270,185.244.25.235,6667,tcp,irc,2.079572,74,242,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405600.131935,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWv49j1WXVz2NDl4qf,192.168.1.195,49366,185.244.25.235,6667,tcp,-,3.090487,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405310.022512,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CfFN9z1kO4e5ANxPPg,192.168.1.195,49272,185.244.25.235,6667,tcp,irc,1.119860,75,243,7,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405607.302363,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CDZdbX1locL9h8UPnj,192.168.1.195,49366,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405311.102643,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C4zQirpd2YTXZFe81,192.168.1.195,49274,185.244.25.235,6667,tcp,irc,2.179760,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405313.237428,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CGJd6x2dmc5SKjTGR,192.168.1.195,49276,185.244.25.235,6667,tcp,irc,2.125037,75,243,8,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405610.133984,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C6o1Df4VUErY9gZTIk,192.168.1.195,49368,185.244.25.235,6667,tcp,-,3.088493,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405617.302398,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQOFyo1po4t7mBWEL2,192.168.1.195,49368,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405325.321551,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CHI3JU3xivmWOLMY75,192.168.1.195,49280,185.244.25.235,6667,tcp,irc,4.100904,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405624.193973,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CNwK3y4kahnE2rl52,192.168.1.195,49372,185.244.25.235,6667,tcp,-,3.108483,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405329.378479,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CiAgSuFip86vkVJ19,192.168.1.195,49282,185.244.25.235,6667,tcp,irc,1.103873,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405330.435127,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CLnvXz3DBootHXLFDl,192.168.1.195,49284,185.244.25.235,6667,tcp,irc,1.087384,74,242,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405632.263122,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CeQmau42TlDgKLL4t3,192.168.1.195,49374,185.244.25.235,6667,tcp,-,3.119224,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405639.462520,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C5koPn359tjJ9K1b8i,192.168.1.195,49374,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405642.264936,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CMSVzE33quRk2FIgEl,192.168.1.195,49376,185.244.25.235,6667,tcp,-,3.117461,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405649.462336,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CfDx3x2HVxi15z73V4,192.168.1.195,49376,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405652.268222,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CNRjh71r8OT4NL5oYh,192.168.1.195,49378,185.244.25.235,6667,tcp,-,3.114224,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405659.462383,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CAHCzF3ptrmzHmB4f3,192.168.1.195,49378,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405667.412590,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CVUcaE4olzJV1XBpA3,192.168.1.195,49386,185.244.25.235,6667,tcp,-,3.089758,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405371.500736,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CS5BYD1bOTnNtfkOll,192.168.1.195,49294,185.244.25.235,6667,tcp,irc,4.091658,75,234,11,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405674.582255,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C3IWhg1fEFhSZWZyQ3,192.168.1.195,49386,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405685.679929,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cwx0iu2S8cWNDZYQKf,192.168.1.195,49400,185.244.25.235,6667,tcp,-,3.142460,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405692.902319,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CE0J6r1Zij2TTr5lEg,192.168.1.195,49400,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405695.687234,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CE14TS3lPsxlrclwD2,192.168.1.195,49402,185.244.25.235,6667,tcp,-,3.135205,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405702.902365,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CSmvrf2Vh5cCW7nzVe,192.168.1.195,49402,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405705.689531,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Cf8dqG3FBEKBHGgvb4,192.168.1.195,49404,185.244.25.235,6667,tcp,-,3.132727,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405415.555873,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CY9UQb21pUSd9No6He,192.168.1.195,49304,185.244.25.235,6667,tcp,irc,2.040333,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405417.596706,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CIJW1TkwP5CIetJX3,192.168.1.195,49306,185.244.25.235,6667,tcp,irc,1.095638,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405712.902415,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,C1s28I9He87CA9ZEl,192.168.1.195,49404,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405715.691332,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CWxOg9ZVZEKC9wht,192.168.1.195,49406,185.244.25.235,6667,tcp,-,3.130960,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405418.651355,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CivCtj1yLfUwgqO4ff,192.168.1.195,49308,185.244.25.235,6667,tcp,irc,4.080925,75,243,9,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405423.729212,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,Ck7ofp2rCJ6gg037Pe,192.168.1.195,49312,185.244.25.235,6667,tcp,irc,1.078645,75,243,8,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405422.692802,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CPVAVo2sTW4AFtrK23,192.168.1.195,49310,185.244.25.235,6667,tcp,irc,1.079636,75,243,7,6,S3,CTU-IoT-Malware-Capture-34-1
+1545405722.902481,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CJgKhn4ku3xLGQX6i8,192.168.1.195,49406,185.244.25.235,6667,tcp,-,-,-,-,1,0,S0,CTU-IoT-Malware-Capture-34-1
+1545405432.022487,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,COEoiq31ej4MZO3802,192.168.1.195,49314,185.244.25.235,6667,tcp,irc,1.649824,75,243,7,7,S3,CTU-IoT-Malware-Capture-34-1
+1545405730.840692,iot23-raspberry-pi-capture-34,Raspberry Pi malware capture 34,single_board_computer,CQ2QeB42TOrtkjXOX3,192.168.1.195,49412,185.244.25.235,6667,tcp,-,3.101732,0,0,3,0,S0,CTU-IoT-Malware-Capture-34-1

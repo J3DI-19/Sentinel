@@ -1,6 +1,6 @@
 # Traceveil Roadmap
 
-> Current software status (September 2026): the persisted batch-investigation workflow through Step 8 is implemented. Controlled live-shaped adapters and fixtures exist for compatibility testing, but genuine device ingestion, physical hardware acceptance, and real-time browser delivery remain explicitly deferred to Steps 5, 7, and 12.
+> Current software status (9 September 2026): 114 of 164 roadmap items are complete. The persisted batch workflow, authenticated live intake, deterministic investigation APIs, curated evaluation datasets, classification transparency, and case-analysis UX are implemented. Real-time browser delivery, the remaining AI workflows, and physical hardware acceptance remain tracked separately.
 
 ## 1. Initialization
 - [x] Set up React + Vite frontend
@@ -40,8 +40,8 @@ when Ollama is offline.
 application shell, case workspaces, evidence import flow, investigation
 dashboard, metrics, evidence tables, deterministic visualizations, timeline,
 entity graph, findings, live-monitoring views, Investigation Assistant, and
-report review experience. These interfaces currently use structured mock data;
-backend evidence ingestion and analytical integration begin in Step 3.
+report review experience. Persisted investigation views are connected to the
+backend APIs; mock data remains limited to explicit demonstrations and tests.
 
 ## 3. Input Check and Evidence Validation
 - [x] Accept supported evidence file types
@@ -83,19 +83,24 @@ The existing TON_IoT network and CICIoT2023 adapters remain secondary
 compatibility paths.
 
 ## 5. Live IoT Integration
-- [ ] Select the Arduino-compatible microcontroller
-- [ ] Select the IoT test device or endpoint
-- [ ] Define the controlled laboratory topology
-- [ ] Define the live telemetry message format
-- [ ] Implement device-to-backend telemetry transport
-- [ ] Support MQTT and/or HTTP based on the chosen implementation
-- [ ] Build the backend live event collector
-- [ ] Add device registration/identification
-- [ ] Add connection and heartbeat status
-- [ ] Store accepted live telemetry as evidence
-- [ ] Forward normalized live events into the common analysis pipeline
-- [ ] Prepare controlled suspicious-event scenarios for demonstration
-- [ ] Verify end-to-end live ingestion
+- [x] Select the Arduino-compatible microcontroller
+- [x] Select the IoT test device or endpoint
+- [x] Define the controlled laboratory topology
+- [x] Define the live telemetry message format
+- [x] Implement device-to-backend telemetry transport
+- [x] Support MQTT and/or HTTP based on the chosen implementation
+- [x] Build the backend live event collector
+- [x] Add device registration/identification
+- [x] Add connection and heartbeat status
+- [x] Store accepted live telemetry as evidence
+- [x] Forward normalized live events into the common analysis pipeline
+- [x] Prepare controlled suspicious-event scenarios for demonstration
+- [x] Verify end-to-end live ingestion
+
+**Current result:** Step 5 is complete for the authenticated HTTP laboratory
+path. Accepted telemetry is identified, validated, persisted, normalized, and
+processed through the common analysis pipeline. Physical showcase acceptance is
+still tracked under Step 12.
 
 ## 6. Filtering, Detection, Risk and Correlation
 - [x] Add deterministic filters
@@ -116,8 +121,10 @@ rule traces, baseline samples, bounded five-factor risk scores, explicit
 correlation reasons, incident components, stable timelines, NetworkX graph
 data, Pandas chart aggregates, and pending alerts for actual live triggers.
 Golden and adversarial tests verify reproducibility, phase boundaries, missing
-observed time, stable filtering, and batch/live alert behaviour. APIs,
-real-time delivery, and persistence of derived artifacts remain later steps.
+observed time, stable filtering, batch/live alert behaviour, label provenance,
+blind anomaly detection, bounded incident grouping, and cross-source identity.
+Derived artifacts are persisted and exposed through the Step 8 APIs; real-time
+browser delivery remains Step 7.
 
 ## 7. Real-Time Event Delivery
 - [ ] Add backend real-time event delivery
@@ -208,3 +215,36 @@ incidents are acceptance dependencies of Steps 5 and 7, not Step 8.
 - [ ] Confirm device/entity relationships are visible
 - [ ] Confirm the captured incident can be investigated after the live event
 - [ ] Document the complete demonstration procedure
+
+## 13. Dataset Intelligence, Classification Transparency, and Analysis UX
+
+**Owner:** J3DI
+
+**Status:** Complete in `c4ec731` and `42efe68`
+
+- [x] Create one discoverable dataset catalog — **J3DI**
+- [x] Curate practical HAI, IoT-23, TON_IoT, CASAS, and simulation samples — **J3DI**
+- [x] Add small schema-contract fixtures and dataset checksums — **J3DI**
+- [x] Document physical devices, canonical identities, and camera involvement — **J3DI**
+- [x] Retain reproducible sample-building tools while excluding bulky full archives — **J3DI**
+- [x] Add label-free HAI ICS and IoT-23 validation profiles — **J3DI**
+- [x] Normalize common attack labels into a stable classification taxonomy — **J3DI**
+- [x] Record whether classification came from a dataset label, deterministic rule, or behavioural anomaly — **J3DI**
+- [x] Keep source-supplied labels separate from Traceveil-discovered findings — **J3DI**
+- [x] Detect wide-telemetry baseline and rate-of-change anomalies — **J3DI**
+- [x] Detect unusual network fan-out, destination-port fan-out, and connection-failure bursts — **J3DI**
+- [x] Include classification and evidence confidence in explainable risk scoring — **J3DI**
+- [x] Split dense findings into bounded, time-aware incident sessions — **J3DI**
+- [x] Prevent analysis-artifact identifier collisions during large imports — **J3DI**
+- [x] Persist activity-window anomaly attribution and unknown-cause explanations — **J3DI**
+- [x] Correlate mixed datasets only through genuine time, device, or network context — **J3DI**
+- [x] Page dense timelines and lazily load expanded minute records — **J3DI**
+- [x] Prevent blank/stale timeline content during client-side navigation — **J3DI**
+- [x] Add classification, risk, incident, entity, and spike-attribution explainers — **J3DI**
+- [x] Generate beginner-friendly descriptions for single- and multi-dataset cases — **J3DI**
+- [x] Keep case rows concise and show the full explanation in Case Overview — **J3DI**
+
+**Current result:** Step 13 is complete. Traceveil can evaluate label-free
+industrial and IoT network records, distinguish supplied answers from its own
+detections, group dense results safely, explain timeline activity, converge
+genuinely related sources, and tell a non-specialist what each case contains.

@@ -1,6 +1,145 @@
 {
   "components": {
     "schemas": {
+      "ActivityClassificationCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "minimum": 1.0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/ClassificationSource"
+          },
+          "value": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "count",
+          "provenance"
+        ],
+        "title": "ActivityClassificationCount",
+        "type": "object"
+      },
+      "ActivityWindowExplanation": {
+        "additionalProperties": false,
+        "properties": {
+          "activity_explanation_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Activity Explanation Version",
+            "type": "string"
+          },
+          "baseline_count": {
+            "minimum": 0.0,
+            "title": "Baseline Count",
+            "type": "number"
+          },
+          "cause_status": {
+            "enum": [
+              "source_classified",
+              "rule_context",
+              "undetermined"
+            ],
+            "title": "Cause Status",
+            "type": "string"
+          },
+          "deviation_ratio": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deviation Ratio"
+          },
+          "event_count": {
+            "minimum": 1.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "explanation": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "finding_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "incident_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Incident Ids",
+            "type": "array"
+          },
+          "is_volume_anomaly": {
+            "title": "Is Volume Anomaly",
+            "type": "boolean"
+          },
+          "source_classifications": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityClassificationCount"
+            },
+            "title": "Source Classifications",
+            "type": "array"
+          },
+          "top_devices": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Top Devices",
+            "type": "object"
+          },
+          "top_event_types": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Top Event Types",
+            "type": "object"
+          },
+          "window_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Window Id",
+            "type": "string"
+          },
+          "window_start": {
+            "format": "date-time",
+            "title": "Window Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "window_id",
+          "window_start",
+          "event_count",
+          "baseline_count",
+          "is_volume_anomaly",
+          "cause_status",
+          "explanation",
+          "top_event_types",
+          "top_devices"
+        ],
+        "title": "ActivityWindowExplanation",
+        "type": "object"
+      },
       "Alert": {
         "additionalProperties": false,
         "properties": {
@@ -45,6 +184,27 @@
             "title": "Finding Id",
             "type": "string"
           },
+          "notification_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notification Error"
+          },
+          "notification_status": {
+            "default": "not_requested",
+            "enum": [
+              "not_requested",
+              "delivered",
+              "delivery_failed"
+            ],
+            "title": "Notification Status",
+            "type": "string"
+          },
           "risk_score": {
             "maximum": 100.0,
             "minimum": 0.0,
@@ -58,6 +218,18 @@
           "severity": {
             "$ref": "#/components/schemas/Severity"
           },
+          "status_updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Updated At"
+          },
           "title": {
             "title": "Title",
             "type": "string"
@@ -65,6 +237,28 @@
           "triggered_at": {
             "format": "date-time",
             "title": "Triggered At",
+            "type": "string"
+          },
+          "workflow_actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Actor"
+          },
+          "workflow_status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "acknowledged",
+              "resolved",
+              "suppressed"
+            ],
+            "title": "Workflow Status",
             "type": "string"
           }
         },
@@ -83,9 +277,70 @@
         "title": "Alert",
         "type": "object"
       },
+      "AlertWorkflowUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "actor": {
+            "default": "Investigator",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Actor",
+            "type": "string"
+          },
+          "notification_error": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notification Error"
+          },
+          "notification_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "not_requested",
+                  "delivered",
+                  "delivery_failed"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notification Status"
+          },
+          "status": {
+            "enum": [
+              "acknowledged",
+              "resolved",
+              "suppressed",
+              "pending"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "AlertWorkflowUpdate",
+        "type": "object"
+      },
       "AnalysisConfig": {
         "additionalProperties": false,
         "properties": {
+          "activity_explanation_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Activity Explanation Version",
+            "type": "string"
+          },
           "authentication_failure_threshold": {
             "default": 10,
             "maximum": 1000.0,
@@ -140,6 +395,15 @@
             "title": "Baseline Version",
             "type": "string"
           },
+          "classification_taxonomy_version": {
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
+            "title": "Classification Taxonomy Version",
+            "type": "string"
+          },
           "configuration_version": {
             "const": "1.0",
             "default": "1.0",
@@ -147,8 +411,11 @@
             "type": "string"
           },
           "correlation_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Correlation Version",
             "type": "string"
           },
@@ -182,11 +449,31 @@
             "title": "Dataset Benign Labels",
             "type": "array"
           },
+          "dataset_label_max_events_per_finding": {
+            "default": 512,
+            "maximum": 4096.0,
+            "minimum": 1.0,
+            "title": "Dataset Label Max Events Per Finding",
+            "type": "integer"
+          },
           "default_device_criticality": {
             "default": 50,
             "maximum": 100.0,
             "minimum": 0.0,
             "title": "Default Device Criticality",
+            "type": "integer"
+          },
+          "incident_grouping_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Incident Grouping Version",
+            "type": "string"
+          },
+          "incident_max_trigger_span_seconds": {
+            "default": 120,
+            "maximum": 86400.0,
+            "minimum": 1.0,
+            "title": "Incident Max Trigger Span Seconds",
             "type": "integer"
           },
           "incident_reference_policy_version": {
@@ -225,6 +512,34 @@
             "title": "Malicious Labels",
             "type": "array"
           },
+          "network_failure_threshold": {
+            "default": 20,
+            "maximum": 100000.0,
+            "minimum": 2.0,
+            "title": "Network Failure Threshold",
+            "type": "integer"
+          },
+          "network_fanout_threshold": {
+            "default": 20,
+            "maximum": 100000.0,
+            "minimum": 2.0,
+            "title": "Network Fanout Threshold",
+            "type": "integer"
+          },
+          "network_port_scan_threshold": {
+            "default": 15,
+            "maximum": 65536.0,
+            "minimum": 2.0,
+            "title": "Network Port Scan Threshold",
+            "type": "integer"
+          },
+          "network_window_seconds": {
+            "default": 60,
+            "maximum": 86400.0,
+            "minimum": 1.0,
+            "title": "Network Window Seconds",
+            "type": "integer"
+          },
           "request_rate_multiplier": {
             "default": 3.0,
             "maximum": 1000.0,
@@ -243,19 +558,32 @@
             "$ref": "#/components/schemas/RiskWeights"
           },
           "rule_set_version": {
-            "default": "1.1",
+            "default": "1.4",
             "enum": [
               "1.0",
-              "1.1"
+              "1.1",
+              "1.2",
+              "1.3",
+              "1.4"
             ],
             "title": "Rule Set Version",
             "type": "string"
           },
           "scoring_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Scoring Version",
             "type": "string"
+          },
+          "telemetry_rate_change_multiplier": {
+            "default": 5.0,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Telemetry Rate Change Multiplier",
+            "type": "number"
           }
         },
         "title": "AnalysisConfig",
@@ -264,6 +592,13 @@
       "AnalysisResult": {
         "additionalProperties": false,
         "properties": {
+          "activity_windows": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityWindowExplanation"
+            },
+            "title": "Activity Windows",
+            "type": "array"
+          },
           "alerts": {
             "items": {
               "$ref": "#/components/schemas/Alert"
@@ -356,10 +691,13 @@
             "type": "integer"
           },
           "rule_set_version": {
-            "default": "1.1",
+            "default": "1.4",
             "enum": [
               "1.0",
-              "1.1"
+              "1.1",
+              "1.2",
+              "1.3",
+              "1.4"
             ],
             "title": "Rule Set Version",
             "type": "string"
@@ -928,7 +1266,9 @@
           "ton_iot_network",
           "ciciot2023_network",
           "generic",
-          "live_telemetry"
+          "live_telemetry",
+          "hai_ics_blind",
+          "iot23_zeek_blind"
         ],
         "title": "CanonicalSourceType",
         "type": "string"
@@ -1130,6 +1470,17 @@
         "title": "ChartPoint",
         "type": "object"
       },
+      "ClassificationSource": {
+        "enum": [
+          "dataset_label",
+          "deterministic_rule",
+          "behavioral_anomaly",
+          "investigator_assigned",
+          "ai_suggestion"
+        ],
+        "title": "ClassificationSource",
+        "type": "string"
+      },
       "CommitRequest": {
         "properties": {
           "allow_partial": {
@@ -1192,8 +1543,11 @@
         "additionalProperties": false,
         "properties": {
           "correlation_version": {
-            "const": "1.0",
             "default": "1.0",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Correlation Version",
             "type": "string"
           },
@@ -1211,7 +1565,7 @@
             "items": {
               "$ref": "#/components/schemas/CorrelationReason"
             },
-            "maxItems": 4,
+            "maxItems": 5,
             "minItems": 1,
             "title": "Reasons",
             "type": "array"
@@ -1248,7 +1602,8 @@
           "shared_device",
           "shared_actor",
           "shared_target",
-          "shared_network_address"
+          "shared_network_address",
+          "shared_service"
         ],
         "title": "CorrelationReason",
         "type": "string"
@@ -1296,6 +1651,23 @@
             "title": "Case Id",
             "type": "integer"
           },
+          "classification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FindingClassification"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "classification_confidence": {
+            "default": 100,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Classification Confidence",
+            "type": "integer"
+          },
           "condition_trace": {
             "items": {
               "$ref": "#/components/schemas/ConditionTrace"
@@ -1311,6 +1683,18 @@
             "title": "Confidence",
             "type": "integer"
           },
+          "entity_id": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
           "event_ids": {
             "items": {
               "format": "uuid",
@@ -1320,6 +1704,13 @@
             "minItems": 1,
             "title": "Event Ids",
             "type": "array"
+          },
+          "evidence_confidence": {
+            "default": 100,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Evidence Confidence",
+            "type": "integer"
           },
           "evidence_ids": {
             "items": {
@@ -1741,6 +2132,18 @@
             "title": "Dataset Profile",
             "type": "string"
           },
+          "duplicate_of_evidence_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of Evidence Id"
+          },
           "evidence_id": {
             "format": "uuid",
             "title": "Evidence Id",
@@ -1938,6 +2341,18 @@
             "title": "Dataset Profile",
             "type": "string"
           },
+          "duplicate_of_evidence_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of Evidence Id"
+          },
           "evidence_id": {
             "format": "uuid",
             "title": "Evidence Id",
@@ -2024,7 +2439,9 @@
           "ton_iot_network",
           "ciciot2023_network",
           "simulated",
-          "generic"
+          "generic",
+          "hai_ics_blind",
+          "iot23_zeek_blind"
         ],
         "title": "EvidenceSource",
         "type": "string"
@@ -2125,6 +2542,78 @@
           "rejected_records"
         ],
         "title": "EvidenceValidationReport",
+        "type": "object"
+      },
+      "FindingClassification": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Category",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "integer"
+          },
+          "display_name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ClassificationSource"
+          },
+          "source_field": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Source Field",
+            "type": "string"
+          },
+          "source_value": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Source Value",
+            "type": "string"
+          },
+          "subcategory": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Subcategory",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 16,
+            "title": "Tags",
+            "type": "array"
+          },
+          "taxonomy_version": {
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
+            "title": "Taxonomy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "subcategory",
+          "display_name",
+          "source",
+          "source_field",
+          "source_value",
+          "confidence"
+        ],
+        "title": "FindingClassification",
         "type": "object"
       },
       "GraphData": {
@@ -2427,6 +2916,12 @@
       "Incident": {
         "additionalProperties": false,
         "properties": {
+          "alert_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Alert Count",
+            "type": "integer"
+          },
           "alert_ids": {
             "items": {
               "format": "uuid",
@@ -2435,6 +2930,11 @@
             "maxItems": 1024,
             "title": "Alert Ids",
             "type": "array"
+          },
+          "alert_ids_truncated": {
+            "default": false,
+            "title": "Alert Ids Truncated",
+            "type": "boolean"
           },
           "case_id": {
             "minimum": 1.0,
@@ -2473,6 +2973,20 @@
             ],
             "title": "Ended At"
           },
+          "entity_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Entity Count",
+            "type": "integer"
+          },
+          "entity_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1024,
+            "title": "Entity Ids",
+            "type": "array"
+          },
           "event_ids": {
             "items": {
               "format": "uuid",
@@ -2483,6 +2997,18 @@
             "title": "Event Ids",
             "type": "array"
           },
+          "evidence_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Evidence Count",
+            "type": "integer"
+          },
+          "finding_count": {
+            "default": 0,
+            "minimum": 1.0,
+            "title": "Finding Count",
+            "type": "integer"
+          },
           "finding_ids": {
             "items": {
               "format": "uuid",
@@ -2492,6 +3018,32 @@
             "minItems": 1,
             "title": "Finding Ids",
             "type": "array"
+          },
+          "finding_ids_truncated": {
+            "default": false,
+            "title": "Finding Ids Truncated",
+            "type": "boolean"
+          },
+          "grouping_policy": {
+            "default": "transitive_component",
+            "enum": [
+              "transitive_component",
+              "finding_centered_bounded_session"
+            ],
+            "title": "Grouping Policy",
+            "type": "string"
+          },
+          "inactivity_window_seconds": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inactivity Window Seconds"
           },
           "incident_id": {
             "format": "uuid",
@@ -2510,6 +3062,38 @@
             "title": "Maximum Risk",
             "type": "integer"
           },
+          "maximum_trigger_span_seconds": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maximum Trigger Span Seconds"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Severity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "severity_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Severity"
+            },
+            "title": "Severity Counts",
+            "type": "object"
+          },
           "started_at": {
             "anyOf": [
               {
@@ -2521,6 +3105,14 @@
               }
             ],
             "title": "Started At"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Tags",
+            "type": "array"
           }
         },
         "required": [
@@ -3120,11 +3712,58 @@
         "title": "RiskFactor",
         "type": "object"
       },
+      "RiskPenalty": {
+        "additionalProperties": false,
+        "properties": {
+          "explanation": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Explanation",
+            "type": "string"
+          },
+          "points": {
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Points",
+            "type": "integer"
+          },
+          "reason": {
+            "enum": [
+              "unknown_identity",
+              "missing_observed_time",
+              "generic_unverified_label",
+              "limited_baseline"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "points",
+          "explanation"
+        ],
+        "title": "RiskPenalty",
+        "type": "object"
+      },
       "RiskScore": {
         "additionalProperties": false,
         "properties": {
           "band": {
             "$ref": "#/components/schemas/RiskBand"
+          },
+          "base_score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Score"
           },
           "factors": {
             "items": {
@@ -3135,6 +3774,14 @@
             "title": "Factors",
             "type": "array"
           },
+          "penalties": {
+            "items": {
+              "$ref": "#/components/schemas/RiskPenalty"
+            },
+            "maxItems": 3,
+            "title": "Penalties",
+            "type": "array"
+          },
           "score": {
             "maximum": 100.0,
             "minimum": 0.0,
@@ -3142,8 +3789,11 @@
             "type": "integer"
           },
           "scoring_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Scoring Version",
             "type": "string"
           }
@@ -3330,6 +3980,123 @@
         ],
         "title": "TimelineEntryType",
         "type": "string"
+      },
+      "TimelineWindowPage": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineWindowPublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "minimum": 1.0,
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "record_total": {
+            "minimum": 0.0,
+            "title": "Record Total",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total",
+          "record_total"
+        ],
+        "title": "TimelineWindowPage",
+        "type": "object"
+      },
+      "TimelineWindowPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "activity_explanation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActivityWindowExplanation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Category Counts",
+            "type": "object"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "peak_severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Severity"
+          },
+          "record_count": {
+            "minimum": 1.0,
+            "title": "Record Count",
+            "type": "integer"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          }
+        },
+        "required": [
+          "key",
+          "started_at",
+          "ended_at",
+          "record_count",
+          "category_counts",
+          "peak_severity"
+        ],
+        "title": "TimelineWindowPublic",
+        "type": "object"
       },
       "ValidationError": {
         "properties": {
@@ -3839,6 +4606,63 @@
         ]
       }
     },
+    "/api/v1/cases/{case_id}/activity-windows": {
+      "get": {
+        "operationId": "activity_windows_api_v1_cases__case_id__activity_windows_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Activity Windows",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
     "/api/v1/cases/{case_id}/aggregates": {
       "get": {
         "operationId": "aggregates_api_v1_cases__case_id__aggregates_get",
@@ -3998,6 +4822,22 @@
               ],
               "title": "Analysis Id"
             }
+          },
+          {
+            "in": "query",
+            "name": "window_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Window Key"
+            }
           }
         ],
         "responses": {
@@ -4023,6 +4863,68 @@
           }
         },
         "summary": "List Alerts",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/alerts/{alert_id}": {
+      "patch": {
+        "operationId": "update_alert_workflow_api_v1_cases__case_id__alerts__alert_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "alert_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Alert Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertWorkflowUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Alert"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Alert Workflow",
         "tags": [
           "batch-investigation"
         ]
@@ -4812,6 +5714,22 @@
               ],
               "title": "Analysis Id"
             }
+          },
+          {
+            "in": "query",
+            "name": "window_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Window Key"
+            }
           }
         ],
         "responses": {
@@ -5076,6 +5994,22 @@
                 }
               ],
               "title": "Analysis Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Window Key"
             }
           }
         ],
@@ -5539,6 +6473,22 @@
               ],
               "title": "Analysis Id"
             }
+          },
+          {
+            "in": "query",
+            "name": "window_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Window Key"
+            }
           }
         ],
         "responses": {
@@ -5564,6 +6514,88 @@
           }
         },
         "summary": "List Timeline",
+        "tags": [
+          "batch-investigation"
+        ]
+      }
+    },
+    "/api/v1/cases/{case_id}/timeline/windows": {
+      "get": {
+        "operationId": "timeline_windows_api_v1_cases__case_id__timeline_windows_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineWindowPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Timeline Windows",
         "tags": [
           "batch-investigation"
         ]

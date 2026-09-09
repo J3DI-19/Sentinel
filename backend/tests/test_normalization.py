@@ -52,6 +52,31 @@ def warning_codes(event: CanonicalEvent) -> set[str]:
     return {warning.code for warning in event.normalization_warnings}
 
 
+def test_hai_blind_adapter_preserves_device_and_telemetry_without_labels():
+    source = EvidenceSource.HAI_ICS_BLIND
+    row = {"timestamp": "2026-08-06T10:00:00Z", "device_id": "water-plant-01", "P1_FCV01D": 42.5, "P1_STATE": "RUN"}
+    result = NormalizationService().normalize_batch_record(metadata=metadata(source), validated_record=validated_record(source, 1, row))
+
+    assert result.status == NormalizationStatus.NORMALIZED
+    assert result.event.device.id == "water-plant-01"
+    assert result.event.source_label is None
+    assert result.event.attributes["p1_fcv01d"] == 42.5
+
+
+def test_iot23_blind_adapter_preserves_capture_device_and_network_entities():
+    source = EvidenceSource.IOT23_ZEEK_BLIND
+    row = {"ts": "1", "device_id": "camera-01", "device_type": "smart_camera", "id.orig_h": "10.0.0.2", "id.orig_p": "40123", "id.resp_h": "198.51.100.8", "id.resp_p": "443", "proto": "tcp", "service": "ssl", "orig_pkts": "9", "resp_pkts": "4", "conn_state": "SF"}
+    result = NormalizationService().normalize_batch_record(metadata=metadata(source), validated_record=validated_record(source, 1, row))
+
+    assert result.status == NormalizationStatus.NORMALIZED
+    assert result.event.device.id == "camera-01"
+    assert result.event.device.device_type == "smart_camera"
+    assert str(result.event.network.source_ip) == "10.0.0.2"
+    assert str(result.event.network.destination_ip) == "198.51.100.8"
+    assert result.event.attributes["service"] == "ssl"
+    assert result.event.source_label is None
+
+
 def validated_record(
     source: EvidenceSource,
     row_number: int,

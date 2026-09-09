@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectedCaseWorkspaceV3Page } from "./ConnectedCaseWorkspaceV3Page";
 
-const summary = (analysisId: string | null) => ({ case: { id: 7, name: "Case Seven" }, event_count: 2, entity_count: 1, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: analysisId });
+const summary = (analysisId: string | null) => ({ case: { id: 7, name: "Case Seven", description: "Dataset overview: This is a simple explanation of the imported smart-device data." }, event_count: 2, entity_count: 1, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: analysisId });
 const page = (items: Record<string, unknown>[]) => ({ items, page: 1, page_size: 50, total: items.length });
 const jsonResponse = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 function respond(routes: Record<string, unknown>) {
@@ -211,39 +211,116 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     expect(screen.queryByRole("dialog", { name: "Details for finding-1" })).not.toBeInTheDocument();
   });
 
-  it("shows incidents as context within Findings instead of a separate destination", async () => {
+  it("shows incident context and exposes a dedicated incident destination", async () => {
     const incidentId = "44444444-4444-4444-8444-444444444444";
     respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/findings": page([{ finding_id: "finding-1", title: "Grouped finding", severity: "high" }]), "/cases/7/incidents": page([{ incident_id: incidentId, finding_ids: ["finding-1"], event_ids: ["event-1", "event-2"], maximum_risk: 81, correlation_edge_count: 4, started_at: "2026-09-01T00:00:00Z", ended_at: "2026-09-01T00:01:00Z" }]) });
-    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    const navigate = vi.fn();
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={navigate}/>);
     expect(await screen.findByText("1 incidents organize these findings")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Incidents" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Incidents" }));
+    expect(navigate).toHaveBeenCalledWith("/cases/7/incidents");
     fireEvent.click(screen.getByRole("button", { name: `Inspect ${incidentId}` }));
     expect(screen.getByRole("dialog", { name: `Details for ${incidentId}` })).toBeInTheDocument();
   });
 
-  it("paginates a safely batched timeline by ten minute windows", async () => {
-    const entries = Array.from({ length: 11 }, (_, index) => ({ entry_id: `event-${index + 1}`, entry_type: "event", occurred_at: `2026-09-01T00:${String(index).padStart(2, "0")}:01Z`, title: "telemetry", event_ids: [`event-${index + 1}`] }));
+  it("renders a readable entity inventory when a mixed case has no graph edges", async () => {
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/charts": page([{ series: "attack_class", category: "normal", value: 10 }]), "/cases/7/graph": { nodes: [{ node_id: "sensor-1", label: "Kitchen sensor", kind: "device", event_count: 5000, maximum_risk: 0 }, { node_id: "fridge-1", label: "Fridge", kind: "device", event_count: 1400, maximum_risk: 89 }], edges: [], truncated: false } });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/visuals" navigate={vi.fn()}/>);
+    expect(await screen.findByLabelText("Entity activity inventory")).toHaveTextContent("Kitchen sensor");
+    expect(screen.getByLabelText("Entity activity inventory")).toHaveTextContent("Fridge");
+    expect(screen.getByText(/no cross-entity relationships were persisted/i)).toBeInTheDocument();
+  });
+  it("pages timeline summaries and loads dense minute records only when expanded", async () => {
+    const windows = Array.from({ length: 11 }, (_, index) => ({ key: `2026-09-01T00:${String(index).padStart(2, "0")}`, started_at: `2026-09-01T00:${String(index).padStart(2, "0")}:01Z`, ended_at: `2026-09-01T00:${String(index).padStart(2, "0")}:59Z`, record_count: 20, category_counts: { event: 20 }, peak_severity: null }));
     vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
       const url = new URL(String(input), "http://traceveil.test");
       if (url.pathname.endsWith("/cases/7/summary")) return Promise.resolve(jsonResponse(summary("analysis-1")));
       if (url.pathname.endsWith("/cases/7/charts")) return Promise.resolve(jsonResponse(page([{ series: "activity_minute", category: "2026-09-01T00:00:00Z", value: 3 }])));
-      if (url.pathname.endsWith("/cases/7/timeline")) {
-        const batch = url.searchParams.get("page") === "2" ? entries.slice(10) : entries.slice(0, 10);
-        return Promise.resolve(jsonResponse({ items: batch, page: Number(url.searchParams.get("page")), page_size: 200, total: 201 }));
+      if (url.pathname.endsWith("/cases/7/timeline/windows")) {
+        const items = url.searchParams.get("page") === "2" ? windows.slice(10) : windows.slice(0, 10);
+        return Promise.resolve(jsonResponse({ items, page: Number(url.searchParams.get("page")), page_size: 10, total: 11, record_total: 220 }));
       }
+      if (url.pathname.endsWith("/cases/7/timeline")) return Promise.resolve(jsonResponse({ items: [{ entry_id: "event-11", entry_type: "event", occurred_at: windows[10].started_at, title: "telemetry", event_ids: ["event-11"] }], page: 1, page_size: 200, total: 20 }));
       return Promise.resolve(jsonResponse({ code: "not_found", message: "Not found", retryable: false }, 404));
     }));
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/timeline" navigate={vi.fn()}/>);
     expect(await screen.findByRole("heading", { name: "Activity across the full snapshot" })).toBeInTheDocument();
     expect(screen.getByRole("list", { name: "Chronological investigation timeline" }).children).toHaveLength(10);
     expect(document.querySelector(".timeline-pagination")).toHaveTextContent("Minute blocks 1–10 of 11");
-    expect(vi.mocked(fetch).mock.calls.some(([input]) => String(input).includes("/cases/7/timeline?page=2&page_size=200"))).toBe(true);
+    expect(vi.mocked(fetch).mock.calls.some(([input]) => new URL(String(input), "http://traceveil.test").pathname.endsWith("/timeline") )).toBe(false);
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(screen.getByRole("list", { name: "Chronological investigation timeline" }).children).toHaveLength(1);
+    await waitFor(() => expect(screen.getByRole("list", { name: "Chronological investigation timeline" }).children).toHaveLength(1));
     expect(document.querySelector(".timeline-pagination")).toHaveTextContent("Minute blocks 11–11 of 11");
-    const group = screen.getByText("Review records in this minute").closest("details");
-    expect(group).not.toHaveAttribute("open");
     fireEvent.click(screen.getByText("Review records in this minute"));
-    expect(screen.getByRole("button", { name: "Inspect event-11" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Inspect event-11" })).toBeInTheDocument();
+    expect(screen.getByText("Showing the first 1 of 20 records in this dense minute.")).toBeInTheDocument();
+  });
+
+  it("does not render rows from the previous tab as timeline windows during client navigation", async () => {
+    const timelineWindow = { key: "2026-09-01T00:05", started_at: "2026-09-01T00:05:00Z", ended_at: "2026-09-01T00:05:59Z", record_count: 4, category_counts: { event: 4 }, peak_severity: "medium" };
+    respond({
+      "/cases/7/summary": summary("analysis-1"),
+      "/cases/7/findings": page([{ finding_id: "finding-before-navigation", title: "Finding from previous tab", severity: "high" }]),
+      "/cases/7/timeline/windows": { items: [timelineWindow], page: 1, page_size: 10, total: 1, record_total: 4 },
+      "/cases/7/charts": page([{ series: "activity_minute", category: "2026-09-01T00:05:00Z", value: 4 }]),
+      "/cases/7/activity-windows": page([]),
+    });
+
+    const { rerender } = render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    expect(await screen.findByText("Finding from previous tab")).toBeInTheDocument();
+
+    rerender(<ConnectedCaseWorkspaceV3Page path="/cases/7/timeline" navigate={vi.fn()}/>);
+    expect(screen.getByText("Loading persisted timeline…")).toBeInTheDocument();
+    expect(await screen.findByRole("list", { name: "Chronological investigation timeline" })).toBeInTheDocument();
+    expect(screen.queryByText("Finding from previous tab")).not.toBeInTheDocument();
+  });
+
+  it("turns the overview into a decision summary with distinct analysis layers", async () => {
+    respond({
+      "/cases/7/summary": { ...summary("analysis-1"), event_count: 180, finding_count: 2, alert_count: 1, incident_count: 1, maximum_risk: 82 },
+      "/cases/7/findings": page([{ finding_id: "finding-1", title: "Suspicious network burst", entity_id: "edge-device-01", risk: { score: 82 }, classification: { source: "dataset_label" } }]),
+      "/cases/7/alerts": page([{ alert_id: "alert-1", workflow_status: "pending" }]),
+      "/cases/7/incidents": page([{ incident_id: "incident-1" }]),
+      "/cases/7/evidence": page([{ evidence_id: "evidence-1", source_type: "hai_ics_blind" }, { evidence_id: "evidence-2", source_type: "iot23_zeek_blind" }]),
+    });
+    const navigate = vi.fn();
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/overview" navigate={navigate}/>);
+    const datasetOverview = await screen.findByLabelText("Case dataset sources");
+    expect(screen.getByRole("heading", { name: "Case Seven" })).toBeInTheDocument();
+    expect(screen.getByText("This is a simple explanation of the imported smart-device data.")).toBeInTheDocument();
+    expect(datasetOverview).toHaveTextContent("2 dataset sources");
+    expect(datasetOverview).toHaveTextContent("hai ics blind");
+    const summaryPanel = await screen.findByLabelText("Case analysis summary");
+    expect(summaryPanel).toHaveTextContent("Prioritized investigation required");
+    expect(summaryPanel).toHaveTextContent("Dataset supplied");
+    expect(summaryPanel).toHaveTextContent("1 alert need review");
+    expect(summaryPanel).toHaveTextContent("hai ics blind + iot23 zeek blind");
+    expect(summaryPanel).toHaveTextContent("edge-device-01");
+    fireEvent.click(screen.getByRole("button", { name: "Review alerts" }));
+    expect(navigate).toHaveBeenCalledWith("/cases/7/alerts");
+  });
+
+  it("explains classification provenance and the persisted risk equation", async () => {
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/findings": page([{ finding_id: "finding-1", title: "DDoS-labelled traffic", entity_id: "edge-camera-01", severity: "high", evidence_confidence: 0.8, classification_confidence: 0.95, classification: { display_name: "Distributed denial of service", category: "availability", subcategory: "ddos", source: "dataset_label", source_field: "attack_type", source_value: "DDoS", confidence: 0.95, tags: ["network", "availability"] }, risk: { base_score: 88, score: 78, band: "high", factors: [{ name: "severity", weighted_points: 40, explanation: "High source severity" }], penalties: [{ reason: "limited_evidence", points: 10, explanation: "Limited corroborating evidence" }] } }]) });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/findings" navigate={vi.fn()}/>);
+    fireEvent.click(await screen.findByRole("button", { name: "Inspect finding-1" }));
+    const explanation = screen.getByLabelText("Finding classification and risk explanation");
+    expect(explanation).toHaveTextContent("Dataset supplied");
+    expect(explanation).toHaveTextContent("attack_type");
+    expect(explanation).toHaveTextContent("edge-camera-01");
+    expect(explanation).toHaveTextContent("88 base score");
+    expect(explanation).toHaveTextContent("10 penalties");
+    expect(explanation).toHaveTextContent("Limited corroborating evidence");
+  });
+
+  it("lets investigators select an anomalous minute and see whether its cause is attributable", async () => {
+    const timelineWindow = { key: "2026-09-01T00:05", started_at: "2026-09-01T00:05:00Z", ended_at: "2026-09-01T00:05:59Z", record_count: 60, category_counts: { event: 60 }, peak_severity: "high" };
+    const explanation = { activity_explanation_version: "1.0", window_id: "2026-09-01T00:05:00Z", window_start: "2026-09-01T00:05:00Z", event_count: 60, baseline_count: 10, deviation_ratio: 6, is_volume_anomaly: true, cause_status: "undetermined", explanation: "Activity is elevated without a dominant classified cause.", top_event_types: { network: 40 }, top_devices: { gateway: 35 }, source_classifications: [], finding_ids: [], incident_ids: [] };
+    respond({ "/cases/7/summary": summary("analysis-1"), "/cases/7/charts": page([{ series: "activity_minute", category: "2026-09-01T00:05:00Z", value: 60 }]), "/cases/7/timeline/windows": { items: [timelineWindow], page: 1, page_size: 10, total: 1, record_total: 60 }, "/cases/7/activity-windows": page([explanation]) });
+    render(<ConnectedCaseWorkspaceV3Page path="/cases/7/timeline" navigate={vi.fn()}/>);
+    const attribution = await screen.findByLabelText("Timeline spike attribution");
+    expect(attribution).toHaveTextContent("6.00× baseline");
+    expect(attribution).toHaveTextContent("undetermined");
+    expect(attribution).toHaveTextContent("not a DDoS conclusion");
   });
 });

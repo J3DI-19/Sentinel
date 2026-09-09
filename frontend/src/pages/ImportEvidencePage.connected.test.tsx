@@ -62,6 +62,19 @@ describe("connected ImportEvidencePage case selection", () => {
     expect(screen.queryByRole("button", { name: "View import history" })).not.toBeInTheDocument();
   });
 
+  it("offers blind HAI and IoT-23 profiles with label-leakage guidance", async () => {
+    respond();
+    render(<ImportEvidencePage navigate={vi.fn()} dataSource={dataSource}/>);
+    await screen.findByLabelText("Case destination");
+    fireEvent.click(screen.getByRole("button", { name: /HAI ICS · Blind/ }));
+    expect(screen.getByText("hai_ics_blind@1.0")).toBeInTheDocument();
+    expect(screen.getByText("Blind analysis · labels prohibited")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /real label-free HAI sample/ })).toHaveAttribute("href", "/examples/hai-ics-blind-sample.csv");
+    fireEvent.click(screen.getByRole("button", { name: /IoT-23 · Blind/ }));
+    expect(screen.getByText("iot23_zeek_blind@1.0")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /real label-free IoT-23 sample/ })).toHaveAttribute("href", "/examples/iot23-zeek-blind-sample.csv");
+  });
+
   it("requires partial approval, renders row and field context, prevents duplicate requests, and opens results", async () => {
     respond(); const navigate = vi.fn();
     let finishValidation!: (value: Awaited<ReturnType<ImportDataSource["validate"]>>) => void;

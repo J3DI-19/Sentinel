@@ -25,6 +25,8 @@ class CanonicalSourceType(str, Enum):
     CICIOT2023_NETWORK = "ciciot2023_network"
     GENERIC = "generic"
     LIVE_TELEMETRY = "live_telemetry"
+    HAI_ICS_BLIND = "hai_ics_blind"
+    IOT23_ZEEK_BLIND = "iot23_zeek_blind"
 
 
 class EventOrigin(str, Enum):

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Background, Controls, MiniMap, ReactFlow, type Edge, type Node } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Area, AreaChart, Bar, BarChart, Brush, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -35,48 +36,64 @@ export function PersistedVisuals({ points, nodes, edges, truncated }: { points: 
   </div>;
 }
 
-export function PersistedTimeline({ items, onInspect, page, windowsPerPage, onPage }: { items: Record<string, unknown>[]; onInspect: (item: InvestigationRecordViewModel) => void; page: number; windowsPerPage: number; onPage: (page: number) => void }) {
-  const mapped = mapInvestigationRecords("timeline", items);
-  if (!mapped.length) return <VisualEmpty text="No timestamped analysis or event records are available."/>;
-  const groups = new Map<string, InvestigationRecordViewModel[]>();
-  mapped.forEach(item => {
-    const minute = timelineMinute(item.timestampUtc);
-    groups.set(minute, [...(groups.get(minute) ?? []), item]);
-  });
-  const windows = Array.from(groups.entries());
-  const totalPages = Math.max(1, Math.ceil(windows.length / windowsPerPage));
-  const currentPage = Math.min(page, totalPages);
-  const firstWindow = (currentPage - 1) * windowsPerPage;
-  const visibleWindows = windows.slice(firstWindow, firstWindow + windowsPerPage);
-  return <><ol className="persisted-timeline" aria-label="Chronological investigation timeline">{visibleWindows.map(([minute, group]) => {
-    const first = group[0]; const last = group[group.length - 1];
-    const categories = countBy(group, item => label(item.category ?? item.kind));
-    const severities = group.map(item => item.severity).filter((value): value is string => Boolean(value));
-    const peakSeverity = highestSeverity(severities);
-    return <li key={minute} className="timeline-stop">
-      <div className={`timeline-marker severity-${peakSeverity}`} aria-hidden="true"/>
-      <div className="timeline-time"><time dateTime={first.timestampUtc ?? undefined}>{timelineTime(first.timestampUtc)}</time><span>{timelineDate(first.timestampUtc)}</span></div>
-      <article className="timeline-card timeline-window">
-        <header><div><span className="timeline-window-kicker">Minute window</span><strong>{group.length.toLocaleString()} persisted {group.length === 1 ? "record" : "records"}</strong></div><span>{timestampRange(first.timestampUtc, last.timestampUtc)}</span></header>
-        <div className="timeline-composition" aria-label={`Composition of ${group.length} records`}>{categories.map(([category, count], index) => <span key={category} className={`timeline-segment timeline-segment-${index % 5}`} style={{ flexGrow: count }} title={`${category}: ${count}`}/>)}</div>
-        <div className="timeline-kind-breakdown">{categories.map(([category, count], index) => <span key={category}><i className={`timeline-key timeline-key-${index % 5}`}/><b>{count.toLocaleString()}</b> {category}</span>)}</div>
-        <details className="timeline-group"><summary><span>Review records in this minute</span><b>{group.length.toLocaleString()}</b></summary><div className="timeline-group-records">{group.map(item => <div key={item.id}><span><strong>{item.title}</strong><code>{item.id}</code></span><time>{timelineTimeWithSeconds(item.timestampUtc)}</time>{item.severity && <span className={`timeline-severity severity-${item.severity.toLowerCase()}`}>{item.severity}</span>}<button className="record-inspect" onClick={() => onInspect(item)} aria-label={`Inspect ${item.id}`}>Inspect</button></div>)}</div></details>
-      </article>
-    </li>;
-  })}</ol>{windows.length > windowsPerPage && <div className="table-footer timeline-pagination"><div><button className="button button-secondary" disabled={currentPage === 1} onClick={() => onPage(1)}>First</button><button className="button button-secondary" disabled={currentPage === 1} onClick={() => onPage(currentPage - 1)}>Previous</button></div><span>Minute blocks <b>{firstWindow + 1}–{Math.min(firstWindow + windowsPerPage, windows.length)}</b> of <b>{windows.length}</b></span><div><button className="button button-secondary" disabled={currentPage >= totalPages} onClick={() => onPage(currentPage + 1)}>Next</button><button className="button button-secondary" disabled={currentPage >= totalPages} onClick={() => onPage(totalPages)}>Last</button></div></div>}</>;
+export interface TimelineWindowSummary {
+  key: string; started_at: string | null; ended_at: string | null; record_count: number;
+  category_counts: Record<string, number>; peak_severity: string | null;
+  activity_explanation?: { event_count: number; baseline_count: number; deviation_ratio: number | null; is_volume_anomaly: boolean; cause_status: string; explanation: string; top_event_types: Record<string, number>; top_devices: Record<string, number>; source_classifications: { value: string; count: number; provenance: string }[] } | null;
+}
+
+type TimelineRecordPage = { items?: Record<string, unknown>[]; total?: number };
+
+export function PersistedTimeline({ items, onInspect, loadRecords }: { items: TimelineWindowSummary[]; onInspect: (item: InvestigationRecordViewModel) => void; loadRecords: (window: TimelineWindowSummary, signal: AbortSignal) => Promise<TimelineRecordPage> }) {
+  if (!items.length) return <VisualEmpty text="No timestamped analysis or event records are available."/>;
+  return <ol className="persisted-timeline" aria-label="Chronological investigation timeline">{items.map(window => <TimelineWindow key={window.key} window={window} onInspect={onInspect} loadRecords={loadRecords}/>)}</ol>;
+}
+
+function TimelineWindow({ window, onInspect, loadRecords }: { window: TimelineWindowSummary; onInspect: (item: InvestigationRecordViewModel) => void; loadRecords: (window: TimelineWindowSummary, signal: AbortSignal) => Promise<TimelineRecordPage> }) {
+  const [records, setRecords] = useState<InvestigationRecordViewModel[] | null>(null);
+  const [recordTotal, setRecordTotal] = useState(window.record_count);
+  const [loading, setLoading] = useState(false); const [error, setError] = useState(false);
+  const request = useRef<AbortController | null>(null);
+  useEffect(() => () => request.current?.abort(), []);
+  const categories = Object.entries(window.category_counts).sort((left, right) => right[1] - left[1]);
+  const load = () => {
+    if (loading || records) return;
+    request.current?.abort(); const controller = new AbortController(); request.current = controller;
+    setLoading(true); setError(false);
+    void loadRecords(window, controller.signal).then(result => {
+      if (controller.signal.aborted) return;
+      setRecords(mapInvestigationRecords("timeline", result.items ?? [])); setRecordTotal(result.total ?? window.record_count);
+    }).catch(() => { if (!controller.signal.aborted) setError(true); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+  };
+  return <li className="timeline-stop">
+    <div className={`timeline-marker severity-${(window.peak_severity ?? "none").toLowerCase()}`} aria-hidden="true"/>
+    <div className="timeline-time"><time dateTime={window.started_at ?? undefined}>{timelineTime(window.started_at)}</time><span>{timelineDate(window.started_at)}</span></div>
+    <article className="timeline-card timeline-window">
+      <header><div><span className="timeline-window-kicker">Minute window</span><strong>{window.record_count.toLocaleString()} persisted {window.record_count === 1 ? "record" : "records"}</strong></div><span>{timestampRange(window.started_at, window.ended_at)}</span></header>
+      <div className="timeline-composition" aria-label={`Composition of ${window.record_count} records`}>{categories.map(([category, count], index) => <span key={category} className={`timeline-segment timeline-segment-${index % 5}`} style={{ flexGrow: count }} title={`${label(category)}: ${count}`}/>)}</div>
+      <div className="timeline-kind-breakdown">{categories.map(([category, count], index) => <span key={category}><i className={`timeline-key timeline-key-${index % 5}`}/><b>{count.toLocaleString()}</b> {label(category)}</span>)}</div>
+      {window.activity_explanation && <div className={`timeline-explanation${window.activity_explanation.is_volume_anomaly ? " is-anomaly" : ""}`}><strong>{window.activity_explanation.is_volume_anomaly ? "Volume anomaly explained" : "Activity context"}</strong><p>{window.activity_explanation.explanation}</p><small>Minute baseline {window.activity_explanation.baseline_count.toLocaleString()} events{window.activity_explanation.deviation_ratio != null ? ` · ${window.activity_explanation.deviation_ratio.toFixed(2)}× baseline` : ""} · {label(window.activity_explanation.cause_status)}</small></div>}
+      <details className="timeline-group" onToggle={event => { if (event.currentTarget.open) load(); }}><summary><span>Review records in this minute</span><b>{window.record_count.toLocaleString()}</b></summary>
+        {loading && <p className="timeline-window-state">Loading this minute’s records…</p>}
+        {error && <p className="timeline-window-state">Records could not be loaded. <button className="record-inspect" onClick={load}>Retry</button></p>}
+        {records && <><div className="timeline-group-records">{records.map(item => <div key={item.id}><span><strong>{item.title}</strong><code>{item.id}</code></span><time>{timelineTimeWithSeconds(item.timestampUtc)}</time>{item.severity && <span className={`timeline-severity severity-${item.severity.toLowerCase()}`}>{item.severity}</span>}<button className="record-inspect" onClick={() => onInspect(item)} aria-label={`Inspect ${item.id}`}>Inspect</button></div>)}</div>{recordTotal > records.length && <p className="timeline-window-state">Showing the first {records.length.toLocaleString()} of {recordTotal.toLocaleString()} records in this dense minute.</p>}</>}
+      </details>
+    </article>
+  </li>;
 }
 
 export function TimelineActivityOverview({ points, total }: { points: ChartPoint[]; total: number }) {
   const activity = points.filter(point => point.series === "activity_minute" && typeof point.value === "number").sort((left, right) => Date.parse(left.category ?? "") - Date.parse(right.category ?? "")).map(point => ({ time: shortTime(point.category), value: point.value ?? 0 }));
-  return <section className="timeline-overview"><header><div><span>Complete chronology</span><h2>Activity across the full snapshot</h2><p>{total.toLocaleString()} persisted entries are represented here. Drag the navigator beneath the chart to inspect dense periods; the chronological windows below provide individual records.</p></div></header>{activity.length ? <div className="timeline-overview-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={activity}><defs><linearGradient id="timelineActivity" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#27c2e8" stopOpacity={0.4}/><stop offset="1" stopColor="#27c2e8" stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#1b2a40" vertical={false}/><XAxis dataKey="time" stroke="#71839a" minTickGap={30}/><YAxis stroke="#71839a" allowDecimals={false}/><Tooltip contentStyle={tooltipStyle}/><Area type="monotone" dataKey="value" name="Events" stroke="#27c2e8" strokeWidth={2} fill="url(#timelineActivity)"/><Brush dataKey="time" height={24} stroke="#27c2e8" fill="#0b1322" travellerWidth={8}/></AreaChart></ResponsiveContainer></div> : <VisualEmpty text="No complete-snapshot activity aggregate is available."/>}</section>;
+  const activityTotal = activity.reduce((sum, point) => sum + point.value, 0);
+  return <section className="timeline-overview"><header><div><span>Complete chronology</span><h2>Activity across the full snapshot</h2><p>{activityTotal.toLocaleString()} event records are summarized across {total.toLocaleString()} timeline entries. Drag the navigator beneath the chart to inspect dense periods; the chronological windows below provide individual records.</p></div></header>{activity.length ? <div className="timeline-overview-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={activity}><defs><linearGradient id="timelineActivity" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#27c2e8" stopOpacity={0.4}/><stop offset="1" stopColor="#27c2e8" stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#1b2a40" vertical={false}/><XAxis dataKey="time" stroke="#71839a" minTickGap={30}/><YAxis stroke="#71839a" allowDecimals={false}/><Tooltip contentStyle={tooltipStyle}/><Area type="monotone" dataKey="value" name="Events" stroke="#27c2e8" strokeWidth={2} fill="url(#timelineActivity)"/><Brush dataKey="time" height={24} stroke="#27c2e8" fill="#0b1322" travellerWidth={8}/></AreaChart></ResponsiveContainer></div> : <VisualEmpty text="No complete-snapshot activity aggregate is available."/>}</section>;
 }
 
 export function IncidentContext({ items, onInspect }: { items: Record<string, unknown>[]; onInspect: (item: InvestigationRecordViewModel) => void }) {
   const mapped = mapInvestigationRecords("incidents", items);
   if (!mapped.length) return null;
-  return <section className="incident-context"><header><div><span>Correlated context</span><h2>{mapped.length.toLocaleString()} incidents organize these findings</h2><p>Incidents group related events and findings. They are shown here as context rather than a separate investigation destination.</p></div></header><div className="incident-card-grid">{mapped.map(item => {
-    const source = item.source as Record<string, unknown>; const findings = Array.isArray(source.finding_ids) ? source.finding_ids.length : 0; const events = Array.isArray(source.event_ids) ? source.event_ids.length : 0;
-    return <article key={item.id} className="incident-context-card"><div><span className={`timeline-severity severity-${(item.severity ?? "high").toLowerCase()}`}>Risk {String(item.risk ?? source.maximum_risk ?? "—")}</span><code>{item.id}</code></div><h3>{findings} related finding{findings === 1 ? "" : "s"} · {events.toLocaleString()} events</h3><p>{String(source.started_at ?? "Start unavailable")} — {String(source.ended_at ?? "End unavailable")}</p><footer><span>{Number(source.correlation_edge_count ?? 0).toLocaleString()} correlations{source.correlation_edges_truncated ? " · references truncated" : ""}</span><button className="record-inspect" onClick={() => onInspect(item)} aria-label={`Inspect ${item.id}`}>Inspect incident</button></footer></article>;
+  return <section className="incident-context"><header><div><span>Correlated context</span><h2>{mapped.length.toLocaleString()} incidents organize these findings</h2><p>Incidents group related events and findings. Open the dedicated Incidents tab for the complete filterable register.</p></div></header><div className="incident-card-grid">{mapped.map(item => {
+    const source = item.source as Record<string, unknown>; const findings = Number(source.finding_count ?? (Array.isArray(source.finding_ids) ? source.finding_ids.length : 0)); const events = Array.isArray(source.event_ids) ? source.event_ids.length : 0; const bounded = source.grouping_policy === "finding_centered_bounded_session"; const triggerSpan = Number(source.maximum_trigger_span_seconds ?? 120);
+    return <article key={item.id} className="incident-context-card"><div><span className={`timeline-severity severity-${(item.severity ?? "none").toLowerCase()}`}>Risk {String(item.risk ?? source.maximum_risk ?? "—")}{item.severity ? ` · ${item.severity}` : ""}</span><code>{item.id}</code></div><h3>{findings.toLocaleString()} related finding{findings === 1 ? "" : "s"} · {events.toLocaleString()} events</h3><p>{String(source.started_at ?? "Start unavailable")} — {String(source.ended_at ?? "End unavailable")}</p><footer><span>{Number(source.correlation_edge_count ?? 0).toLocaleString()} correlations · {bounded ? `finding-centred · trigger span ≤ ${Math.round(triggerSpan / 60)}m` : "legacy transitive grouping"}{source.correlation_edges_truncated ? " · references truncated" : ""}</span><button className="record-inspect" onClick={() => onInspect(item)} aria-label={`Inspect ${item.id}`}>Inspect incident</button></footer></article>;
   })}</div></section>;
 }
 
@@ -85,7 +102,11 @@ function PersistedGraph({ nodes, edges }: { nodes: GraphNode[]; edges: GraphEdge
   const flowNodes: Node[] = nodes.map((node, index) => ({ id: node.node_id ?? `node-${index}`, position: { x: (index % 4) * 210, y: Math.floor(index / 4) * 145 }, data: { label: `${node.label ?? node.node_id ?? "Entity"}\n${node.event_count ?? 0} events` }, style: { background: "#102238", border: `1px solid ${palette[index % palette.length]}`, borderRadius: 9, color: "#dce8f7", fontSize: 11, padding: 10, width: 170 } }));
   const known = new Set(flowNodes.map(node => node.id));
   const flowEdges: Edge[] = edges.filter(edge => edge.source_node_id && edge.target_node_id && known.has(edge.source_node_id) && known.has(edge.target_node_id)).map((edge, index) => ({ id: edge.edge_id ?? `edge-${index}`, source: edge.source_node_id!, target: edge.target_node_id!, label: edge.relationships?.join(", ") ?? "related", animated: false, style: { stroke: "#506783" }, labelStyle: { fill: "#94a7be", fontSize: 10 } }));
-  return <><div className="persisted-graph" aria-label="Entity relationship graph"><ReactFlow nodes={flowNodes} edges={flowEdges} fitView colorMode="dark" nodesDraggable={false}><Background color="#24344a" gap={22}/><Controls/><MiniMap nodeColor="#27c2e8"/></ReactFlow></div>{flowEdges.length === 0 && <p className="visual-empty-note">One or more entities were identified, but this evidence contains no persisted relationships between them.</p>}</>;
+  if (!flowEdges.length) {
+    const ranked = [...nodes].sort((left, right) => (right.event_count ?? 0) - (left.event_count ?? 0)).slice(0, 24);
+    return <><div className="entity-inventory" aria-label="Entity activity inventory">{ranked.map(node => <article key={node.node_id}><span>{label(node.kind ?? "entity")}</span><strong>{node.label ?? node.node_id ?? "Entity"}</strong><small>{(node.event_count ?? 0).toLocaleString()} events · peak risk {node.maximum_risk ?? 0}</small></article>)}</div><p className="visual-empty-note">No cross-entity relationships were persisted. Showing the {ranked.length === nodes.length ? "complete" : `top ${ranked.length}`} entity inventory instead of an unreadable disconnected graph{ranked.length < nodes.length ? ` · ${nodes.length - ranked.length} lower-activity entities omitted` : ""}.</p></>;
+  }
+  return <div className="persisted-graph" aria-label="Entity relationship graph"><ReactFlow nodes={flowNodes} edges={flowEdges} fitView colorMode="dark" nodesDraggable={false}><Background color="#24344a" gap={22}/><Controls/><MiniMap nodeColor="#27c2e8"/></ReactFlow></div>;
 }
 
 function Distribution({ rows, empty }: { rows: { name: string; value: number; fill: string }[]; empty: string }) {

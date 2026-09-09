@@ -80,6 +80,7 @@ class DatasetProfile:
     source: EvidenceSource
     required_columns: tuple[str, ...]
     validators: dict[str, tuple[str, ValueValidator]]
+    forbidden_columns: tuple[str, ...] = ()
 
 
 PROFILES: dict[EvidenceSource, DatasetProfile] = {
@@ -179,6 +180,29 @@ PROFILES: dict[EvidenceSource, DatasetProfile] = {
         source=EvidenceSource.GENERIC,
         required_columns=(),
         validators={},
+    ),
+    EvidenceSource.HAI_ICS_BLIND: DatasetProfile(
+        name="hai_ics_blind@1.0",
+        source=EvidenceSource.HAI_ICS_BLIND,
+        required_columns=("timestamp", "device_id"),
+        validators={
+            "timestamp": ("INVALID_TIMESTAMP", _timestamp),
+            "device_id": ("MISSING_DEVICE_ID", _nonempty),
+        },
+        forbidden_columns=("label", "type", "attack", "attack_type", "attack_label", "class", "category"),
+    ),
+    EvidenceSource.IOT23_ZEEK_BLIND: DatasetProfile(
+        name="iot23_zeek_blind@1.0",
+        source=EvidenceSource.IOT23_ZEEK_BLIND,
+        required_columns=("ts", "device_id", "id.orig_h", "id.resp_h", "proto"),
+        validators={
+            "ts": ("INVALID_TIMESTAMP", _timestamp),
+            "device_id": ("MISSING_DEVICE_ID", _nonempty),
+            "id.orig_h": ("INVALID_IP_ADDRESS", _ip),
+            "id.resp_h": ("INVALID_IP_ADDRESS", _ip),
+            "proto": ("MISSING_VALUE", _nonempty),
+        },
+        forbidden_columns=("label", "detailed-label", "detailed_label", "type", "attack", "attack_type", "category"),
     ),
 }
 

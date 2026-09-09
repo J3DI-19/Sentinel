@@ -1,0 +1,4 @@
+timestamp,device_id,event_type,label,source_ip
+2026-07-21T14:29:47Z,sim-camera-01,authentication_failure,controlled-test,192.0.2.10
+2026-07-21T14:30:12Z,sim-camera-01,authentication_failure,controlled-test,192.0.2.10
+2026-07-21T14:31:02Z,sim-camera-01,device_state,controlled-test,192.0.2.10

@@ -1,9 +1,11 @@
 # COMPLETION REPORT
 **Traceveil roadmap reconciliation, delivery status, and contribution record**
 
-**Prepared:** 2026-09-06
-**Source set:** Roadmap, frontend completion audit, batch-practical-usability-checklist, and updated contribution record.
-**Repository snapshot:** Contribution history reviewed up to 2026-09-06.
+**Prepared:** 2026-09-09
+
+**Source set:** Roadmap, frontend completion audit, batch-practical-usability checklist, contribution record, and the verified diffs for `c4ec731` and `42efe68`.
+
+**Repository snapshot:** `42efe68` on branch `J3DI`.
 
 ## Executive Summary
 
@@ -15,13 +17,17 @@ Traceveil has crossed a critical threshold in its development lifecycle, transit
 - **Batch Processing Attained:** The system securely ingests, validates, and normalizes evidence into canonical events. The deterministic analysis engine is actively generating bounded risk scores, timelines, and analytical projections (Steps 3, 4, 6, and 8).
 - **Live IoT Intake Established:** Authenticated HTTP intake, durable sessions, and controlled telemetry simulators are now fully implemented, bridging the gap between hardware sensors and our investigation backend (Step 5).
 - **Usability Readiness:** The platform has passed the strict requirements of the *Batch Practical Usability Checklist*, meaning it is ready for the second-review university showcase.
+- **Blind Evaluation Added:** HAI industrial telemetry and IoT-23 network flows can now be evaluated without their original answer labels. Traceveil uses behavioural and deterministic rules and preserves the exact reason for each classification.
+- **Classification Made Explicit:** Dataset-supplied labels such as DDoS are visibly separated from Traceveil-discovered findings. Risk output now exposes classification source, confidence, evidence confidence, factors, and penalties.
+- **Dense and Mixed Cases Hardened:** Incident grouping is bounded and time-aware, artifact identifiers remain unique, dense timelines are paged, anomalous activity windows preserve cause attribution, and datasets converge only through genuine time/device/network context.
+- **Dataset and Case UX Completed:** Curated samples, checksums, device inventory, automatic beginner-friendly case descriptions, compact case rows, and a full Case Overview explanation are implemented.
 
 **Overall Progress:**
-Based on an accurate recount of the roadmap, exactly **93 of 143 planned sub-items** are completely implemented and verified, establishing a formal roadmap completion rate of **65.0%**. The final remaining focus areas are real-time frontend event delivery (Step 7), AI-powered visual/chat integrations (Steps 9 & 10), automated reporting (Step 11), and the conclusive physical demonstration (Step 12).
+The reconciled roadmap now contains **164 planned sub-items**, of which **114 are implemented and verified**, for a formal completion rate of **69.5%**. The 21 newly recorded items in Step 13 are all complete and owned by J3DI. The 50 remaining items are concentrated in real-time frontend delivery (Step 7), remaining AI visual/chat integrations (Steps 9 and 10), reporting automation (Step 11), and the physical demonstration (Step 12).
 
 ```mermaid
 pie title Overall Roadmap Completion
-    "Complete (93)" : 93
+    "Complete (114)" : 114
     "Pending (50)" : 50
 ```
 
@@ -244,21 +250,56 @@ pie title Step 12 Progress
 - [ ] Confirm the captured incident can be investigated after the live event
 - [ ] Document the complete demonstration procedure
 
+### 13. Dataset Intelligence, Classification Transparency, and Analysis UX (Complete — J3DI)
+```mermaid
+pie title Step 13 Progress
+    "Complete" : 21
+```
+- [x] Centralize the reusable dataset catalog — **J3DI**
+- [x] Curate practical HAI, IoT-23, TON_IoT, CASAS, and simulation samples — **J3DI**
+- [x] Add schema-contract fixtures and checksums — **J3DI**
+- [x] Document the represented devices, canonical identities, and camera involvement — **J3DI**
+- [x] Preserve reproducible sample-building tools without retaining bulky full archives — **J3DI**
+- [x] Add label-free HAI ICS and IoT-23 evidence profiles — **J3DI**
+- [x] Add a normalized attack-classification taxonomy — **J3DI**
+- [x] Preserve classification provenance as dataset label, deterministic rule, or behavioural anomaly — **J3DI**
+- [x] Separate supplied attack labels from independently discovered findings — **J3DI**
+- [x] Add telemetry baseline and rate-of-change anomaly detection — **J3DI**
+- [x] Add network fan-out, port-fan-out, and connection-failure detection — **J3DI**
+- [x] Add classification/evidence confidence to explainable risk output — **J3DI**
+- [x] Bound and time-split dense incident groups — **J3DI**
+- [x] Prevent analysis-artifact identifier collisions on large imports — **J3DI**
+- [x] Persist activity-window anomaly and cause attribution — **J3DI**
+- [x] Converge mixed evidence only through genuine temporal or entity context — **J3DI**
+- [x] Page dense timelines and lazy-load expanded records — **J3DI**
+- [x] Prevent blank/stale timeline state during route changes — **J3DI**
+- [x] Add classification, risk, incident, entity, and spike explainers — **J3DI**
+- [x] Generate beginner-friendly single- and multi-dataset case descriptions — **J3DI**
+- [x] Add compact case-row hover text and a full Case Overview description panel — **J3DI**
+
+**Acceptance evidence:** Backend regression coverage verifies blind detection,
+classification provenance, bounded incident references, unique artifact IDs,
+activity-window attribution, mixed-case convergence, and automatic description
+updates. Frontend regression coverage verifies timeline paging/navigation,
+classification/risk explanations, incident and entity context, spike attribution,
+compact case rows, and the Case Overview dataset panel.
+
 ---
 
 ## Team Ownership & Contributions
 
-Our team has completed 50 total commits so far.
+The repository contains 51 commits at the recorded snapshot.
 
-**J3DI (Project Lead)** - *34 Commits*
+**J3DI (Project Lead)** - *39 verified commits across the J3DI and J3DI-19 author identities*
 - **Role:** Documentation, planning, merging, review, and integration oversight.
-- **Key Deliverables:** Repository foundation, frontend architecture (dashboards, timelines, graphs), three-phase integration, dataset-scope corrections, and Phase 1/Phase 2 workflows.
+- **Key Deliverables:** Repository foundation, frontend architecture, three-phase integration, dataset-scope corrections, blind-evaluation datasets, classification transparency, anomaly attribution, mixed-case analysis, bounded incident handling, and case-description UX.
+- **Latest Delivery:** `c4ec731` and `42efe68`, covering all 21 completed Step 13 items.
 
 **Aarya (Contributor)** - *10 Commits*
 - **Role:** Backend and Analysis Engineering
 - **Key Deliverables:** Step 3 (Evidence Validation), Step 4 (Canonical Normalization), Step 6 (Deterministic Analytics), and Step 8 (Investigation APIs & Workflows).
 
-**Ayra (Contributor)** - *6 Commits*
+**Ayra (Contributor)** - *2 verified commits in the repository history*
 - **Role:** IoT & Live Integration Engineering
 - **Key Deliverables:** Step 5 (Live IoT Integration), including authenticated HTTP intake, sessions, fixes, and CI/CD corrections.
 
@@ -268,6 +309,8 @@ Our team has completed 50 total commits so far.
 - **TypeScript and lint:** Passing
 - **Production build:** Passing
 - **Batch Usability Showcase:** Passed integration and usability gate across Steps 1, 2, 3, 4, 6, and 8.
+- **Recent regression pass:** Full backend suite passed; full frontend suite passed (80 tests); the final case-list/overview adjustment passed all 24 affected frontend tests; production build passed.
+- **Dataset acceptance:** HAI ICS (300 wide telemetry rows), IoT-23 (1,000 flows), TON_IoT refrigerator (1,000 readings), CASAS Milan (1,000 sensor events), and simulation samples are cataloged with checksums and device descriptions.
 
 ## Closeout Note
-This report serves as the updated, consolidated project handoff record reflecting work completed up to early September 2026. The batch pipeline and live IoT integration are now successfully embedded in the codebase, leaving real-time frontend delivery, AI interactions, and the physical demonstration as the final remaining milestones.
+This report is the consolidated handoff record through 9 September 2026 and commit `42efe68`. The batch pipeline, authenticated live intake, deterministic analysis, evaluation datasets, classification transparency, mixed-case investigation UX, and dataset-aware case explanations are embedded in the codebase. Remaining roadmap work is explicitly retained under Steps 7, 9, 10, 11, and 12 rather than being inferred as complete.
