@@ -422,6 +422,115 @@ button.button {
   border-top: 1px solid var(--border);
 }
 
+.cases-register .cases-table {
+  min-width: 48rem;
+  table-layout: fixed;
+}
+
+.cases-register .cases-table th:first-child {
+  width: 42%;
+}
+
+.cases-register .case-cell,
+.cases-register .case-cell > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cases-register .case-cell small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: normal;
+}
+
+.case-dataset-overview {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(12rem, auto);
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid #26405f;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #0d1929, #09121e);
+  box-shadow: 0 0.9rem 2.5rem rgba(0, 0, 0, 0.2);
+}
+
+.case-dataset-overview__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #28647d;
+  border-radius: 50%;
+  background: #0c2a38;
+  color: #69d1ee;
+  font: 700 1rem "DM Mono", monospace;
+}
+
+.case-dataset-overview__copy > span,
+.case-dataset-overview aside > span {
+  color: #59c4e5;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.case-dataset-overview h2 {
+  margin: 0.2rem 0 0.35rem;
+  color: #e2edf8;
+  font-size: 1rem;
+}
+
+.case-dataset-overview p {
+  max-width: 62rem;
+  color: #95a8bd;
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.case-dataset-overview aside {
+  align-self: stretch;
+  padding-left: 1rem;
+  border-left: 1px solid #20354e;
+}
+
+.case-dataset-overview aside div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.case-dataset-overview aside b {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #244865;
+  border-radius: 0.3rem;
+  background: #0b2232;
+  color: #9bc8dc;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+@media (max-width: 760px) {
+  .case-dataset-overview {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .case-dataset-overview aside {
+    grid-column: 1 / -1;
+    padding: 0.8rem 0 0;
+    border-top: 1px solid #20354e;
+    border-left: 0;
+  }
+}
+
 /* Import Evidence workflow */
 .capability-chip {
   min-height: 2rem;

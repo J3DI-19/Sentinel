@@ -192,7 +192,7 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
     {!viewLoading && !error && resolvingReference && <div className="settings-notice" role="status"><div><b>Opening source record</b><p>Resolving the case-owned reference from persisted data…</p></div></div>}
     {!viewLoading && !error && section === "reports" && <ConnectedReportsPanel key={reportRefresh} caseId={caseId}/>}
     {!viewLoading && !error && section === "history" && <AnalysisHistory snapshots={all as unknown as AnalysisSnapshot[]} latestId={summary?.analysis_id ?? null} selectedId={selectedAnalysisId} caseId={id} pageNumber={pageNumber} total={total} onPage={setPageNumber} navigate={navigate}/>}
-    {!viewLoading && !error && section === "overview" && <AnalysisOverview summary={object} context={overviewContext} caseId={id} navigate={navigate}/>}
+    {!viewLoading && !error && section === "overview" && <><CaseDatasetOverview summary={object} context={overviewContext}/><AnalysisOverview summary={object} context={overviewContext} caseId={id} navigate={navigate}/></>}
     {!viewLoading && !error && section === "visuals" && (summary?.analysis_id ? <PersistedVisuals points={(chartResult.items ?? []) as { series?: string; category?: string; subgroup?: string | null; value?: number }[]} nodes={graphResult.nodes ?? []} edges={graphResult.edges ?? []} truncated={graphResult.truncated}/> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
     {!viewLoading && !error && section === "timeline" && (summary?.analysis_id ? <><TimelineActivityOverview points={timelinePoints} total={timelineRecordTotal}/><section className="table-panel timeline-visual-panel"><div className="filter-row timeline-window-header"><div><strong>Chronological record windows</strong><p>Each page loads ten lightweight minute summaries. Individual records load only when a minute is expanded.</p></div><span>{total ? `${total.toLocaleString()} minute blocks · ${timelineRecordTotal.toLocaleString()} persisted entries` : "0 persisted entries"}</span></div>{all.length ? <PersistedTimeline items={all as unknown as TimelineWindowSummary[]} onInspect={selectRecord} loadRecords={loadTimelineRecords}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>} {total > pageSize && <div className="table-footer timeline-pagination"><div><Button disabled={pageNumber === 1} onClick={() => setPageNumber(1)}>First</Button><Button disabled={pageNumber === 1} onClick={() => setPageNumber(value => value - 1)}>Previous</Button></div><span>Minute blocks <b>{start}–{end}</b> of <b>{total}</b></span><div><Button disabled={pageNumber >= totalPages} onClick={() => setPageNumber(value => value + 1)}>Next</Button><Button disabled={pageNumber >= totalPages} onClick={() => setPageNumber(totalPages)}>Last</Button></div></div>}</section></> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
     {!viewLoading && !error && section === "timeline" && summary?.analysis_id && <TimelineAttributionPanel windows={activityWindows}/>}
@@ -200,6 +200,24 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
     {!viewLoading && !error && !["overview", "history", "visuals", "timeline", "reports"].includes(section) && <section className="workspace-results"><div className="table-panel"><div className="filter-row"><input className="input" aria-label={`Filter ${section}`} placeholder={section === "events" ? "Exact event type" : section === "evidence" ? "Exact source" : ["findings", "alerts", "incidents"].includes(section) ? "Exact severity" : `Filter ${section}`} value={query} onChange={event => { setQuery(event.target.value); setPageNumber(1); }}/><span>{total ? `Showing ${start}–${end} of ${total} persisted records` : "0 persisted records"}</span></div>{all.length ? <RecordTable section={section} items={all} columns={columns[section]} selectedId={selected?.id} onSelect={selectRecord}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed={Boolean(summary?.analysis_id)} snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>} {total > 50 && <div className="table-footer"><Button disabled={pageNumber === 1} onClick={() => setPageNumber(value => value - 1)}>Previous</Button><span>Page {pageNumber} · partial view of {total}</span><Button disabled={pageNumber * 50 >= total} onClick={() => setPageNumber(value => value + 1)}>Next</Button></div>}</div></section>}
     {selected && detailOpen && <RecordDetail item={selected} caseId={id} analysisId={selectedAnalysisId} navigate={navigate} onClose={() => setDetailOpen(false)}/>}
   </>;
+}
+
+function CaseDatasetOverview({ summary, context }: { summary: Record<string, unknown>; context: OverviewContext }) {
+  const caseDetails = record(summary.case);
+  const description = String(caseDetails.description ?? "").replace(/^Dataset overview:\s*/i, "").trim();
+  const sourceTypes = [...new Set(context.evidence.map(item => String(item.source_type ?? "")).filter(Boolean))];
+  return <section className="case-dataset-overview" aria-labelledby="case-dataset-overview-title">
+    <div className="case-dataset-overview__icon" aria-hidden="true">i</div>
+    <div className="case-dataset-overview__copy">
+      <span>About this case</span>
+      <h2 id="case-dataset-overview-title">{String(caseDetails.name ?? "Dataset overview")}</h2>
+      <p>{description || "Import evidence to generate a simple explanation of what this case contains."}</p>
+    </div>
+    <aside aria-label="Case dataset sources">
+      <span>{sourceTypes.length ? `${sourceTypes.length} dataset source${sourceTypes.length === 1 ? "" : "s"}` : "Awaiting evidence"}</span>
+      {sourceTypes.length > 0 && <div>{sourceTypes.map(source => <b key={source}>{heading(source)}</b>)}</div>}
+    </aside>
+  </section>;
 }
 
 function AnalysisOverview({ summary, context, caseId, navigate }: { summary: Record<string, unknown>; context: OverviewContext; caseId: string; navigate: (path: string) => void }) {

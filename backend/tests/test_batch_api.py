@@ -75,6 +75,31 @@ def test_valid_import_is_persisted_and_queryable(client):
     assert events["items"][0]["ingested_at"] == job["validation"]["metadata"]["received_at"]
 
 
+def test_blank_case_description_is_explained_after_import_and_custom_text_is_preserved(client):
+    created = client.post("/api/v1/cases", json={"name": "Beginner-friendly case"}).json()
+    assert "No evidence has been imported yet" in created["description"]
+
+    body = b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-1,motion\n"
+    imported = upload(client, created["id"], body).json()
+    job = wait_for(client, imported["import_id"], {"awaiting_commit"})
+    client.post(f"/api/v1/imports/{job['import_id']}/commit", json={"allow_partial": False})
+    assert wait_for(client, job["import_id"], {"completed"})["state"] == "completed"
+
+    updated = client.get(f"/api/v1/cases/{created['id']}").json()
+    assert "made-up demonstration data" in updated["description"]
+    assert "not evidence of a real incident" in updated["description"]
+
+    custom = client.post(
+        "/api/v1/cases",
+        json={"name": "Custom case", "description": "Investigator-written context"},
+    ).json()
+    imported = upload(client, custom["id"], body).json()
+    job = wait_for(client, imported["import_id"], {"awaiting_commit"})
+    client.post(f"/api/v1/imports/{job['import_id']}/commit", json={"allow_partial": False})
+    assert wait_for(client, job["import_id"], {"completed"})["state"] == "completed"
+    assert client.get(f"/api/v1/cases/{custom['id']}").json()["description"] == "Investigator-written context"
+
+
 def test_hai_blind_sample_commits_metric_findings_without_artifact_id_collisions(client):
     case_id = create_case(client)
     sample = Path(__file__).parents[2] / "datasets" / "sample" / "hai-ics-blind-sample.csv"

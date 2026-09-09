@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectedCaseWorkspaceV3Page } from "./ConnectedCaseWorkspaceV3Page";
 
-const summary = (analysisId: string | null) => ({ case: { id: 7, name: "Case Seven" }, event_count: 2, entity_count: 1, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: analysisId });
+const summary = (analysisId: string | null) => ({ case: { id: 7, name: "Case Seven", description: "Dataset overview: This is a simple explanation of the imported smart-device data." }, event_count: 2, entity_count: 1, finding_count: 0, alert_count: 0, incident_count: 0, maximum_risk: 0, analysis_id: analysisId });
 const page = (items: Record<string, unknown>[]) => ({ items, page: 1, page_size: 50, total: items.length });
 const jsonResponse = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "Content-Type": "application/json" } });
 function respond(routes: Record<string, unknown>) {
@@ -285,6 +285,11 @@ describe("ConnectedCaseWorkspaceV3Page", () => {
     });
     const navigate = vi.fn();
     render(<ConnectedCaseWorkspaceV3Page path="/cases/7/overview" navigate={navigate}/>);
+    const datasetOverview = await screen.findByLabelText("Case dataset sources");
+    expect(screen.getByRole("heading", { name: "Case Seven" })).toBeInTheDocument();
+    expect(screen.getByText("This is a simple explanation of the imported smart-device data.")).toBeInTheDocument();
+    expect(datasetOverview).toHaveTextContent("2 dataset sources");
+    expect(datasetOverview).toHaveTextContent("hai ics blind");
     const summaryPanel = await screen.findByLabelText("Case analysis summary");
     expect(summaryPanel).toHaveTextContent("Prioritized investigation required");
     expect(summaryPanel).toHaveTextContent("Dataset supplied");

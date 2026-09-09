@@ -10,6 +10,11 @@ from uuid import UUID, uuid4
 from app.analysis.service import AnalysisService
 from app.db.sqlite import SQLiteRepository
 from app.evidence.authorization import ValidationAuthority
+from app.evidence.descriptions import (
+    DatasetReference,
+    case_description,
+    is_managed_case_description,
+)
 from app.evidence.hashing import sha256_bytes
 from app.evidence.schemas import EvidenceSource, EvidenceValidationReport, ValidationStatus
 from app.evidence.service import EvidenceValidationService
@@ -35,6 +40,7 @@ class BatchInvestigationService:
         self.queue: Queue[tuple[str, str, object | None]] = Queue(maxsize=8)
         self.stop_event = Event()
         self.worker = Thread(target=self._run_worker, name="traceveil-batch-worker", daemon=True)
+        self._backfill_case_descriptions()
         self._recover_jobs()
         self.worker.start()
 
@@ -45,9 +51,40 @@ class BatchInvestigationService:
 
     def create_case(self, name: str, description: str, owner: str) -> dict:
         now = utcnow()
+        description = description.strip() or case_description([])
         with self.repository.write_lock, self.db:
             cursor = self.db.execute("INSERT INTO cases(name,description,case_type,status,owner,created_at,updated_at) VALUES(?,?,?,?,?,?,?)", (name, description, "batch", "active", owner, now, now))
         return self.get_case(cursor.lastrowid)
+
+    def _refresh_case_description(self, case_id: int) -> None:
+        row = self.db.execute("SELECT description FROM cases WHERE id=?", (case_id,)).fetchone()
+        if row is None or not is_managed_case_description(row["description"]):
+            return
+        references: list[DatasetReference] = []
+        for evidence in self.db.execute(
+            """
+            SELECT DISTINCT source_type, dataset_profile
+            FROM evidence_metadata
+            WHERE case_id=? AND committed_at IS NOT NULL AND source_type IS NOT NULL
+            """,
+            (case_id,),
+        ).fetchall():
+            try:
+                source = EvidenceSource(evidence["source_type"])
+            except ValueError:
+                continue
+            references.append(DatasetReference(source, evidence["dataset_profile"]))
+        self.db.execute(
+            "UPDATE cases SET description=? WHERE id=?",
+            (case_description(references), case_id),
+        )
+
+    def _backfill_case_descriptions(self) -> None:
+        with self.repository.write_lock, self.db:
+            rows = self.db.execute("SELECT id,description FROM cases").fetchall()
+            for row in rows:
+                if is_managed_case_description(row["description"]):
+                    self._refresh_case_description(row["id"])
 
     def get_case(self, case_id: int) -> dict:
         with self.repository.write_lock:
@@ -193,6 +230,7 @@ class BatchInvestigationService:
                 self.db.execute("INSERT OR IGNORE INTO canonical_events VALUES(?,?,?,?,?,?,?,?,?,?,?)", (str(event.event_id),event.case_id,str(event.provenance.evidence_id),event.observed_at.isoformat() if event.observed_at else None,event.ingested_at.isoformat(),event.provenance.origin.value,event.event_type,entity.id if entity else None,event.source_label,json.dumps(raw,sort_keys=True),event.model_dump_json()))
             self._persist_analysis(result, now)
             self.db.execute("UPDATE evidence_metadata SET committed_at=? WHERE evidence_id=?", (now,job["evidence_id"]))
+            self._refresh_case_description(job["case_id"])
             self.db.execute("UPDATE import_jobs SET status=?,updated_at=? WHERE import_id=?", (final_status,now,import_id))
             self.db.execute("UPDATE cases SET updated_at=? WHERE id=?", (now,job["case_id"]))
         return self.get_import(import_id)
