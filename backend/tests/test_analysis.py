@@ -7,9 +7,12 @@ import pytest
 from pydantic import ValidationError
 
 from app.analysis.config import AnalysisConfig, RiskWeights
+from app.analysis.correlation import build_incidents
 from app.analysis.schemas import (
     INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT,
+    INCIDENT_FINDING_REFERENCE_LIMIT,
     EventFilter,
+    Severity,
     SortDirection,
 )
 from app.analysis.service import AnalysisService
@@ -241,7 +244,9 @@ def test_default_label_risk_has_a_versioned_repetition_reference():
 
     assert repetition.score == 25
     assert repetition.explanation == "1 occurrence(s) against configured reference 4"
-    assert finding.risk.score == 59
+    assert finding.risk.base_score == 59
+    assert finding.risk.score == 49
+    assert finding.risk.penalties[0].reason == "generic_unverified_label"
 
 
 def test_authentication_rule_requires_verified_actor_and_target_identities():
@@ -368,9 +373,10 @@ def test_dataset_label_findings_group_shared_attack_classes_and_vary_severity():
     label_findings = [finding for finding in result.findings if finding.rule_id == "LABEL-001"]
     assert len(label_findings) == 2
     by_title = {finding.title: finding for finding in label_findings}
-    assert by_title["Dataset identifies scanning activity"].severity.value == "medium"
-    assert len(by_title["Dataset identifies scanning activity"].event_ids) == 2
-    assert by_title["Dataset identifies ransomware activity"].severity.value == "critical"
+    assert by_title["Dataset-labelled Scanning activity"].severity.value == "medium"
+    assert len(by_title["Dataset-labelled Scanning activity"].event_ids) == 2
+    assert by_title["Dataset-labelled Ransomware activity"].severity.value == "critical"
+    assert by_title["Dataset-labelled Ransomware activity"].classification.source.value == "dataset_label"
     assert {point.category for point in result.chart_points if point.series == "attack_class"} == {
         "ransomware",
         "scanning",
@@ -470,6 +476,124 @@ def test_dense_incident_bounds_correlation_references_without_losing_total():
     assert first.configuration.incident_reference_policy_version == "1.0"
 
 
+def test_dense_incident_bounds_finding_references_without_losing_total():
+    event = canonical_event(
+        50_000,
+        seconds=0,
+        event_type="telemetry",
+        source_label="1",
+        source_type=CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
+        attributes={"attack_type": "ddos"},
+    )
+    template = AnalysisService().analyze(case_id=1, events=[event]).findings[0]
+    total = INCIDENT_FINDING_REFERENCE_LIMIT + 520
+    findings = [
+        template.model_copy(update={"finding_id": UUID(int=index + 1)})
+        for index in range(total)
+    ]
+
+    first = build_incidents(
+        case_id=1,
+        events=[event],
+        findings=findings,
+        alerts=[],
+        correlations=[],
+    )[0]
+    second = build_incidents(
+        case_id=1,
+        events=[event],
+        findings=list(reversed(findings)),
+        alerts=[],
+        correlations=[],
+    )[0]
+
+    assert len(first.finding_ids) == INCIDENT_FINDING_REFERENCE_LIMIT
+    assert first.finding_count == total
+    assert first.finding_ids_truncated is True
+    assert first.finding_ids == second.finding_ids
+
+
+def test_transitive_activity_is_split_into_bounded_incident_sessions():
+    events = [
+        canonical_event(
+            60_000 + index,
+            seconds=index * 60,
+            event_type="network_flow",
+            source_label="malicious",
+        )
+        for index in range(11)
+    ]
+
+    result = AnalysisService().analyze(case_id=1, events=events)
+
+    assert len(result.incidents) == 4
+    assert all(
+        (incident.ended_at - incident.started_at).total_seconds()
+        <= incident.maximum_trigger_span_seconds
+        for incident in result.incidents
+    )
+    assert all(
+        incident.grouping_policy == "finding_centered_bounded_session"
+        for incident in result.incidents
+    )
+
+
+def test_dataset_label_findings_are_split_by_time_and_record_bounds():
+    evidence_id = UUID(int=88_000)
+    events = [
+        canonical_event(
+            61_000 + index,
+            seconds=index * 60,
+            event_type="network_flow",
+            source_label="malicious",
+        ).model_copy(
+            update={
+                "provenance": canonical_event(
+                    61_000 + index,
+                    seconds=index * 60,
+                    event_type="network_flow",
+                    source_label="malicious",
+                ).provenance.model_copy(update={"evidence_id": evidence_id})
+            }
+        )
+        for index in range(11)
+    ]
+
+    result = AnalysisService().analyze(case_id=1, events=events)
+    label_findings = [
+        finding for finding in result.findings if finding.rule_id == "LABEL-001"
+    ]
+
+    assert len(label_findings) == 4
+    assert max(len(finding.event_ids) for finding in label_findings) == 3
+    assert all("bounded temporal session" in finding.summary for finding in label_findings)
+
+
+def test_incident_does_not_absorb_correlated_events_without_findings():
+    finding_event = canonical_event(
+        62_000,
+        seconds=0,
+        event_type="network_flow",
+        source_label="malicious",
+    )
+    background = [
+        canonical_event(
+            62_000 + index,
+            seconds=index * 60,
+            event_type="network_flow",
+        )
+        for index in range(1, 8)
+    ]
+
+    result = AnalysisService().analyze(
+        case_id=1,
+        events=[finding_event, *background],
+    )
+
+    assert len(result.incidents) == 1
+    assert result.incidents[0].event_ids == [finding_event.event_id]
+
+
 def test_equal_entity_text_with_different_kinds_does_not_correlate():
     left = canonical_event(
         220,
@@ -517,3 +641,90 @@ def test_risk_configuration_is_bounded_and_requires_exact_weight_total():
         RiskWeights(severity=50)
     with pytest.raises(ValidationError):
         AnalysisConfig(critical_device_scores={"CAM-01": 101})
+    with pytest.raises(ValidationError, match="incident_max_trigger_span_seconds"):
+        AnalysisConfig(incident_max_trigger_span_seconds=119)
+
+
+def test_dataset_ddos_classification_is_explicitly_source_supplied():
+    event = canonical_event(
+        900,
+        seconds=0,
+        event_type="telemetry",
+        source_label="1",
+        source_type=CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
+        attributes={"attack_type": "ddos"},
+    )
+    finding = AnalysisService().analyze(case_id=1, events=[event]).findings[0]
+    assert finding.title == "Dataset-labelled DDoS activity"
+    assert finding.classification.category == "denial_of_service"
+    assert finding.classification.subcategory == "distributed_denial_of_service"
+    assert finding.classification.source.value == "dataset_label"
+    assert finding.classification.source_field == "attributes.attack_type"
+    assert finding.classification.source_value == "ddos"
+    assert finding.classification.tags == ["denial_of_service", "distributed_denial_of_service"]
+
+
+def test_activity_windows_explain_source_labels_and_preserve_unknown_cause():
+    classified = canonical_event(
+        901, seconds=0, event_type="telemetry", source_label="1",
+        source_type=CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
+        attributes={"attack_type": "ddos"},
+    )
+    unexplained = canonical_event(902, seconds=60, event_type="device_state")
+    result = AnalysisService().analyze(case_id=1, events=[classified, unexplained])
+    assert result.activity_windows[0].cause_status == "source_classified"
+    assert result.activity_windows[0].source_classifications[0].value == "ddos"
+    assert result.activity_windows[1].cause_status == "undetermined"
+    assert "No source classification" in result.activity_windows[1].explanation
+
+
+def test_incident_exposes_peak_severity_and_summary_metrics():
+    events = [
+        canonical_event(
+            910 + index, seconds=index, event_type="telemetry", source_label="1",
+            source_type=CanonicalSourceType.TON_IOT_FRIDGE_TELEMETRY,
+            attributes={"attack_type": attack},
+        )
+        for index, attack in enumerate(("scanning", "ransomware"))
+    ]
+    incident = AnalysisService().analyze(case_id=1, events=events).incidents[0]
+    assert incident.severity.value == "critical"
+    assert incident.severity_counts[Severity.CRITICAL] == 1
+    assert incident.severity_counts[Severity.MEDIUM] == 1
+    assert incident.evidence_count == 2
+    assert incident.entity_count >= 1
+    assert "ransomware" in incident.tags
+
+
+def test_blind_network_rules_detect_behavior_without_source_labels():
+    events = []
+    for index in range(6):
+        event = canonical_event(
+            1000 + index, seconds=index, event_type="network_flow", device_id="camera-01",
+            source_type=CanonicalSourceType.IOT23_ZEEK_BLIND, source_label=None,
+        )
+        events.append(event.model_copy(update={"network": event.network.model_copy(update={"destination_ip": f"10.0.1.{index + 1}", "destination_port": 1000 + index})}))
+
+    result = AnalysisService(AnalysisConfig(network_fanout_threshold=5, network_port_scan_threshold=5)).analyze(case_id=1, events=events)
+    rules = {finding.rule_id for finding in result.findings}
+
+    assert {"NET-FANOUT-001", "NET-PORTSCAN-001"} <= rules
+    assert all(finding.classification.source.value != "dataset_label" for finding in result.findings)
+    assert all(finding.classification.source_field == "condition_trace" for finding in result.findings)
+
+
+def test_hai_and_iot23_findings_converge_by_device_and_overlapping_time():
+    telemetry = [
+        canonical_event(1100 + index, seconds=index * 5, event_type="telemetry", device_id="edge-device-01", actor_ip=None, source_type=CanonicalSourceType.HAI_ICS_BLIND, attributes={"pressure": value})
+        for index, value in enumerate((10, 10, 10, 60))
+    ]
+    flows = []
+    for index in range(4):
+        event = canonical_event(1200 + index, seconds=16 + index, event_type="network_flow", device_id="edge-device-01", source_type=CanonicalSourceType.IOT23_ZEEK_BLIND)
+        flows.append(event.model_copy(update={"network": event.network.model_copy(update={"destination_ip": f"10.0.2.{index + 1}", "destination_port": 2000 + index})}))
+    result = AnalysisService(AnalysisConfig(network_fanout_threshold=4, network_port_scan_threshold=4)).analyze(case_id=1, events=[*telemetry, *flows])
+
+    assert {"BASELINE-001", "NET-FANOUT-001", "NET-PORTSCAN-001"} <= {finding.rule_id for finding in result.findings}
+    assert len(result.incidents) == 1
+    assert result.incidents[0].entity_count >= 1
+    assert result.incidents[0].evidence_count >= 2

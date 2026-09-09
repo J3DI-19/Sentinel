@@ -18,6 +18,8 @@ from app.normalization.adapters import (
     CanonicalAdapter,
     CicIot2023NetworkAdapter,
     GenericAdapter,
+    HaiIcsBlindAdapter,
+    Iot23ZeekBlindAdapter,
     LiveTelemetryAdapter,
     SimulatedAdapter,
     SimulationAdapter,
@@ -47,6 +49,8 @@ _BATCH_SOURCE_MAP = {
     EvidenceSource.TON_IOT_NETWORK: CanonicalSourceType.TON_IOT_NETWORK,
     EvidenceSource.CICIOT2023_NETWORK: CanonicalSourceType.CICIOT2023_NETWORK,
     EvidenceSource.GENERIC: CanonicalSourceType.GENERIC,
+    EvidenceSource.HAI_ICS_BLIND: CanonicalSourceType.HAI_ICS_BLIND,
+    EvidenceSource.IOT23_ZEEK_BLIND: CanonicalSourceType.IOT23_ZEEK_BLIND,
 }
 
 
@@ -62,6 +66,8 @@ class NormalizationService:
             TonIotNetworkAdapter(),
             CicIot2023NetworkAdapter(),
             GenericAdapter(),
+            HaiIcsBlindAdapter(),
+            Iot23ZeekBlindAdapter(),
             LiveTelemetryAdapter(),
         ]
         self.adapters = {adapter.source_type: adapter for adapter in adapters}

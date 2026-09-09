@@ -489,6 +489,111 @@ class CicIot2023NetworkAdapter(CanonicalAdapter):
         )
 
 
+class HaiIcsBlindAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.HAI_ICS_BLIND
+    name = "hai_ics_blind"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record)
+        warnings: list[NormalizationIssue] = []
+        try:
+            observed_at = parse_timestamp(view.get("timestamp"), field="timestamp", warnings=warnings, required=True)
+        except ValueError as exc:
+            raise AdapterRejection(NormalizationIssue(code="INVALID_TIMESTAMP", message=str(exc), field="timestamp")) from exc
+        device_id = _required_text(view.get("device_id"), "device_id")
+        device = CanonicalEntity(
+            id=device_id,
+            kind=EntityKind.DEVICE,
+            name=_optional_text(view.get("device_name")) or device_id,
+            device_type=_optional_text(view.get("device_type")) or "industrial_control_system",
+        )
+        excluded = RecordView.keys("timestamp", "device_id", "device_name", "device_type", "event_type", "source_id")
+        attributes = scalar_attributes(record, excluded_keys=excluded, warnings=warnings)
+        if not any(isinstance(value, (int, float)) and not isinstance(value, bool) for value in attributes.values()):
+            raise AdapterRejection(NormalizationIssue(code="TELEMETRY_METRIC_REQUIRED", message="HAI blind records require at least one numeric telemetry metric"))
+        return self._build_event(
+            record=record,
+            context=context,
+            observed_at=observed_at,
+            event_type="telemetry",
+            source_event_type="hai_ics_telemetry",
+            source_label=None,
+            warnings=warnings,
+            device=device,
+            target=device,
+            action="report_process_state",
+            attributes=attributes,
+        )
+
+
+class Iot23ZeekBlindAdapter(CanonicalAdapter):
+    source_type = CanonicalSourceType.IOT23_ZEEK_BLIND
+    name = "iot23_zeek_blind"
+
+    def normalize(self, record: dict[str, Any], context: NormalizationContext) -> CanonicalEvent:
+        view = RecordView(record)
+        warnings: list[NormalizationIssue] = []
+        try:
+            observed_at = parse_timestamp(view.get("ts"), field="ts", warnings=warnings, required=True)
+        except ValueError as exc:
+            raise AdapterRejection(NormalizationIssue(code="INVALID_TIMESTAMP", message=str(exc), field="ts")) from exc
+        source_ip = _required_ip(view.get("id.orig_h"), "id.orig_h")
+        destination_ip = _required_ip(view.get("id.resp_h"), "id.resp_h")
+        device_id = _required_text(view.get("device_id"), "device_id")
+        device = CanonicalEntity(
+            id=device_id,
+            kind=EntityKind.DEVICE,
+            name=_optional_text(view.get("device_name")) or device_id,
+            device_type=_optional_text(view.get("device_type")) or "iot_device",
+        )
+        actor = CanonicalEntity(id=f"ip:{source_ip}", kind=EntityKind.IP_ADDRESS, ip=source_ip)
+        target = CanonicalEntity(id=f"ip:{destination_ip}", kind=EntityKind.IP_ADDRESS, ip=destination_ip)
+        source_port = parse_nonnegative_int(view.get("id.orig_p"), field="id.orig_p", warnings=warnings, maximum=65535)
+        destination_port = parse_nonnegative_int(view.get("id.resp_p"), field="id.resp_p", warnings=warnings, maximum=65535)
+        network = CanonicalNetwork(
+            source_ip=source_ip,
+            source_port=source_port,
+            destination_ip=destination_ip,
+            destination_port=destination_port,
+            protocol=normalized_token(view.get("proto")),
+            bytes_sent=parse_nonnegative_int(view.get("orig_bytes"), field="orig_bytes", warnings=warnings),
+            bytes_received=parse_nonnegative_int(view.get("resp_bytes"), field="resp_bytes", warnings=warnings),
+            packets_sent=parse_nonnegative_int(view.get("orig_pkts"), field="orig_pkts", warnings=warnings),
+            packets_received=parse_nonnegative_int(view.get("resp_pkts"), field="resp_pkts", warnings=warnings),
+        )
+        excluded = RecordView.keys(
+            "ts", "uid", "device_id", "device_name", "device_type", "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p",
+            "proto", "service", "duration", "orig_bytes", "resp_bytes", "orig_pkts", "resp_pkts", "conn_state",
+        )
+        attributes = scalar_attributes(record, excluded_keys=excluded, warnings=warnings)
+        raw_duration = view.get("duration")
+        duration = infer_scalar(str(raw_duration)) if raw_duration not in (None, "", "-") else None
+        if isinstance(duration, (int, float)) and not isinstance(duration, bool):
+            attributes["duration"] = duration
+        service = _optional_text(view.get("service"))
+        if service:
+            attributes["service"] = service
+        uid = _optional_text(view.get("uid"))
+        if uid:
+            attributes["zeek_uid"] = uid
+        return self._build_event(
+            record=record,
+            context=context,
+            observed_at=observed_at,
+            event_type="network_flow",
+            source_event_type="zeek_conn",
+            source_label=None,
+            warnings=warnings,
+            device=device,
+            actor=actor,
+            target=target,
+            network=network,
+            action="network_communication",
+            outcome=normalized_token(view.get("conn_state")),
+            attributes=attributes,
+        )
+
+
 class GenericAdapter(CanonicalAdapter):
     source_type = CanonicalSourceType.GENERIC
     name = "generic"

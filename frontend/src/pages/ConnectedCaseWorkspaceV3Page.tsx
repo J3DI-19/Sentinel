@@ -2,24 +2,26 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiClient } from "../api/batch";
 import { phase3Api } from "../api/phase3";
 import { normalizeApiError, serializeQuery } from "../api/client";
-import { Button, MetricCard, PageHeader } from "../components/ui/core";
+import { Button, PageHeader } from "../components/ui/core";
 import { ConnectedReportsPanel } from "./ConnectedReportsPanel";
 import { mapInvestigationRecords, type InvestigationRecordKind, type InvestigationRecordViewModel } from "../features/investigation/viewModels";
-import { IncidentContext, PersistedTimeline, PersistedVisuals, TimelineActivityOverview } from "../features/investigation/PersistedVisuals";
+import { IncidentContext, PersistedTimeline, PersistedVisuals, TimelineActivityOverview, type TimelineWindowSummary } from "../features/investigation/PersistedVisuals";
 import type { components } from "../api/generated";
 
-interface PageResult { items?: Record<string, unknown>[]; page?: number; page_size?: number; total?: number }
+interface PageResult { items?: Record<string, unknown>[]; page?: number; page_size?: number; total?: number; record_total?: number }
 interface CaseSummary { analysis_id?: string | null; event_count?: number; [key: string]: unknown }
+interface OverviewContext { findings: Record<string, unknown>[]; alerts: Record<string, unknown>[]; incidents: Record<string, unknown>[]; evidence: Record<string, unknown>[] }
 interface AnalysisSnapshot { analysis_id: string; case_id: number; status: string; created_at: string }
 type ReanalysisResult = components["schemas"]["ReanalysisPublic"];
+type ActivityWindowExplanation = components["schemas"]["ActivityWindowExplanation"];
 type LoadMode = "initial" | "refresh";
 const names: Record<string, string> = { overview: "Case overview", evidence: "Evidence", events: "Canonical events", history: "Analysis history", findings: "Findings", alerts: "Alerts", incidents: "Incidents", timeline: "Timeline", visuals: "Visuals", reports: "Reports", audit: "Audit history" };
 const columns: Record<string, string[]> = {
-  evidence: ["evidence_id", "original_filename", "source_type", "validation_status", "sha256", "received_at"],
+  evidence: ["evidence_id", "original_filename", "source_type", "validation_status", "duplicate_of_evidence_id", "sha256", "received_at"],
   events: ["event_id", "observed_at", "origin", "event_type", "entity_id"],
-  findings: ["finding_id", "title", "severity", "risk_score", "rule_id"],
-  alerts: ["alert_id", "title", "severity", "risk_score", "triggered_at"],
-  incidents: ["incident_id", "maximum_risk", "correlation_edge_count", "correlation_edges_truncated", "started_at", "ended_at"],
+  findings: ["finding_id", "title", "entity_id", "classification_source", "severity", "risk_score", "rule_id"],
+  alerts: ["alert_id", "title", "severity", "risk_score", "workflow_status", "notification_status", "triggered_at"],
+  incidents: ["incident_id", "severity", "maximum_risk", "finding_count", "evidence_count", "entity_count", "entity_ids", "started_at", "ended_at"],
   timeline: ["entry_id", "occurred_at", "entry_type", "title", "severity", "risk_score"],
   audit: ["occurred_at", "action", "actor", "subject_type", "subject_id", "request_id"],
   aggregates: ["series", "category", "subgroup", "value"],
@@ -30,32 +32,19 @@ const columns: Record<string, string[]> = {
 const analysisSections = new Set(["findings", "alerts", "incidents", "timeline", "visuals"]);
 const visualAliases = new Set(["graph", "charts", "aggregates", "analytics"]);
 const primaryTabs = ["overview", "evidence", "findings", "timeline", "visuals", "reports"];
-const timelineBatchSize = 200;
 const timelineWindowsPerPage = 10;
 const heading = (value: string) => value.replaceAll("_", " ");
 const record = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const display = (value: unknown): string => value == null ? "—" : typeof value === "boolean" ? (value ? "Yes" : "No") : Array.isArray(value) ? value.join(", ") : typeof value === "object" ? "Structured details" : String(value);
-const valueFor = (item: Record<string, unknown>, column: string): unknown => column === "risk_score" ? item.risk_score ?? item.score ?? record(item.risk).score : item[column];
+const valueFor = (item: Record<string, unknown>, column: string): unknown => column === "risk_score" ? item.risk_score ?? item.score ?? record(item.risk).score : column === "classification_source" ? record(item.classification).source : column === "finding_count" ? item.finding_count ?? (Array.isArray(item.finding_ids) ? item.finding_ids.length : 0) : item[column];
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-async function loadCompleteTimeline(caseId: string, analysisId: string | null, signal: AbortSignal): Promise<PageResult> {
-  const path = (page: number) => `/cases/${caseId}/timeline${serializeQuery({ page, page_size: timelineBatchSize, analysis_id: analysisId })}`;
-  const first = await apiClient.request<PageResult>(path(1), { signal });
-  const total = first.total ?? first.items?.length ?? 0;
-  const pages = Math.ceil(total / timelineBatchSize);
-  const items = [...(first.items ?? [])];
-  for (let page = 2; page <= pages; page += 1) {
-    const result = await apiClient.request<PageResult>(path(page), { signal });
-    items.push(...(result.items ?? []));
-  }
-  return { ...first, items, page: 1, page_size: items.length, total };
-}
-
 export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { path: string; search?: string; navigate: (path: string) => void }) {
-  const [, , id = "", requested = "overview"] = path.split("/"); const caseId = Number(id); const section = requested === "incidents" ? "findings" : visualAliases.has(requested) ? "visuals" : requested;
+  const [, , id = "", requested = "overview"] = path.split("/"); const caseId = Number(id); const section = visualAliases.has(requested) ? "visuals" : requested;
   const requestedAnalysis = new URLSearchParams(search).get("analysis");
   const selectedAnalysisId = requestedAnalysis && uuid.test(requestedAnalysis) ? requestedAnalysis : null;
   const snapshotSearch = selectedAnalysisId ? serializeQuery({ analysis: selectedAnalysisId }) : "";
   const [data, setData] = useState<unknown>(null); const [summary, setSummary] = useState<CaseSummary | null>(null);
+  const [loadedEndpoint, setLoadedEndpoint] = useState<string | null>(null);
   const [loading, setLoading] = useState(section !== "reports"); const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null); const [refreshError, setRefreshError] = useState<string | null>(null);
   const [query, setQuery] = useState(""); const [pageNumber, setPageNumber] = useState(1); const [reportRefresh, setReportRefresh] = useState(0);
@@ -63,19 +52,21 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
   const [detailOpen, setDetailOpen] = useState(false);
   const [relatedIncidents, setRelatedIncidents] = useState<Record<string, unknown>[]>([]);
   const [timelinePoints, setTimelinePoints] = useState<Record<string, unknown>[]>([]);
+  const [activityWindows, setActivityWindows] = useState<ActivityWindowExplanation[]>([]);
+  const [overviewContext, setOverviewContext] = useState<OverviewContext>({ findings: [], alerts: [], incidents: [], evidence: [] });
   const [referenceError, setReferenceError] = useState<string | null>(null); const [resolvingReference, setResolvingReference] = useState(false);
   const [reanalyzing, setReanalyzing] = useState(false); const [reanalysisError, setReanalysisError] = useState<string | null>(null);
   const [reanalysisResult, setReanalysisResult] = useState<ReanalysisResult | null>(null);
   const loadSequence = useRef(0); const activeLoad = useRef<AbortController | null>(null); const refreshFlight = useRef(false); const reanalysisFlight = useRef(false);
-  const pageSize = section === "history" ? 25 : 50;
-  const requestPageNumber = section === "timeline" ? 1 : pageNumber;
+  const pageSize = section === "timeline" ? timelineWindowsPerPage : section === "history" ? 25 : 50;
   const endpoint = useMemo(() => {
     if (section === "overview") return `/cases/${id}/summary`;
     if (section === "history") return `/cases/${id}/analyses${serializeQuery({ page: pageNumber, page_size: 25 })}`;
     if (section === "visuals") return `/cases/${id}/charts${serializeQuery({ analysis_id: selectedAnalysisId })}`;
+    if (section === "timeline") return `/cases/${id}/timeline/windows${serializeQuery({ page: pageNumber, page_size: timelineWindowsPerPage, analysis_id: selectedAnalysisId })}`;
     const filter = section === "events" ? { event_type: query || undefined } : section === "evidence" ? { source: query || undefined } : ["findings", "alerts", "incidents", "timeline"].includes(section) ? { severity: query || undefined } : {};
-    return `/cases/${id}/${section}${serializeQuery({ page: requestPageNumber, page_size: section === "timeline" ? timelineBatchSize : pageSize, ...filter, analysis_id: analysisSections.has(section) ? selectedAnalysisId : null })}`;
-  }, [id, pageSize, query, requestPageNumber, section, selectedAnalysisId]);
+    return `/cases/${id}/${section}${serializeQuery({ page: pageNumber, page_size: pageSize, ...filter, analysis_id: analysisSections.has(section) ? selectedAnalysisId : null })}`;
+  }, [id, pageNumber, pageSize, query, section, selectedAnalysisId]);
 
   useEffect(() => { setPageNumber(1); setQuery(""); setSelected(null); setDetailOpen(false); setReferenceError(null); }, [section]);
   useEffect(() => { setPageNumber(1); setSelected(null); }, [selectedAnalysisId]);
@@ -92,21 +83,34 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
     if (mode === "initial") { refreshFlight.current = false; setRefreshing(false); setLoading(true); } else setRefreshing(true);
     setError(null); setRefreshError(null);
     const summaryRequest = apiClient.request<CaseSummary>(`/cases/${id}/summary`, { signal: controller.signal });
-    const dataRequest: Promise<unknown> = section === "reports" ? Promise.resolve(null) : section === "audit" ? phase3Api.audit(caseId, controller.signal) : section === "overview" ? summaryRequest : section === "timeline" ? loadCompleteTimeline(id, selectedAnalysisId, controller.signal) : section === "visuals" ? Promise.all([
+    const dataRequest: Promise<unknown> = section === "reports" ? Promise.resolve(null) : section === "audit" ? phase3Api.audit(caseId, controller.signal) : section === "overview" ? summaryRequest : section === "visuals" ? Promise.all([
       apiClient.request<unknown>(`/cases/${id}/charts${serializeQuery({ analysis_id: selectedAnalysisId })}`, { signal: controller.signal }),
       apiClient.request<unknown>(`/cases/${id}/graph${serializeQuery({ analysis_id: selectedAnalysisId })}`, { signal: controller.signal }),
     ]).then(([charts, graph]) => ({ charts, graph })) : apiClient.request<unknown>(endpoint, { signal: controller.signal });
     const snapshotRequest = selectedAnalysisId ? apiClient.request(`/cases/${id}/analyses/${selectedAnalysisId}`, { signal: controller.signal }) : Promise.resolve(null);
-    const contextRequest = section === "findings"
+    const contextRequest = section === "overview"
+      ? Promise.all([
+          apiClient.request<PageResult>(`/cases/${id}/findings${serializeQuery({ page: 1, page_size: 6, analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+          apiClient.request<PageResult>(`/cases/${id}/alerts${serializeQuery({ page: 1, page_size: 6, analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+          apiClient.request<PageResult>(`/cases/${id}/incidents${serializeQuery({ page: 1, page_size: 6, analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+          apiClient.request<PageResult>(`/cases/${id}/evidence${serializeQuery({ page: 1, page_size: 50 })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+        ]).then(([findings, alerts, incidents, evidence]) => ({ overview: { findings: findings.items ?? [], alerts: alerts.items ?? [], incidents: incidents.items ?? [], evidence: evidence.items ?? [] } }))
+      : section === "findings"
       ? apiClient.request<PageResult>(`/cases/${id}/incidents${serializeQuery({ page: 1, page_size: 50, analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => null)
       : section === "timeline"
-      ? apiClient.request<PageResult>(`/cases/${id}/charts${serializeQuery({ analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => null)
+      ? Promise.all([
+          apiClient.request<PageResult>(`/cases/${id}/charts${serializeQuery({ analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+          apiClient.request<PageResult>(`/cases/${id}/activity-windows${serializeQuery({ analysis_id: selectedAnalysisId })}`, { signal: controller.signal }).catch(() => ({ items: [] })),
+        ]).then(([charts, windows]) => ({ charts: charts.items ?? [], windows: windows.items ?? [] }))
       : Promise.resolve(null);
     void Promise.all([summaryRequest, dataRequest, snapshotRequest, contextRequest]).then(([nextSummary, nextData, , contextData]) => {
       if (controller.signal.aborted || requestId !== loadSequence.current) return;
-      setSummary(nextSummary); setData(section === "overview" ? nextSummary : nextData);
-      setRelatedIncidents(section === "findings" && contextData?.items ? contextData.items : []);
-      setTimelinePoints(section === "timeline" && contextData?.items ? contextData.items : []);
+      setSummary(nextSummary); setData(section === "overview" ? nextSummary : nextData); setLoadedEndpoint(endpoint);
+      const context = record(contextData);
+      setOverviewContext(section === "overview" && context.overview ? context.overview as OverviewContext : { findings: [], alerts: [], incidents: [], evidence: [] });
+      setRelatedIncidents(section === "findings" && Array.isArray(context.items) ? context.items as Record<string, unknown>[] : []);
+      setTimelinePoints(section === "timeline" && Array.isArray(context.charts) ? context.charts as Record<string, unknown>[] : []);
+      setActivityWindows(section === "timeline" && Array.isArray(context.windows) ? context.windows as unknown as ActivityWindowExplanation[] : []);
     }).catch(reason => {
       if (controller.signal.aborted || requestId !== loadSequence.current) return;
       const message = normalizeApiError(reason).message;
@@ -145,10 +149,15 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
     }
   };
 
-  const object = record(data); const result = object as PageResult; const all = Array.isArray(result.items) ? result.items : [];
+  // Route changes reuse this component. Never interpret the previous tab's rows
+  // using the new tab's schema while the new request is waiting for its effect.
+  const dataIsCurrent = loadedEndpoint === endpoint;
+  const viewLoading = loading || (!error && !dataIsCurrent);
+  const activeData = dataIsCurrent ? data : null;
+  const object = record(activeData); const result = object as PageResult; const all = Array.isArray(result.items) ? result.items : [];
   const mapped = mapInvestigationRecords(section as InvestigationRecordKind, all);
   useEffect(() => {
-    if (loading || error || !["evidence", "events"].includes(section)) return;
+    if (viewLoading || error || !["evidence", "events"].includes(section)) return;
     const parameter = section === "evidence" ? "evidence" : "event"; const requestedId = new URLSearchParams(search).get(parameter);
     if (!requestedId) { setReferenceError(null); setSelected(null); setDetailOpen(false); return; }
     if (!uuid.test(requestedId)) { setSelected(null); setDetailOpen(false); setReferenceError(`The requested ${parameter} reference is malformed.`); return; }
@@ -158,37 +167,103 @@ export function ConnectedCaseWorkspaceV3Page({ path, search = "", navigate }: { 
     const detailPath = section === "evidence" ? `/cases/${id}/evidence/${requestedId}` : `/cases/${id}/events/${requestedId}`;
     void apiClient.request<Record<string, unknown>>(detailPath, { signal: controller.signal }).then(value => { setSelected(mapInvestigationRecords(section as InvestigationRecordKind, [value])[0]); setDetailOpen(true); }).catch(() => { if (!controller.signal.aborted) { setSelected(null); setDetailOpen(false); setReferenceError(`The requested ${parameter} is unavailable or does not belong to this case.`); } }).finally(() => { if (!controller.signal.aborted) setResolvingReference(false); });
     return () => controller.abort();
-  }, [data, error, id, loading, search, section]);
+  }, [activeData, error, id, search, section, viewLoading]);
 
+  const loadTimelineRecords = useCallback((window: TimelineWindowSummary, signal: AbortSignal) => apiClient.request<PageResult>(`/cases/${id}/timeline${serializeQuery({ page: 1, page_size: 200, window_key: window.key, analysis_id: selectedAnalysisId })}`, { signal }), [id, selectedAnalysisId]);
   const selectRecord = (item: InvestigationRecordViewModel) => { const analysis = selectedAnalysisId ?? undefined; setSelected(item); setDetailOpen(true); if (section === "evidence") navigate(`/cases/${id}/evidence${serializeQuery({ evidence: item.id, analysis })}`); else if (section === "events") navigate(`/cases/${id}/events${serializeQuery({ event: item.id, analysis })}`); };
-  const total = result.total ?? all.length; const start = total ? (pageNumber - 1) * pageSize + 1 : 0; const end = Math.min(pageNumber * pageSize, total);
+  const total = result.total ?? all.length; const start = total ? (pageNumber - 1) * pageSize + 1 : 0; const end = Math.min(pageNumber * pageSize, total); const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const timelineRecordTotal = result.record_total ?? 0;
   const viewingHistorical = Boolean(selectedAnalysisId && summary?.analysis_id !== selectedAnalysisId);
   const snapshotLabel = viewingHistorical ? "historical analysis" : "latest analysis";
 
-  const primarySection = section === "events" ? "evidence" : section === "alerts" ? "findings" : section === "audit" ? "reports" : section;
+  const primarySection = section === "events" ? "evidence" : ["alerts", "incidents"].includes(section) ? "findings" : section === "audit" ? "reports" : section;
   const visualData = record(data); const chartResult = record(visualData.charts) as PageResult; const graphResult = record(visualData.graph) as { nodes?: Record<string, unknown>[]; edges?: Record<string, unknown>[]; truncated?: boolean };
-  return <><PageHeader eyebrow={`Persisted investigation · CASE-${id.padStart(4, "0")}`} title={names[section] ?? heading(section)} description="Connected records and visual summaries preserve backend-authored identifiers, timestamps, provenance, rule traces, and risk factors." actions={<><Button onClick={() => navigate(`/cases/${id}/history${snapshotSearch}`)}>Analysis history</Button><Button disabled={loading || refreshing} onClick={refreshWorkspace}>{refreshing ? "Refreshing…" : "Refresh"}</Button><Button onClick={() => navigate(`/import?case=${id}`)}>Import evidence</Button><Button variant="primary" disabled={reanalyzing} onClick={reanalyze}>{reanalyzing ? "Reanalyzing…" : "Reanalyze"}</Button></>}/>
+  return <><PageHeader eyebrow={`Persisted investigation · CASE-${id.padStart(4, "0")}`} title={names[section] ?? heading(section)} description="Connected records and visual summaries preserve backend-authored identifiers, timestamps, provenance, rule traces, and risk factors." actions={<><Button onClick={() => navigate(`/cases/${id}/history${snapshotSearch}`)}>Analysis history</Button><Button disabled={viewLoading || refreshing} onClick={refreshWorkspace}>{refreshing ? "Refreshing…" : "Refresh"}</Button><Button onClick={() => navigate(`/import?case=${id}`)}>Import evidence</Button><Button variant="primary" disabled={reanalyzing} onClick={reanalyze}>{reanalyzing ? "Reanalyzing…" : "Reanalyze"}</Button></>}/>
     <nav className="case-tabs case-tabs-primary" aria-label="Connected case views">{primaryTabs.map(tab => <button className={primarySection === tab ? "active" : ""} onClick={() => navigate(`/cases/${id}/${tab}${snapshotSearch}`)} key={tab}>{tab}</button>)}</nav>
-    {(["evidence", "events"].includes(section) || ["findings", "alerts"].includes(section) || ["reports", "audit"].includes(section)) && <nav className="case-subtabs" aria-label={`${primarySection} views`}>{(primarySection === "evidence" ? [["evidence", "Imported evidence"], ["events", "Canonical events"]] : primarySection === "findings" ? [["findings", "Findings & incidents"], ["alerts", "Alerts"]] : [["reports", "Reports"], ["audit", "Audit history"]]).map(([tab, label]) => <button className={section === tab ? "active" : ""} onClick={() => navigate(`/cases/${id}/${tab}${snapshotSearch}`)} key={tab}>{label}</button>)}</nav>}
+    {(["evidence", "events"].includes(section) || ["findings", "alerts", "incidents"].includes(section) || ["reports", "audit"].includes(section)) && <nav className="case-subtabs" aria-label={`${primarySection} views`}>{(primarySection === "evidence" ? [["evidence", "Imported evidence"], ["events", "Canonical events"]] : primarySection === "findings" ? [["findings", "Findings"], ["incidents", "Incidents"], ["alerts", "Alerts"]] : [["reports", "Reports"], ["audit", "Audit history"]]).map(([tab, label]) => <button className={section === tab ? "active" : ""} onClick={() => navigate(`/cases/${id}/${tab}${snapshotSearch}`)} key={tab}>{label}</button>)}</nav>}
     {refreshing && <div className="settings-notice" role="status"><div><b>Refreshing persisted data</b><p>The current view remains available while Traceveil reloads this case.</p></div></div>}
     {refreshError && <div className="settings-notice reference-warning" role="alert"><div><b>Refresh failed</b><p>{refreshError} Existing results remain available.</p></div><Button disabled={refreshing} onClick={refreshWorkspace}>Retry</Button></div>}
     {reanalysisError && <div className="settings-notice reference-warning" role="alert"><div><b>Reanalysis failed</b><p>{reanalysisError} Existing persisted results were not replaced.</p></div><Button disabled={reanalyzing} onClick={reanalyze}>Retry reanalysis</Button></div>}
     {reanalysisResult && <div className="settings-notice" role="status"><div><b>{reanalysisResult.outcome === "created" ? "New analysis snapshot created" : "Identical analysis snapshot reused"}</b><p>{reanalysisResult.outcome === "created" ? "Traceveil persisted a new deterministic result." : "The evidence and analysis inputs were unchanged, so Traceveil reused the existing deterministic result."} Snapshot <code>{reanalysisResult.analysis_id}</code>.</p></div></div>}
-    {loading && <div className="state-box" aria-live="polite"><strong>Loading persisted {heading(section)}…</strong><p>Traceveil is reading case-owned records from the backend.</p></div>}
+    {viewLoading && <div className="state-box" aria-live="polite"><strong>Loading persisted {heading(section)}…</strong><p>Traceveil is reading case-owned records from the backend.</p></div>}
     {error && <div className="state-box" role="alert"><strong>{requestedAnalysis ? "Selected analysis unavailable" : "Connected view unavailable"}</strong><p>{error}</p>{requestedAnalysis ? <Button onClick={() => navigate(`/cases/${id}/history`)}>Open analysis history</Button> : <Button onClick={() => loadWorkspace("initial")}>Retry</Button>}</div>}
-    {!loading && !error && summary?.analysis_id && (analysisSections.has(section) || section === "history") && <div className={`analysis-snapshot-banner ${viewingHistorical ? "historical" : "latest"}`} role="status"><div><span>{viewingHistorical ? "Historical snapshot" : "Latest snapshot"}</span><b>{selectedAnalysisId ?? summary.analysis_id}</b><p>{viewingHistorical ? "Results are pinned to a persisted historical analysis and will stay selected across case tabs." : "Results use the case's latest persisted analysis."}</p></div>{viewingHistorical && <Button onClick={() => navigate(`/cases/${id}/${section}`)}>View latest</Button>}</div>}
-    {!loading && !error && referenceError && <div className="settings-notice reference-warning" role="alert"><div><b>Source reference unavailable</b><p>{referenceError} The surrounding persisted results remain available.</p></div><Button onClick={() => navigate(`/cases/${id}/${section}${snapshotSearch}`)}>Clear reference</Button></div>}
-    {!loading && !error && resolvingReference && <div className="settings-notice" role="status"><div><b>Opening source record</b><p>Resolving the case-owned reference from persisted data…</p></div></div>}
-    {!loading && !error && section === "reports" && <ConnectedReportsPanel key={reportRefresh} caseId={caseId}/>}
-    {!loading && !error && section === "history" && <AnalysisHistory snapshots={all as unknown as AnalysisSnapshot[]} latestId={summary?.analysis_id ?? null} selectedId={selectedAnalysisId} caseId={id} pageNumber={pageNumber} total={total} onPage={setPageNumber} navigate={navigate}/>}
-    {!loading && !error && section === "overview" && <><div className="metrics-grid">{Object.entries(object).filter(([, value]) => value == null || ["string", "number", "boolean"].includes(typeof value)).map(([key, value]) => <MetricCard key={key} label={heading(key)} value={display(value)} detail={key.includes("time") || key.endsWith("_at") ? "UTC" : "Persisted backend value"}/>)}</div>{!summary?.analysis_id && <EmptyState title="No analysis has run" message="This case has no persisted analysis snapshot yet. Import evidence or run deterministic analysis to create result sections." action="Import evidence" onAction={() => navigate(`/import?case=${id}`)}/>}</>}
-    {!loading && !error && section === "visuals" && (summary?.analysis_id ? <PersistedVisuals points={(chartResult.items ?? []) as { series?: string; category?: string; subgroup?: string | null; value?: number }[]} nodes={graphResult.nodes ?? []} edges={graphResult.edges ?? []} truncated={graphResult.truncated}/> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
-    {!loading && !error && section === "timeline" && (summary?.analysis_id ? <><TimelineActivityOverview points={timelinePoints} total={total}/><section className="table-panel timeline-visual-panel"><div className="filter-row timeline-window-header"><div><strong>Chronological record windows</strong><p>Each stop represents one minute. Ten minute blocks are shown per page regardless of activity density.</p></div><span>{total ? `${total.toLocaleString()} persisted entries loaded in safe batches` : "0 persisted entries"}</span></div>{all.length ? <PersistedTimeline items={all} onInspect={selectRecord} page={pageNumber} windowsPerPage={timelineWindowsPerPage} onPage={setPageNumber}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>}</section></> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
-    {!loading && !error && section === "findings" && summary?.analysis_id && <IncidentContext items={relatedIncidents} onInspect={selectRecord}/>}
-    {!loading && !error && !["overview", "history", "visuals", "timeline", "reports"].includes(section) && <section className="workspace-results"><div className="table-panel"><div className="filter-row"><input className="input" aria-label={`Filter ${section}`} placeholder={section === "events" ? "Exact event type" : section === "evidence" ? "Exact source" : ["findings", "alerts", "incidents"].includes(section) ? "Exact severity" : `Filter ${section}`} value={query} onChange={event => { setQuery(event.target.value); setPageNumber(1); }}/><span>{total ? `Showing ${start}–${end} of ${total} persisted records` : "0 persisted records"}</span></div>{all.length ? <RecordTable section={section} items={all} columns={columns[section]} selectedId={selected?.id} onSelect={selectRecord}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed={Boolean(summary?.analysis_id)} snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>} {total > 50 && <div className="table-footer"><Button disabled={pageNumber === 1} onClick={() => setPageNumber(value => value - 1)}>Previous</Button><span>Page {pageNumber} · partial view of {total}</span><Button disabled={pageNumber * 50 >= total} onClick={() => setPageNumber(value => value + 1)}>Next</Button></div>}</div></section>}
+    {!viewLoading && !error && summary?.analysis_id && (analysisSections.has(section) || section === "history") && <div className={`analysis-snapshot-banner ${viewingHistorical ? "historical" : "latest"}`} role="status"><div><span>{viewingHistorical ? "Historical snapshot" : "Latest snapshot"}</span><b>{selectedAnalysisId ?? summary.analysis_id}</b><p>{viewingHistorical ? "Results are pinned to a persisted historical analysis and will stay selected across case tabs." : "Results use the case's latest persisted analysis."}</p></div>{viewingHistorical && <Button onClick={() => navigate(`/cases/${id}/${section}`)}>View latest</Button>}</div>}
+    {!viewLoading && !error && referenceError && <div className="settings-notice reference-warning" role="alert"><div><b>Source reference unavailable</b><p>{referenceError} The surrounding persisted results remain available.</p></div><Button onClick={() => navigate(`/cases/${id}/${section}${snapshotSearch}`)}>Clear reference</Button></div>}
+    {!viewLoading && !error && resolvingReference && <div className="settings-notice" role="status"><div><b>Opening source record</b><p>Resolving the case-owned reference from persisted data…</p></div></div>}
+    {!viewLoading && !error && section === "reports" && <ConnectedReportsPanel key={reportRefresh} caseId={caseId}/>}
+    {!viewLoading && !error && section === "history" && <AnalysisHistory snapshots={all as unknown as AnalysisSnapshot[]} latestId={summary?.analysis_id ?? null} selectedId={selectedAnalysisId} caseId={id} pageNumber={pageNumber} total={total} onPage={setPageNumber} navigate={navigate}/>}
+    {!viewLoading && !error && section === "overview" && <><CaseDatasetOverview summary={object} context={overviewContext}/><AnalysisOverview summary={object} context={overviewContext} caseId={id} navigate={navigate}/></>}
+    {!viewLoading && !error && section === "visuals" && (summary?.analysis_id ? <PersistedVisuals points={(chartResult.items ?? []) as { series?: string; category?: string; subgroup?: string | null; value?: number }[]} nodes={graphResult.nodes ?? []} edges={graphResult.edges ?? []} truncated={graphResult.truncated}/> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
+    {!viewLoading && !error && section === "timeline" && (summary?.analysis_id ? <><TimelineActivityOverview points={timelinePoints} total={timelineRecordTotal}/><section className="table-panel timeline-visual-panel"><div className="filter-row timeline-window-header"><div><strong>Chronological record windows</strong><p>Each page loads ten lightweight minute summaries. Individual records load only when a minute is expanded.</p></div><span>{total ? `${total.toLocaleString()} minute blocks · ${timelineRecordTotal.toLocaleString()} persisted entries` : "0 persisted entries"}</span></div>{all.length ? <PersistedTimeline items={all as unknown as TimelineWindowSummary[]} onInspect={selectRecord} loadRecords={loadTimelineRecords}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>} {total > pageSize && <div className="table-footer timeline-pagination"><div><Button disabled={pageNumber === 1} onClick={() => setPageNumber(1)}>First</Button><Button disabled={pageNumber === 1} onClick={() => setPageNumber(value => value - 1)}>Previous</Button></div><span>Minute blocks <b>{start}–{end}</b> of <b>{total}</b></span><div><Button disabled={pageNumber >= totalPages} onClick={() => setPageNumber(value => value + 1)}>Next</Button><Button disabled={pageNumber >= totalPages} onClick={() => setPageNumber(totalPages)}>Last</Button></div></div>}</section></> : <NoAnalysis onRun={reanalyze} disabled={reanalyzing}/>)}
+    {!viewLoading && !error && section === "timeline" && summary?.analysis_id && <TimelineAttributionPanel windows={activityWindows}/>}
+    {!viewLoading && !error && section === "findings" && summary?.analysis_id && <IncidentContext items={relatedIncidents} onInspect={selectRecord}/>}
+    {!viewLoading && !error && !["overview", "history", "visuals", "timeline", "reports"].includes(section) && <section className="workspace-results"><div className="table-panel"><div className="filter-row"><input className="input" aria-label={`Filter ${section}`} placeholder={section === "events" ? "Exact event type" : section === "evidence" ? "Exact source" : ["findings", "alerts", "incidents"].includes(section) ? "Exact severity" : `Filter ${section}`} value={query} onChange={event => { setQuery(event.target.value); setPageNumber(1); }}/><span>{total ? `Showing ${start}–${end} of ${total} persisted records` : "0 persisted records"}</span></div>{all.length ? <RecordTable section={section} items={all} columns={columns[section]} selectedId={selected?.id} onSelect={selectRecord}/> : <SectionEmpty section={section} filtered={Boolean(query)} analyzed={Boolean(summary?.analysis_id)} snapshotLabel={snapshotLabel} caseId={id} onClear={() => setQuery("")} navigate={navigate} onRun={reanalyze} runDisabled={reanalyzing}/>} {total > 50 && <div className="table-footer"><Button disabled={pageNumber === 1} onClick={() => setPageNumber(value => value - 1)}>Previous</Button><span>Page {pageNumber} · partial view of {total}</span><Button disabled={pageNumber * 50 >= total} onClick={() => setPageNumber(value => value + 1)}>Next</Button></div>}</div></section>}
     {selected && detailOpen && <RecordDetail item={selected} caseId={id} analysisId={selectedAnalysisId} navigate={navigate} onClose={() => setDetailOpen(false)}/>}
   </>;
 }
+
+function CaseDatasetOverview({ summary, context }: { summary: Record<string, unknown>; context: OverviewContext }) {
+  const caseDetails = record(summary.case);
+  const description = String(caseDetails.description ?? "").replace(/^Dataset overview:\s*/i, "").trim();
+  const sourceTypes = [...new Set(context.evidence.map(item => String(item.source_type ?? "")).filter(Boolean))];
+  return <section className="case-dataset-overview" aria-labelledby="case-dataset-overview-title">
+    <div className="case-dataset-overview__icon" aria-hidden="true">i</div>
+    <div className="case-dataset-overview__copy">
+      <span>About this case</span>
+      <h2 id="case-dataset-overview-title">{String(caseDetails.name ?? "Dataset overview")}</h2>
+      <p>{description || "Import evidence to generate a simple explanation of what this case contains."}</p>
+    </div>
+    <aside aria-label="Case dataset sources">
+      <span>{sourceTypes.length ? `${sourceTypes.length} dataset source${sourceTypes.length === 1 ? "" : "s"}` : "Awaiting evidence"}</span>
+      {sourceTypes.length > 0 && <div>{sourceTypes.map(source => <b key={source}>{heading(source)}</b>)}</div>}
+    </aside>
+  </section>;
+}
+
+function AnalysisOverview({ summary, context, caseId, navigate }: { summary: Record<string, unknown>; context: OverviewContext; caseId: string; navigate: (path: string) => void }) {
+  const analysisId = summary.analysis_id;
+  if (!analysisId) return <EmptyState title="No analysis has run" message="This case has no persisted analysis snapshot yet. Import evidence or run deterministic analysis to create result sections." action="Import evidence" onAction={() => navigate(`/import?case=${caseId}`)}/>;
+  const openAlerts = context.alerts.filter(alert => !["resolved", "suppressed"].includes(String(alert.workflow_status ?? "pending")));
+  const rankedFindings = [...context.findings].sort((left, right) => Number(record(right.risk).score ?? right.risk_score ?? 0) - Number(record(left.risk).score ?? left.risk_score ?? 0));
+  const topFinding = rankedFindings[0];
+  const topRisk = topFinding ? Number(record(topFinding.risk).score ?? topFinding.risk_score ?? 0) : Number(summary.maximum_risk ?? 0);
+  const classification = record(topFinding?.classification);
+  const sourceTypes = [...new Set(context.evidence.map(item => String(item.source_type ?? "unknown")))].filter(item => item !== "unknown");
+  const affectedDevices = [...new Set(context.findings.map(item => String(item.entity_id ?? "")).filter(Boolean))];
+  const metricRows: [string, unknown, string][] = [
+    ["Events", summary.event_count ?? 0, "Normalized activity"],
+    ["Findings", summary.finding_count ?? 0, "Detected concerns"],
+    ["Incidents", summary.incident_count ?? 0, "Correlated groups"],
+    ["Peak risk", summary.maximum_risk ?? 0, riskBand(Number(summary.maximum_risk ?? 0))],
+  ];
+  return <section className="analysis-command-summary" aria-label="Case analysis summary">
+    <header><div><span>Analysis posture</span><h2>{topRisk >= 70 ? "Prioritized investigation required" : topRisk >= 40 ? "Review noteworthy activity" : "No urgent risk detected"}</h2><p>Counts describe different layers: events are source activity, findings are detections, incidents correlate related findings, and alerts track investigator action.</p></div><span className={`risk-orb risk-${riskBand(topRisk).toLowerCase()}`}><b>{topRisk}</b><small>peak risk</small></span></header>
+    <div className="analysis-metric-strip">{metricRows.map(([label, value, detail]) => <button key={String(label)} onClick={() => navigate(`/cases/${caseId}/${label === "Events" ? "events" : String(label).toLowerCase() === "peak risk" ? "findings" : String(label).toLowerCase()}`)}><span>{label}</span><b>{String(value)}</b><small>{detail}</small></button>)}</div>
+    <div className="analysis-attention-grid">
+      <article><span>Next action</span><h3>{openAlerts.length ? `${openAlerts.length} alert${openAlerts.length === 1 ? "" : "s"} need review` : "No open alert workflow"}</h3><p>{openAlerts.length ? "Acknowledge, resolve, or suppress the outstanding alerts so the case state reflects the investigation." : "All loaded alerts are resolved or suppressed. Review findings if the evidence has changed."}</p><Button onClick={() => navigate(`/cases/${caseId}/alerts`)}>Review alerts</Button></article>
+      <article><span>Highest-priority finding</span><h3>{String(topFinding?.title ?? "No findings produced")}</h3><p>{topFinding ? `Risk ${topRisk} · ${riskBand(topRisk)} · ${classificationLabel(String(classification.source ?? "unknown"))}` : "The latest deterministic analysis produced no classified finding."}</p><Button onClick={() => navigate(`/cases/${caseId}/findings`)}>Open findings</Button></article>
+      <article><span>Correlation</span><h3>{context.incidents.length ? `${context.incidents.length} recent incident group${context.incidents.length === 1 ? "" : "s"}` : "No incident groups"}</h3><p>Incidents explain which findings share time, entities, evidence, or correlation edges; they are not additional detections.</p><Button onClick={() => navigate(`/cases/${caseId}/incidents`)}>Review incidents</Button></article>
+    </div>
+    <div className="evidence-convergence"><div><span>Converged evidence</span><h3>{sourceTypes.length ? sourceTypes.map(heading).join(" + ") : "Source inventory unavailable"}</h3><p>{context.evidence.length} evidence object{context.evidence.length === 1 ? "" : "s"} contribute to this case-wide analysis. Timelines and incidents can overlap across sources only through shared device, network, service, or observed-time context.</p></div><div><span>Affected canonical devices</span><strong>{affectedDevices.length ? affectedDevices.join(", ") : "No finding-linked device identity"}</strong></div></div>
+  </section>;
+}
+
+function TimelineAttributionPanel({ windows }: { windows: ActivityWindowExplanation[] }) {
+  const interesting = windows.filter(window => window.is_volume_anomaly).sort((left, right) => (right.deviation_ratio ?? 0) - (left.deviation_ratio ?? 0));
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const selected = interesting.find(window => window.window_id === selectedKey) ?? interesting[0];
+  if (!windows.length) return <section className="timeline-attribution empty"><span>Spike attribution</span><h2>No activity explanation data available</h2><p>This analysis snapshot did not return persisted activity-window explanations. Reanalyze the case if it predates activity attribution.</p></section>;
+  if (!interesting.length) return <section className="timeline-attribution empty"><span>Spike attribution</span><h2>No statistically unusual activity windows</h2><p>{windows.length.toLocaleString()} windows were analyzed, but none exceeded the persisted anomaly threshold.</p></section>;
+  if (!selected) return null;
+  return <section className="timeline-attribution" aria-label="Timeline spike attribution"><header><div><span>Spike attribution</span><h2>What caused the activity peaks?</h2><p>Select an anomalous window to inspect the persisted evidence behind its volume.</p></div><b>{interesting.length} anomalous window{interesting.length === 1 ? "" : "s"}</b></header>
+    <div className="timeline-hotspots" role="list" aria-label="Anomalous activity windows">{interesting.slice(0, 8).map(window => <button role="listitem" className={window.window_id === selected.window_id ? "selected" : ""} key={window.window_id} onClick={() => setSelectedKey(window.window_id)}><span>{window.window_id}</span><b>{window.event_count} events</b><small>{window.deviation_ratio?.toFixed(2) ?? "—"}× baseline</small></button>)}</div>
+    <article className="timeline-cause-card"><div><span className={`cause-chip ${selected.cause_status}`}>{heading(selected.cause_status)}</span><h3>{selected.explanation}</h3><p>{selected.cause_status === "undetermined" ? "The spike is real, but no single classification or device dominates enough to claim a cause. Treat this as an investigation lead, not a DDoS conclusion." : "This explanation is derived from the classifications and entities present in the imported records for this window."}</p></div><dl><div><dt>Events</dt><dd>{selected.event_count}</dd></div><div><dt>Baseline</dt><dd>{selected.baseline_count}</dd></div><div><dt>Top devices</dt><dd>{topBreakdown(selected.top_devices)}</dd></div><div><dt>Top event types</dt><dd>{topBreakdown(selected.top_event_types)}</dd></div><div><dt>Source labels</dt><dd>{selected.source_classifications?.slice(0, 3).map(item => `${item.value} (${item.count})`).join(", ") || "None supplied"}</dd></div></dl></article>
+  </section>;
+}
+
+function classificationLabel(source: string) { return ({ dataset_label: "Dataset supplied", deterministic_rule: "Rule detected", behavioral_anomaly: "Behavioral anomaly" } as Record<string, string>)[source] ?? heading(source); }
+function riskBand(score: number) { return score >= 75 ? "Critical" : score >= 50 ? "High" : score >= 25 ? "Medium" : score > 0 ? "Low" : "None"; }
+function topBreakdown(values: Record<string, number>) { const entries = Object.entries(values ?? {}).sort((left, right) => right[1] - left[1]).slice(0, 3); return entries.length ? entries.map(([name, count]) => `${name} (${count})`).join(", ") : "No dominant value"; }
 
 function AnalysisHistory({ snapshots, latestId, selectedId, caseId, pageNumber, total, onPage, navigate }: { snapshots: AnalysisSnapshot[]; latestId: string | null; selectedId: string | null; caseId: string; pageNumber: number; total: number; onPage: (page: number) => void; navigate: (path: string) => void }) {
   if (!snapshots.length) return <EmptyState title="No analysis history" message="This case has no persisted batch-analysis snapshots yet."/>;
@@ -215,14 +290,42 @@ function RecordTable({ section, items, columns: requested, selectedId, onSelect 
 
 function RecordDetail({ item, caseId, analysisId, navigate, onClose }: { item: InvestigationRecordViewModel; caseId: string; analysisId?: string | null; navigate: (path: string) => void; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [workflowStatus, setWorkflowStatus] = useState(String((item.source as Record<string, unknown>).workflow_status ?? "pending"));
+  const [workflowBusy, setWorkflowBusy] = useState(false);
+  const [workflowError, setWorkflowError] = useState<string | null>(null);
   useEffect(() => {
     closeRef.current?.focus();
     const close = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     document.addEventListener("keydown", close);
     return () => document.removeEventListener("keydown", close);
   }, [item.id, onClose]);
-  return <div className="record-detail-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}><aside className="record-detail-panel" role="dialog" aria-modal="true" aria-label={`Details for ${item.id}`}><header><div><span>{heading(item.kind)} record</span><h2>{item.title}</h2><code>{item.id}</code></div><button ref={closeRef} className="record-detail-close" onClick={onClose} aria-label="Close record details">×</button></header><dl className="record-details">{Object.entries(item.source).map(([key, value]) => <DetailValue key={key} name={key} value={value} caseId={caseId} analysisId={analysisId} navigate={navigate}/>)}</dl></aside></div>;
+  const changeWorkflow = async (status: "pending" | "acknowledged" | "resolved" | "suppressed") => { setWorkflowBusy(true); setWorkflowError(null); try { const updated = await apiClient.request<Record<string, unknown>>(`/cases/${caseId}/alerts/${item.id}`, { method: "PATCH", body: JSON.stringify({ status, actor: "Investigator" }) }); setWorkflowStatus(String(updated.workflow_status ?? status)); } catch (reason) { setWorkflowError(normalizeApiError(reason).message); } finally { setWorkflowBusy(false); } };
+  return <div className="record-detail-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}><aside className="record-detail-panel" role="dialog" aria-modal="true" aria-label={`Details for ${item.id}`}><header><div><span>{heading(item.kind)} record</span><h2>{item.title}</h2><code>{item.id}</code></div><button ref={closeRef} className="record-detail-close" onClick={onClose} aria-label="Close record details">×</button></header>{item.kind === "alerts" && <div className="alert-workflow"><strong>Workflow · {workflowStatus}</strong><div>{(["pending", "acknowledged", "resolved", "suppressed"] as const).map(status => <Button key={status} disabled={workflowBusy || status === workflowStatus} onClick={() => void changeWorkflow(status)}>{heading(status)}</Button>)}</div>{workflowError && <p role="alert">{workflowError}</p>}</div>}{item.kind === "findings" && <FindingAnalysis source={item.source as Record<string, unknown>}/>} {item.kind === "incidents" && <IncidentAnalysis source={item.source as Record<string, unknown>}/>}<details className="raw-record-details"><summary>All persisted fields</summary><dl className="record-details">{Object.entries(item.source).map(([key, value]) => <DetailValue key={key} name={key} value={value} caseId={caseId} analysisId={analysisId} navigate={navigate}/>)}</dl></details></aside></div>;
 }
+
+function FindingAnalysis({ source }: { source: Record<string, unknown> }) {
+  const classification = record(source.classification); const risk = record(source.risk);
+  const factors = Array.isArray(risk.factors) ? risk.factors.map(record) : []; const penalties = Array.isArray(risk.penalties) ? risk.penalties.map(record) : [];
+  const score = Number(risk.score ?? source.risk_score ?? 0); const baseScore = Number(risk.base_score ?? score);
+  const tags = Array.isArray(classification.tags) ? classification.tags.map(String) : [];
+  return <section className="finding-explainer" aria-label="Finding classification and risk explanation">
+    <div className="classification-banner"><div><span>{classificationLabel(String(classification.source ?? "unknown"))}</span><h3>{String(classification.display_name ?? source.title ?? "Classified finding")}</h3><p>{heading(String(classification.category ?? "uncategorized"))} <b>→</b> {heading(String(classification.subcategory ?? "unclassified"))}</p></div><span className={`risk-orb risk-${String(risk.band ?? riskBand(score)).toLowerCase()}`}><b>{score}</b><small>{String(risk.band ?? riskBand(score))}</small></span></div>
+    <div className="confidence-grid"><div><span>Affected device</span><b>{String(source.entity_id ?? "Identity unavailable")}</b><small>Canonical identity shared across evidence</small></div><div><span>Classification confidence</span><b>{percent(classification.confidence ?? source.classification_confidence)}</b><small>How certain the category is</small></div><div><span>Evidence confidence</span><b>{percent(source.evidence_confidence)}</b><small>How strongly records support it</small></div><div><span>Classification input</span><b>{String(classification.source_field ?? "Derived fields")}</b><small>{String(classification.source_value ?? "No source label")}</small></div></div>
+    {tags.length > 0 && <div className="classification-tags" aria-label="Classification tags">{tags.map(tag => <span key={tag}>{heading(tag)}</span>)}</div>}
+    <div className="risk-equation"><span>Risk calculation</span><h3><b>{baseScore}</b> base score {penalties.length ? <><i>−</i> <b>{penalties.reduce((sum, penalty) => sum + Number(penalty.points ?? 0), 0)}</b> penalties</> : null} <i>=</i> <strong>{score}</strong></h3><p>Risk factors are weighted contributions. Explicit penalties reduce the score when evidence quality or confidence is limited.</p></div>
+    <div className="risk-factor-list">{factors.length ? factors.map((factor, index) => { const points = Number(factor.weighted_points ?? 0); return <article key={`${String(factor.name)}-${index}`}><header><span>{heading(String(factor.name ?? "factor"))}</span><b>+{points.toFixed(1)}</b></header><div><i style={{ width: `${Math.min(100, Math.max(2, points))}%` }}/></div><p>{String(factor.explanation ?? `Score ${factor.score ?? "—"} × weight ${factor.weight ?? "—"}`)}</p></article>; }) : <p>No factor-level breakdown was persisted for this finding.</p>}</div>
+    {penalties.length > 0 && <div className="risk-penalties"><strong>Score adjustments</strong>{penalties.map((penalty, index) => <p key={index}><b>−{String(penalty.points ?? 0)}</b> {String(penalty.explanation ?? heading(String(penalty.reason ?? "penalty")))}</p>)}</div>}
+  </section>;
+}
+
+function IncidentAnalysis({ source }: { source: Record<string, unknown> }) {
+  const tags = Array.isArray(source.tags) ? source.tags.map(String) : [];
+  const entityIds = Array.isArray(source.entity_ids) ? source.entity_ids.map(String) : [];
+  const bounded = source.grouping_policy === "finding_centered_bounded_session";
+  return <section className="incident-explainer" aria-label="Incident scope"><header><div><span>Correlated investigation unit</span><h3>{String(source.severity ?? "unrated")} severity · risk {String(source.maximum_risk ?? 0)}</h3><p>{bounded ? `Finding-centred session · ${String(source.inactivity_window_seconds)}s inactivity boundary · ${String(source.maximum_trigger_span_seconds)}s maximum trigger span` : "Legacy transitive correlation component"}</p>{entityIds.length > 0 && <p>Affected identities: {entityIds.join(", ")}</p>}</div></header><div><span><b>{String(source.finding_count ?? (Array.isArray(source.finding_ids) ? source.finding_ids.length : 0))}</b> findings</span><span><b>{String(source.evidence_count ?? 0)}</b> evidence files</span><span><b>{String(source.entity_count ?? 0)}</b> entities</span><span><b>{String(source.correlation_edge_count ?? 0)}</b> correlations</span></div>{tags.length > 0 && <p>{tags.map(tag => <i key={tag}>{heading(tag)}</i>)}</p>}</section>;
+}
+
+function percent(value: unknown) { const numeric = Number(value); if (!Number.isFinite(numeric)) return "—"; return `${Math.round((numeric <= 1 ? numeric * 100 : numeric))}%`; }
 
 function DetailValue({ name, value, caseId, analysisId, navigate }: { name: string; value: unknown; caseId: string; analysisId?: string | null; navigate: (path: string) => void }) {
   if ((name === "evidence_ids" || name === "event_ids" || name === "trigger_event_ids") && Array.isArray(value)) {

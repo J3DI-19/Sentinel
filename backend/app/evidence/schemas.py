@@ -26,6 +26,8 @@ class EvidenceSource(str, Enum):
     CICIOT2023_NETWORK = "ciciot2023_network"
     SIMULATED = "simulated"
     GENERIC = "generic"
+    HAI_ICS_BLIND = "hai_ics_blind"
+    IOT23_ZEEK_BLIND = "iot23_zeek_blind"
 
 
 class ValidationStatus(str, Enum):

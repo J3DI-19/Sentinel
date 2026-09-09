@@ -30,8 +30,10 @@ Invalid data is never silently repaired. A mixed file may be accepted with warni
 | `ton_iot_network@1.0` | `ts`, `src_ip`, `dst_ip`, `label` |
 | `ciciot2023_network@1.0` | `flow_duration`, `Protocol Type`, `label` |
 | `generic@1.0` | No dataset-specific columns; structural checks still apply |
+| `hai_ics_blind@1.0` | `timestamp`, `device_id`; numeric sensor/actuator columns; ground-truth columns forbidden |
+| `iot23_zeek_blind@1.0` | `ts`, `device_id`, `id.orig_h`, `id.resp_h`, `proto`; ground-truth columns forbidden |
 
-A small redistributable [`simulated@1.0` example](../../frontend/public/examples/simulated-evidence.csv) is provided for the connected import workflow. It contains synthetic records only. Select **Simulation** in the import page before uploading it. The table above remains the authoritative list of supported profile columns.
+A small redistributable [`simulated@1.0` example](../../datasets/sample/simulated-evidence.csv) is provided for the connected import workflow. It contains synthetic records only. Select **Simulation** in the import page before uploading it. The table above remains the authoritative list of supported profile columns. All reusable full and sample files are indexed in [`datasets/README.md`](../../datasets/README.md).
 
 The two primary profiles are pinned to a CSV projection of the [CASAS Milan public smart-home dataset](https://casas.wsu.edu/datasets/index) catalog snapshot updated 2018-09-07 and the [2020 TON_IoT telemetry release](https://research.unsw.edu.au/projects/toniot-datasets)'s `Train_Test_IoT_Fridge.csv` subset. CASAS CSV records preserve the observed timestamp, sensor identity, message, and optional activity annotation. The fridge profile validates its release-specific date/time format, finite temperature, device state, binary label, and attack type.
 

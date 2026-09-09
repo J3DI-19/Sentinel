@@ -112,7 +112,7 @@ export function ConnectedCasesPage({ navigate }: { navigate: (path: string) => v
             <div>
               <span className="eyebrow">New persisted investigation</span>
               <h2>Create case</h2>
-              <p>Define the investigation before importing evidence.</p>
+              <p>Name the investigation. Traceveil can explain the dataset after you import it.</p>
             </div>
           </header>
 
@@ -138,11 +138,11 @@ export function ConnectedCasesPage({ navigate }: { navigate: (path: string) => v
               />
             </label>
             <label className="case-description">
-              <span>Description <small aria-hidden="true">Optional</small></span>
+              <span>Description <small aria-hidden="true">Optional · auto-filled after import</small></span>
               <textarea
                 aria-label="Description"
                 maxLength={2000}
-                placeholder="Add the investigation scope or context."
+                placeholder="Leave blank for a plain-language explanation of the imported dataset."
                 value={draft.description}
                 onChange={event => setDraft(current => ({ ...current, description: event.target.value }))}
               />
@@ -231,8 +231,8 @@ export function ConnectedCasesPage({ navigate }: { navigate: (path: string) => v
                           <span>B</span>
                           <div>
                             <strong>{item.name}</strong>
-                            <small>
-                              CASE-{String(item.id).padStart(4, "0")} · {item.description || "No description"}
+                            <small title={item.description || undefined}>
+                              CASE-{String(item.id).padStart(4, "0")} · Hover for description
                             </small>
                           </div>
                         </div>

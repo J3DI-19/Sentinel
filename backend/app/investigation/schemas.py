@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
-from app.analysis.schemas import GraphEdge, GraphNode
+from app.analysis.schemas import ActivityWindowExplanation, GraphEdge, GraphNode
 from app.evidence.schemas import EvidenceSource, EvidenceValidationReport
 from app.normalization.schemas import CanonicalEvent
 
@@ -23,6 +23,24 @@ class PageResponse(StrictModel, Generic[T]):
     page: int = Field(ge=1)
     page_size: int = Field(ge=0)
     total: int = Field(ge=0)
+
+
+class TimelineWindowPublic(StrictModel):
+    key: str
+    started_at: datetime | None
+    ended_at: datetime | None
+    record_count: int = Field(ge=1)
+    category_counts: dict[str, int]
+    peak_severity: str | None
+    activity_explanation: ActivityWindowExplanation | None = None
+
+
+class TimelineWindowPage(StrictModel):
+    items: list[TimelineWindowPublic]
+    page: int = Field(ge=1)
+    page_size: int = Field(ge=1)
+    total: int = Field(ge=0)
+    record_total: int = Field(ge=0)
 
 
 class CasePublic(StrictModel):
@@ -88,6 +106,7 @@ class EvidencePublic(StrictModel):
     rejected_records: int = Field(ge=0)
     received_at: datetime
     committed_at: datetime | None = None
+    duplicate_of_evidence_id: UUID | None = None
 
 
 class ValidationIssuePublic(StrictModel):

@@ -8,6 +8,12 @@ __pycache__/
 .venv/
 .python-env/
 .runtime/
+.dataset-tools/
+.test-tools/
+.codex-worktrees/
+backend/build/
+all_commits.txt
+frontend/vite.*.log
 *.db
 *.sqlite
 *.sqlite3
@@ -20,3 +26,9 @@ frontend/vite.config.js
 frontend/vite.config.d.ts
 data/*
 !data/.gitkeep
+
+# Local research archives and full prepared datasets. The catalog and
+# redistributable synthetic samples under datasets/ remain versioned.
+datasets/full/
+datasets/sample/casas-milan-sample.csv
+datasets/sample/ton-iot-fridge-sample.csv

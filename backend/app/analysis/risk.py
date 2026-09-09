@@ -11,6 +11,7 @@ from app.analysis.schemas import (
     DetectionFinding,
     RiskBand,
     RiskFactor,
+    RiskPenalty,
     RiskScore,
     Severity,
 )
@@ -102,7 +103,12 @@ def score_candidates(
             )
             for index, (name, score, weight, explanation) in enumerate(inputs)
         ]
-        total = sum(factor.weighted_points for factor in factors)
+        base_total = sum(factor.weighted_points for factor in factors)
+        penalties = [
+            RiskPenalty(reason=reason, points=points, explanation=explanation)
+            for reason, points, explanation in candidate.risk_penalties
+        ]
+        total = max(0, base_total - sum(penalty.points for penalty in penalties))
         event_material = tuple(str(event_id) for event_id in candidate.event_ids)
         findings.append(
             DetectionFinding(
@@ -111,6 +117,23 @@ def score_candidates(
                     case_id,
                     candidate.rule_id,
                     config.rule_set_version,
+                    candidate.entity_id or "",
+                    candidate.classification.category,
+                    candidate.classification.subcategory,
+                    candidate.classification.source.value,
+                    candidate.classification.source_field or "",
+                    candidate.classification.source_value or "",
+                    *(
+                        "|".join(
+                            (
+                                trace.field,
+                                trace.operator,
+                                trace.expected,
+                                trace.actual,
+                            )
+                        )
+                        for trace in candidate.condition_trace
+                    ),
                     *event_material,
                 ),
                 case_id=case_id,
@@ -120,14 +143,21 @@ def score_candidates(
                 summary=candidate.summary,
                 severity=candidate.severity,
                 confidence=candidate.confidence,
+                evidence_confidence=candidate.evidence_confidence,
+                classification_confidence=candidate.classification.confidence,
+                classification=candidate.classification,
+                entity_id=candidate.entity_id,
                 event_ids=list(candidate.event_ids),
                 trigger_event_ids=list(candidate.trigger_event_ids),
                 evidence_ids=list(candidate.evidence_ids),
                 condition_trace=list(candidate.condition_trace),
                 risk=RiskScore(
                     score=total,
+                    base_score=base_total,
                     band=_risk_band(total),
                     factors=factors,
+                    penalties=penalties,
+                    scoring_version=config.scoring_version,
                 ),
                 live_detected=candidate.live_detected,
             )

@@ -15,7 +15,7 @@ def issue_codes(report):
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
-PUBLIC_EXAMPLES = Path(__file__).parents[2] / "frontend" / "public" / "examples"
+PUBLIC_EXAMPLES = Path(__file__).parents[2] / "datasets" / "sample"
 
 
 def test_accepts_valid_simulated_csv_and_hashes_original_bytes():
@@ -54,6 +54,41 @@ def test_public_simulation_example_matches_the_versioned_profile():
     assert report.accepted_records == 3
     assert report.rejected_records == 0
     assert report.metadata.dataset_profile == "simulated@1.0"
+
+
+@pytest.mark.parametrize(
+    ("source", "content"),
+    [
+        (EvidenceSource.HAI_ICS_BLIND, b"timestamp,device_id,sensor_1,label\n2026-01-01T00:00:00Z,pump-1,12.5,attack\n"),
+        (EvidenceSource.IOT23_ZEEK_BLIND, b"ts,device_id,id.orig_h,id.resp_h,proto,detailed-label\n1,camera-1,10.0.0.2,10.0.0.3,tcp,Attack\n"),
+    ],
+)
+def test_blind_profiles_reject_ground_truth_columns(source, content):
+    report = EvidenceValidationService().validate(
+        filename="blind.csv", content=content, source_type=source, media_type="text/csv"
+    )
+
+    assert report.status == ValidationStatus.REJECTED
+    assert "GROUND_TRUTH_COLUMN_FORBIDDEN" in issue_codes(report)
+
+
+@pytest.mark.parametrize(
+    ("filename", "source", "expected_records"),
+    [
+        ("hai-ics-blind-sample.csv", EvidenceSource.HAI_ICS_BLIND, 300),
+        ("iot23-zeek-blind-sample.csv", EvidenceSource.IOT23_ZEEK_BLIND, 1_000),
+    ],
+)
+def test_public_blind_samples_match_their_versioned_profiles(filename, source, expected_records):
+    report = EvidenceValidationService().validate(
+        filename=filename,
+        content=(PUBLIC_EXAMPLES / filename).read_bytes(),
+        source_type=source,
+        media_type="text/csv",
+    )
+
+    assert report.status == ValidationStatus.ACCEPTED
+    assert report.accepted_records == expected_records
 
 
 def test_rejects_unsafe_filename_before_parsing():

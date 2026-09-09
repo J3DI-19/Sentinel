@@ -1,5 +1,8 @@
+import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import sleep
+from uuid import uuid4
 
 from app.evidence.schemas import EvidenceSource
 
@@ -39,7 +42,7 @@ def upload(client, case_id, content, *, source="simulation", filename="events.cs
 
 
 def wait_for(client, import_id, states):
-    for _ in range(100):
+    for _ in range(1_000):
         job = client.get(f"/api/v1/imports/{import_id}").json()
         if job["state"] in states: return job
         sleep(0.01)
@@ -70,6 +73,63 @@ def test_valid_import_is_persisted_and_queryable(client):
     assert events["total"] == 1
     assert events["items"][0]["provenance"]["source_type"] == "simulation"
     assert events["items"][0]["ingested_at"] == job["validation"]["metadata"]["received_at"]
+
+
+def test_blank_case_description_is_explained_after_import_and_custom_text_is_preserved(client):
+    created = client.post("/api/v1/cases", json={"name": "Beginner-friendly case"}).json()
+    assert "No evidence has been imported yet" in created["description"]
+
+    body = b"timestamp,device_id,event_type\n2026-01-01T00:00:00Z,sensor-1,motion\n"
+    imported = upload(client, created["id"], body).json()
+    job = wait_for(client, imported["import_id"], {"awaiting_commit"})
+    client.post(f"/api/v1/imports/{job['import_id']}/commit", json={"allow_partial": False})
+    assert wait_for(client, job["import_id"], {"completed"})["state"] == "completed"
+
+    updated = client.get(f"/api/v1/cases/{created['id']}").json()
+    assert "made-up demonstration data" in updated["description"]
+    assert "not evidence of a real incident" in updated["description"]
+
+    custom = client.post(
+        "/api/v1/cases",
+        json={"name": "Custom case", "description": "Investigator-written context"},
+    ).json()
+    imported = upload(client, custom["id"], body).json()
+    job = wait_for(client, imported["import_id"], {"awaiting_commit"})
+    client.post(f"/api/v1/imports/{job['import_id']}/commit", json={"allow_partial": False})
+    assert wait_for(client, job["import_id"], {"completed"})["state"] == "completed"
+    assert client.get(f"/api/v1/cases/{custom['id']}").json()["description"] == "Investigator-written context"
+
+
+def test_hai_blind_sample_commits_metric_findings_without_artifact_id_collisions(client):
+    case_id = create_case(client)
+    sample = Path(__file__).parents[2] / "datasets" / "sample" / "hai-ics-blind-sample.csv"
+    uploaded = upload(
+        client,
+        case_id,
+        sample.read_bytes(),
+        source=EvidenceSource.HAI_ICS_BLIND.value,
+        filename=sample.name,
+    ).json()
+    job = wait_for(client, uploaded["import_id"], {"awaiting_commit"})
+
+    assert job["validation"]["accepted_records"] == 300
+    response = client.post(
+        f"/api/v1/imports/{job['import_id']}/commit",
+        json={"allow_partial": False},
+    )
+
+    assert response.status_code == 202
+    assert wait_for(client, job["import_id"], {"completed", "failed"})["state"] == "completed"
+    finding_page = client.get(f"/api/v1/cases/{case_id}/findings").json()
+    findings = finding_page["items"]
+    finding_ids = [finding["finding_id"] for finding in findings]
+    assert findings
+    assert len(finding_ids) == len(set(finding_ids))
+    incidents = client.get(f"/api/v1/cases/{case_id}/incidents").json()["items"]
+    assert len(incidents) == 3
+    assert sum(incident["finding_count"] for incident in incidents) == finding_page["total"]
+    assert all(not incident["finding_ids_truncated"] for incident in incidents)
+    assert all(incident["maximum_trigger_span_seconds"] == 120 for incident in incidents)
 
 
 def test_partial_import_requires_explicit_approval(client):
@@ -363,3 +423,87 @@ def test_custom_analysis_configuration_is_explicitly_rejected(client):
     )
     assert response.status_code == 422
     assert response.json()["code"] == "request_validation_error"
+
+
+def test_large_mixed_analysis_balances_charts_and_pages_timeline_windows(client):
+    case_id = create_case(client)
+    analysis_id = client.post(f"/api/v1/cases/{case_id}/analyses").json()["analysis_id"]
+    database = client.app.state.batch_service.db
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    with database:
+        database.execute(
+            "INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)",
+            (analysis_id, case_id, "aggregate", "attack-class", None, None, None, json.dumps({"series": "attack_class", "category": "ransomware", "value": 6})),
+        )
+        for index in range(250):
+            category = (base + timedelta(minutes=index)).isoformat()
+            database.execute(
+                "INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)",
+                (analysis_id, case_id, "aggregate", f"activity-{index:03}", None, None, None, json.dumps({"series": "activity_minute", "category": category, "subgroup": "batch", "value": 2})),
+            )
+        for index in range(21):
+            occurred_at = (base + timedelta(minutes=index // 2, seconds=index % 2)).isoformat()
+            database.execute(
+                "INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)",
+                (analysis_id, case_id, "timeline", f"timeline-{index:03}", occurred_at, None, None, json.dumps({"entry_id": f"timeline-{index:03}", "entry_type": "event", "occurred_at": occurred_at, "ingested_at": occurred_at, "timestamp_basis": "observed", "title": "Test event", "event_ids": [], "evidence_ids": [], "severity": None, "risk_score": None})),
+            )
+
+    charts = client.get(f"/api/v1/cases/{case_id}/charts").json()
+    assert len(charts["items"]) <= 200
+    assert {point["series"] for point in charts["items"]} >= {"activity_minute", "attack_class"}
+    assert sum(point["value"] for point in charts["items"] if point["series"] == "activity_minute") == 500
+
+    first = client.get(f"/api/v1/cases/{case_id}/timeline/windows", params={"page": 1, "page_size": 10})
+    second = client.get(f"/api/v1/cases/{case_id}/timeline/windows", params={"page": 2, "page_size": 10})
+    assert first.status_code == second.status_code == 200
+    assert first.json()["record_total"] == 21
+    assert first.json()["total"] == 11
+    assert len(first.json()["items"]) == 10
+    assert len(second.json()["items"]) == 1
+    assert first.json()["items"][0]["record_count"] == 2
+    assert first.json()["items"][0]["category_counts"] == {"event": 2}
+    records = client.get(f"/api/v1/cases/{case_id}/timeline", params={"window_key": first.json()["items"][0]["key"], "page_size": 200})
+    assert records.status_code == 200
+    assert records.json()["total"] == 2
+
+
+def test_incident_severity_filter_and_alert_workflow_are_operational(client):
+    case_id = create_case(client)
+    analysis_id = client.post(f"/api/v1/cases/{case_id}/analyses").json()["analysis_id"]
+    database = client.app.state.batch_service.db
+    alert_id, finding_id, incident_id, event_id, evidence_id = (str(uuid4()) for _ in range(5))
+    occurred = datetime.now(timezone.utc).isoformat()
+    alert = {
+        "alert_id": alert_id, "case_id": case_id, "finding_id": finding_id,
+        "rule_id": "AUTH-001", "title": "Repeated authentication failures",
+        "severity": "critical", "risk_score": 91, "event_ids": [event_id],
+        "evidence_ids": [evidence_id], "triggered_at": occurred,
+        "delivery_status": "pending",
+    }
+    incident = {
+        "incident_id": incident_id, "case_id": case_id, "event_ids": [event_id],
+        "finding_ids": [finding_id], "alert_ids": [alert_id],
+        "correlation_edge_ids": [], "correlation_edge_count": 0,
+        "correlation_edges_truncated": False, "started_at": occurred,
+        "ended_at": occurred, "maximum_risk": 91, "severity": "critical",
+        "severity_counts": {"critical": 1}, "evidence_count": 1, "entity_count": 1,
+        "incident_version": "1.0",
+    }
+    with database:
+        database.execute("INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)", (analysis_id, case_id, "alert", alert_id, occurred, "critical", 91, json.dumps(alert)))
+        database.execute("INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)", (analysis_id, case_id, "incident", incident_id, occurred, "critical", 91, json.dumps(incident)))
+    filtered = client.get(f"/api/v1/cases/{case_id}/incidents", params={"severity": "critical"})
+    assert filtered.status_code == 200
+    assert filtered.json()["total"] == 1
+    updated = client.patch(f"/api/v1/cases/{case_id}/alerts/{alert_id}", json={"status": "acknowledged", "actor": "Analyst"})
+    assert updated.status_code == 200
+    assert updated.json()["workflow_status"] == "acknowledged"
+    assert updated.json()["workflow_actor"] == "Analyst"
+    assert updated.json()["notification_status"] == "not_requested"
+    failed_delivery = client.patch(f"/api/v1/cases/{case_id}/alerts/{alert_id}", json={"status": "acknowledged", "actor": "Notifier", "notification_status": "delivery_failed", "notification_error": "SMTP offline"})
+    assert failed_delivery.status_code == 200
+    assert failed_delivery.json()["notification_status"] == "delivery_failed"
+    assert failed_delivery.json()["notification_error"] == "SMTP offline"
+    listed = client.get(f"/api/v1/cases/{case_id}/alerts").json()["items"]
+    assert listed[0]["workflow_status"] == "acknowledged"
+    assert listed[0]["notification_status"] == "delivery_failed"

@@ -10,6 +10,11 @@ from uuid import UUID, uuid4
 from app.analysis.service import AnalysisService
 from app.db.sqlite import SQLiteRepository
 from app.evidence.authorization import ValidationAuthority
+from app.evidence.descriptions import (
+    DatasetReference,
+    case_description,
+    is_managed_case_description,
+)
 from app.evidence.hashing import sha256_bytes
 from app.evidence.schemas import EvidenceSource, EvidenceValidationReport, ValidationStatus
 from app.evidence.service import EvidenceValidationService
@@ -35,6 +40,7 @@ class BatchInvestigationService:
         self.queue: Queue[tuple[str, str, object | None]] = Queue(maxsize=8)
         self.stop_event = Event()
         self.worker = Thread(target=self._run_worker, name="traceveil-batch-worker", daemon=True)
+        self._backfill_case_descriptions()
         self._recover_jobs()
         self.worker.start()
 
@@ -45,9 +51,40 @@ class BatchInvestigationService:
 
     def create_case(self, name: str, description: str, owner: str) -> dict:
         now = utcnow()
+        description = description.strip() or case_description([])
         with self.repository.write_lock, self.db:
             cursor = self.db.execute("INSERT INTO cases(name,description,case_type,status,owner,created_at,updated_at) VALUES(?,?,?,?,?,?,?)", (name, description, "batch", "active", owner, now, now))
         return self.get_case(cursor.lastrowid)
+
+    def _refresh_case_description(self, case_id: int) -> None:
+        row = self.db.execute("SELECT description FROM cases WHERE id=?", (case_id,)).fetchone()
+        if row is None or not is_managed_case_description(row["description"]):
+            return
+        references: list[DatasetReference] = []
+        for evidence in self.db.execute(
+            """
+            SELECT DISTINCT source_type, dataset_profile
+            FROM evidence_metadata
+            WHERE case_id=? AND committed_at IS NOT NULL AND source_type IS NOT NULL
+            """,
+            (case_id,),
+        ).fetchall():
+            try:
+                source = EvidenceSource(evidence["source_type"])
+            except ValueError:
+                continue
+            references.append(DatasetReference(source, evidence["dataset_profile"]))
+        self.db.execute(
+            "UPDATE cases SET description=? WHERE id=?",
+            (case_description(references), case_id),
+        )
+
+    def _backfill_case_descriptions(self) -> None:
+        with self.repository.write_lock, self.db:
+            rows = self.db.execute("SELECT id,description FROM cases").fetchall()
+            for row in rows:
+                if is_managed_case_description(row["description"]):
+                    self._refresh_case_description(row["id"])
 
     def get_case(self, case_id: int) -> dict:
         with self.repository.write_lock:
@@ -136,6 +173,16 @@ class BatchInvestigationService:
         stored_content = Path(job["file_path"]).read_bytes()
         if sha256_bytes(stored_content) != original_report.metadata.sha256:
             raise ValueError("evidence_content_hash_mismatch")
+        duplicate = self.repository.find_committed_evidence_by_hash(
+            job["case_id"], original_report.metadata.sha256
+        )
+        if duplicate is not None and str(duplicate) != job["evidence_id"]:
+            with self.repository.write_lock, self.db:
+                self.db.execute(
+                    "UPDATE import_jobs SET evidence_id=?,status='duplicate',updated_at=? WHERE import_id=?",
+                    (str(duplicate), utcnow(), import_id),
+                )
+            return self.get_import(import_id)
         outcome = self.validator.validate_with_records(filename=job["filename"], content=stored_content, source_type=EvidenceSource(job["source_type"]), case_id=job["case_id"])
         fixed_metadata = outcome.report.metadata.model_copy(
             update={
@@ -183,16 +230,17 @@ class BatchInvestigationService:
                 self.db.execute("INSERT OR IGNORE INTO canonical_events VALUES(?,?,?,?,?,?,?,?,?,?,?)", (str(event.event_id),event.case_id,str(event.provenance.evidence_id),event.observed_at.isoformat() if event.observed_at else None,event.ingested_at.isoformat(),event.provenance.origin.value,event.event_type,entity.id if entity else None,event.source_label,json.dumps(raw,sort_keys=True),event.model_dump_json()))
             self._persist_analysis(result, now)
             self.db.execute("UPDATE evidence_metadata SET committed_at=? WHERE evidence_id=?", (now,job["evidence_id"]))
+            self._refresh_case_description(job["case_id"])
             self.db.execute("UPDATE import_jobs SET status=?,updated_at=? WHERE import_id=?", (final_status,now,import_id))
             self.db.execute("UPDATE cases SET updated_at=? WHERE id=?", (now,job["case_id"]))
         return self.get_import(import_id)
 
     def _store_artifacts(self, result) -> None:
-        groups = {"finding":result.findings,"alert":result.alerts,"incident":result.incidents,"timeline":result.timeline,"graph_node":result.graph.nodes,"graph_edge":result.graph.edges,"aggregate":result.chart_points}
+        groups = {"finding":result.findings,"alert":result.alerts,"incident":result.incidents,"timeline":result.timeline,"graph_node":result.graph.nodes,"graph_edge":result.graph.edges,"aggregate":result.chart_points,"activity_window":result.activity_windows}
         for kind, items in groups.items():
             for index,item in enumerate(items):
-                data=item.model_dump(mode="json"); item_id=str(data.get(f"{kind}_id") or data.get("entry_id") or data.get("node_id") or data.get("edge_id") or f"{kind}:{index}")
-                occurred=data.get("occurred_at") or data.get("triggered_at") or data.get("started_at"); severity=data.get("severity"); risk=data.get("risk_score") or data.get("maximum_risk") or (data.get("risk") or {}).get("score")
+                data=item.model_dump(mode="json"); item_id=str(data.get(f"{kind}_id") or data.get("window_id") or data.get("entry_id") or data.get("node_id") or data.get("edge_id") or f"{kind}:{index}")
+                occurred=data.get("occurred_at") or data.get("triggered_at") or data.get("started_at") or data.get("window_start"); severity=data.get("severity"); risk=data.get("risk_score") or data.get("maximum_risk") or (data.get("risk") or {}).get("score")
                 self.db.execute("INSERT INTO analysis_artifacts VALUES(?,?,?,?,?,?,?,?)", (str(result.analysis_id),result.case_id,kind,item_id,occurred,severity,risk,json.dumps(data,sort_keys=True)))
 
     def _persist_analysis(self, result, created_at: str) -> tuple[str, bool]:
@@ -213,6 +261,11 @@ class BatchInvestigationService:
             (analysis_id, result.case_id, "completed", payload, created_at),
         )
         self._store_artifacts(result)
+        for alert in result.alerts:
+            self.db.execute(
+                "INSERT OR IGNORE INTO alert_workflow(case_id,alert_id,status,actor,notification_status,notification_error,updated_at) VALUES(?,?,?,?,?,?,?)",
+                (result.case_id, str(alert.alert_id), "pending", "system", "not_requested", None, created_at),
+            )
         return created_at, True
 
     def get_import(self, import_id: str) -> dict:

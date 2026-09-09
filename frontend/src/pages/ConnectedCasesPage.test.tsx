@@ -15,6 +15,7 @@ describe("ConnectedCasesPage", () => {
     render(<ConnectedCasesPage navigate={navigate}/>);
     expect(await screen.findByText("No persisted cases")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Create case" }));
+    expect(screen.getByPlaceholderText("Leave blank for a plain-language explanation of the imported dataset.")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Case name"), { target: { value: "  Review case  " } });
     fireEvent.change(screen.getByLabelText("Description"), { target: { value: "  Batch showcase  " } });
     fireEvent.change(screen.getByLabelText("Owner"), { target: { value: "  Reviewer  " } });
@@ -52,5 +53,16 @@ describe("ConnectedCasesPage", () => {
     fireEvent.submit(screen.getByRole("form", { name: "Create case" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Enter a case name");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the generated dataset explanation in a hover title", async () => {
+    const description = "Dataset overview: This is network-connection data from IoT-23 scenarios involving several smart devices.";
+    const fetchMock = vi.fn(() => Promise.resolve(new Response(JSON.stringify({ ...page, items: [{ ...created, description }] }), { status: 200 })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<ConnectedCasesPage navigate={vi.fn()}/>);
+
+    const preview = await screen.findByText("CASE-0042 · Hover for description");
+    expect(preview).toHaveAttribute("title", description);
   });
 });

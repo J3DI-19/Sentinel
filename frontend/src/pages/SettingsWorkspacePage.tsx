@@ -7,7 +7,7 @@ type ToggleProps = { label: string; description: string; checked: boolean; onCha
 const tabs: Array<{ name: Tab; description: string; status: string; icon: string }> = [
   { name: "Preferences", description: "Interface and investigation defaults", status: "Local", icon: "◫" },
   { name: "Model settings", description: "Optional grounded Ollama assistance", status: "Server configured", icon: "✦" },
-  { name: "Alert rules", description: "Browser triage preferences; analysis is server authoritative", status: "Session only", icon: "◇" },
+  { name: "Alert rules", description: "Versioned deterministic server policy", status: "Read only", icon: "◇" },
   { name: "Email delivery", description: "Approval-gated server delivery policy", status: "Environment", icon: "↗" },
 ];
 
@@ -29,7 +29,6 @@ export function SettingsWorkspacePage() {
   const [saved, setSaved] = useState(false);
   const [preferences, setPreferences] = useState({ compact: false, motion: false, clock: true, timezone: "Asia/Kolkata", start: "Overview" });
   const [model, setModel] = useState({ enabled: false, references: true, provider: "Local Ollama", name: "llama3.2:3b" });
-  const [alerts, setAlerts] = useState({ critical: true, high: true, medium: false, threshold: "80", window: "15 minutes" });
   const current = tabs.find(item => item.name === tab)!;
   const change = (action: () => void) => { action(); setDirty(true); setSaved(false); };
   const toggle = (label: string, description: string, checked: boolean, action: (value: boolean) => void, disabled = false) => <Toggle label={label} description={description} checked={checked} onChange={value => change(() => action(value))} disabled={disabled}/>;
@@ -71,15 +70,12 @@ export function SettingsWorkspacePage() {
         </>}
 
         {tab === "Alert rules" && <>
-          <Section title="Default alert intake" description="Choose which future detections should enter the investigation queue.">
-            {toggle("Critical detections", "Surface critical detections immediately.", alerts.critical, value => setAlerts({ ...alerts, critical: value }))}
-            {toggle("High-severity detections", "Surface high-severity detections for review.", alerts.high, value => setAlerts({ ...alerts, high: value }))}
-            {toggle("Medium-severity detections", "Include medium-severity detections by default.", alerts.medium, value => setAlerts({ ...alerts, medium: value }))}
+          <div className="settings-unavailable"><span>◇</span><div><b>Analysis policy is server-authoritative</b><p>Alert creation, risk thresholds, and the 120-second incident correlation window are versioned with each immutable analysis. This screen no longer presents browser-only controls that could be mistaken for operational rules.</p></div></div>
+          <Section title="Current deterministic policy" description="Reanalysis records the complete policy configuration in its snapshot.">
+            {toggle("Live trigger required for alerts", "Historical batch findings do not create live alerts.", true, () => undefined, true)}
+            {toggle("All finding severities retained", "Severity does not hide or discard deterministic findings.", true, () => undefined, true)}
+            <div className="settings-control-grid"><SelectField label="Correlation window" description="Server analysis default." value="120 seconds" onChange={() => undefined} disabled><option>120 seconds</option></SelectField><SelectField label="Risk bands" description="Low 0–24 · Medium 25–49 · High 50–74 · Critical 75–100." value="Version 1.1" onChange={() => undefined} disabled><option>Version 1.1</option></SelectField></div>
           </Section>
-          <Section title="Triage defaults" description="Browser-only triage preferences; detection thresholds remain backend-authoritative."><div className="settings-control-grid">
-            <SelectField label="Escalation threshold" description="Minimum score for escalation." value={alerts.threshold} onChange={value => change(() => setAlerts({ ...alerts, threshold: value }))}><option value="70">70 risk</option><option value="80">80 risk</option><option value="90">90 risk</option></SelectField>
-            <SelectField label="Grouping window" description="Combine related detections." value={alerts.window} onChange={value => change(() => setAlerts({ ...alerts, window: value }))}><option>5 minutes</option><option>15 minutes</option><option>30 minutes</option></SelectField>
-          </div></Section>
         </>}
 
         {tab === "Email delivery" && <>
@@ -91,7 +87,7 @@ export function SettingsWorkspacePage() {
           </Section>
         </>}
 
-        <footer className="settings-save"><span className={saved ? "settings-saved" : ""}>{saved ? "✓ Settings applied to this browser session." : dirty ? "Unsaved session changes" : "No unsaved changes"}</span><Button variant="primary" disabled={!dirty || tab === "Email delivery"} onClick={() => { setDirty(false); setSaved(true); }}>Save {tab.toLowerCase()}</Button></footer>
+        <footer className="settings-save"><span className={saved ? "settings-saved" : ""}>{saved ? "✓ Settings applied to this browser session." : dirty ? "Unsaved session changes" : "No unsaved changes"}</span><Button variant="primary" disabled={!dirty || tab === "Email delivery" || tab === "Alert rules"} onClick={() => { setDirty(false); setSaved(true); }}>Save {tab.toLowerCase()}</Button></footer>
       </main>
     </div>
   </>;

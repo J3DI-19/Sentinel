@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime
+from uuid import UUID
+
 import networkx as nx
 
 from app.analysis.config import AnalysisConfig
@@ -10,8 +13,11 @@ from app.analysis.schemas import (
     CorrelationEdge,
     CorrelationReason,
     DetectionFinding,
+    INCIDENT_ALERT_REFERENCE_LIMIT,
     INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT,
+    INCIDENT_FINDING_REFERENCE_LIMIT,
     Incident,
+    Severity,
 )
 from app.normalization.schemas import CanonicalEntity, CanonicalEvent
 
@@ -46,6 +52,7 @@ def correlate(
                     reasons=reasons,
                     difference_seconds=round(difference, 6),
                     window_seconds=config.correlation_window_seconds,
+                    correlation_version=config.correlation_version,
                 )
             )
     return sorted(edges, key=lambda edge: str(edge.edge_id))
@@ -58,78 +65,54 @@ def build_incidents(
     findings: list[DetectionFinding],
     alerts: list[Alert],
     correlations: list[CorrelationEdge],
+    config: AnalysisConfig | None = None,
 ) -> list[Incident]:
     if not findings:
         return []
+    policy = config or AnalysisConfig()
     event_by_id = {event.event_id: event for event in events}
     graph = nx.Graph()
     relevant_ids = {event_id for finding in findings for event_id in finding.event_ids}
-    graph.add_nodes_from(event_by_id)
+    graph.add_nodes_from(relevant_ids)
     for edge in correlations:
-        graph.add_edge(edge.source_event_id, edge.target_event_id, edge_id=edge.edge_id)
+        if edge.source_event_id in relevant_ids and edge.target_event_id in relevant_ids:
+            graph.add_edge(
+                edge.source_event_id,
+                edge.target_event_id,
+                edge_id=edge.edge_id,
+            )
     for finding in findings:
-        anchor = finding.event_ids[0]
-        for event_id in finding.event_ids[1:]:
+        known_event_ids = [
+            event_id for event_id in finding.event_ids if event_id in event_by_id
+        ]
+        if not known_event_ids:
+            continue
+        anchor = known_event_ids[0]
+        for event_id in known_event_ids[1:]:
             graph.add_edge(anchor, event_id, finding_id=finding.finding_id)
 
     incidents: list[Incident] = []
     for component in nx.connected_components(graph):
-        if not component & relevant_ids:
-            continue
-        component_ids = unique_sorted_uuids(component)
         component_findings = [
             finding
             for finding in findings
             if any(event_id in component for event_id in finding.event_ids)
         ]
-        if not component_findings:
-            continue
-        finding_ids = unique_sorted_uuids(finding.finding_id for finding in component_findings)
-        component_alerts = [alert for alert in alerts if alert.finding_id in finding_ids]
-        component_edges = [
-            edge
-            for edge in correlations
-            if edge.source_event_id in component and edge.target_event_id in component
-        ]
-        component_edge_ids = [
-            edge.edge_id
-            for edge in sorted(
-                component_edges,
-                key=lambda edge: (
-                    edge.difference_seconds,
-                    str(edge.source_event_id),
-                    str(edge.target_event_id),
-                    str(edge.edge_id),
-                ),
-            )
-        ]
-        retained_edge_ids = component_edge_ids[
-            :INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT
-        ]
-        observed = [
-            event_by_id[event_id].observed_at
-            for event_id in component_ids
-            if event_id in event_by_id and event_by_id[event_id].observed_at is not None
-        ]
-        incidents.append(
-            Incident(
-                incident_id=stable_uuid(
-                    "incident", case_id, *(str(event_id) for event_id in component_ids)
-                ),
+        for session_findings in _partition_findings(
+            component_findings,
+            event_by_id,
+            policy,
+        ):
+            incident = _build_incident(
                 case_id=case_id,
-                event_ids=component_ids,
-                finding_ids=finding_ids,
-                alert_ids=unique_sorted_uuids(alert.alert_id for alert in component_alerts),
-                correlation_edge_ids=retained_edge_ids,
-                correlation_edge_count=len(component_edge_ids),
-                correlation_edges_truncated=(
-                    len(component_edge_ids) > len(retained_edge_ids)
-                ),
-                started_at=min(observed) if observed else None,
-                ended_at=max(observed) if observed else None,
-                maximum_risk=max(finding.risk.score for finding in component_findings),
+                findings=session_findings,
+                alerts=alerts,
+                correlations=correlations,
+                event_by_id=event_by_id,
+                config=policy,
             )
-        )
+            if incident is not None:
+                incidents.append(incident)
     return sorted(
         incidents,
         key=lambda incident: (
@@ -137,6 +120,208 @@ def build_incidents(
             incident.started_at or incident.ended_at,
             str(incident.incident_id),
         ),
+    )
+
+
+def _partition_findings(
+    findings: list[DetectionFinding],
+    event_by_id: dict[UUID, CanonicalEvent],
+    config: AnalysisConfig,
+) -> list[list[DetectionFinding]]:
+    timed: list[tuple[datetime, DetectionFinding]] = []
+    untimed: list[DetectionFinding] = []
+    for finding in findings:
+        anchor = _finding_anchor_time(finding, event_by_id)
+        if anchor is None:
+            untimed.append(finding)
+        else:
+            timed.append((anchor, finding))
+    timed.sort(key=lambda item: (item[0], str(item[1].finding_id)))
+    untimed.sort(key=lambda finding: str(finding.finding_id))
+
+    sessions: list[list[DetectionFinding]] = []
+    current: list[DetectionFinding] = []
+    session_start = None
+    previous_time = None
+    current_event_ids: set = set()
+    for anchor, finding in timed:
+        finding_event_ids = set(finding.event_ids)
+        starts_new = bool(
+            current
+            and (
+                (anchor - previous_time).total_seconds()
+                > config.correlation_window_seconds
+                or (anchor - session_start).total_seconds()
+                > config.incident_max_trigger_span_seconds
+                or len(current_event_ids | finding_event_ids) > 4096
+            )
+        )
+        if starts_new:
+            sessions.append(current)
+            current = []
+            current_event_ids = set()
+            session_start = None
+        if not current:
+            session_start = anchor
+        current.append(finding)
+        current_event_ids.update(finding_event_ids)
+        previous_time = anchor
+    if current:
+        sessions.append(current)
+
+    current = []
+    current_event_ids = set()
+    for finding in untimed:
+        finding_event_ids = set(finding.event_ids)
+        if current and len(current_event_ids | finding_event_ids) > 4096:
+            sessions.append(current)
+            current = []
+            current_event_ids = set()
+        current.append(finding)
+        current_event_ids.update(finding_event_ids)
+    if current:
+        sessions.append(current)
+    return sessions
+
+
+def _finding_anchor_time(
+    finding: DetectionFinding,
+    event_by_id: dict[UUID, CanonicalEvent],
+) -> datetime | None:
+    trigger_times = [
+        event_by_id[event_id].observed_at
+        for event_id in finding.trigger_event_ids
+        if event_id in event_by_id and event_by_id[event_id].observed_at is not None
+    ]
+    if trigger_times:
+        return max(trigger_times)
+    support_times = [
+        event_by_id[event_id].observed_at
+        for event_id in finding.event_ids
+        if event_id in event_by_id and event_by_id[event_id].observed_at is not None
+    ]
+    return max(support_times) if support_times else None
+
+
+def _build_incident(
+    *,
+    case_id: int,
+    findings: list[DetectionFinding],
+    alerts: list[Alert],
+    correlations: list[CorrelationEdge],
+    event_by_id: dict[UUID, CanonicalEvent],
+    config: AnalysisConfig,
+) -> Incident | None:
+    component_ids = unique_sorted_uuids(
+        event_id
+        for finding in findings
+        for event_id in finding.event_ids
+        if event_id in event_by_id
+    )
+    if not component_ids:
+        return None
+    component_id_set = set(component_ids)
+    all_finding_ids = unique_sorted_uuids(
+        finding.finding_id for finding in findings
+    )
+    finding_id_set = set(all_finding_ids)
+    retained_finding_ids = all_finding_ids[:INCIDENT_FINDING_REFERENCE_LIMIT]
+    component_alerts = [
+        alert for alert in alerts if alert.finding_id in finding_id_set
+    ]
+    all_alert_ids = unique_sorted_uuids(alert.alert_id for alert in component_alerts)
+    retained_alert_ids = all_alert_ids[:INCIDENT_ALERT_REFERENCE_LIMIT]
+    component_edges = [
+        edge
+        for edge in correlations
+        if edge.source_event_id in component_id_set
+        and edge.target_event_id in component_id_set
+    ]
+    component_edge_ids = [
+        edge.edge_id
+        for edge in sorted(
+            component_edges,
+            key=lambda edge: (
+                edge.difference_seconds,
+                str(edge.source_event_id),
+                str(edge.target_event_id),
+                str(edge.edge_id),
+            ),
+        )
+    ]
+    retained_edge_ids = component_edge_ids[
+        :INCIDENT_CORRELATION_EDGE_REFERENCE_LIMIT
+    ]
+    observed = [
+        event_by_id[event_id].observed_at
+        for event_id in component_ids
+        if event_by_id[event_id].observed_at is not None
+    ]
+    severity_order = {
+        Severity.LOW: 1,
+        Severity.MEDIUM: 2,
+        Severity.HIGH: 3,
+        Severity.CRITICAL: 4,
+    }
+    severity_counts = {
+        severity: sum(finding.severity == severity for finding in findings)
+        for severity in Severity
+        if any(finding.severity == severity for finding in findings)
+    }
+    entities = {
+        (entity.kind.value, entity.id)
+        for event_id in component_ids
+        for entity in (
+            event_by_id[event_id].device,
+            event_by_id[event_id].actor,
+            event_by_id[event_id].target,
+        )
+        if entity is not None
+    }
+    return Incident(
+        incident_id=stable_uuid(
+            "incident", case_id, *(str(event_id) for event_id in component_ids)
+        ),
+        case_id=case_id,
+        event_ids=component_ids,
+        finding_ids=retained_finding_ids,
+        finding_count=len(all_finding_ids),
+        finding_ids_truncated=len(all_finding_ids) > len(retained_finding_ids),
+        alert_ids=retained_alert_ids,
+        alert_count=len(all_alert_ids),
+        alert_ids_truncated=len(all_alert_ids) > len(retained_alert_ids),
+        correlation_edge_ids=retained_edge_ids,
+        correlation_edge_count=len(component_edge_ids),
+        correlation_edges_truncated=(
+            len(component_edge_ids) > len(retained_edge_ids)
+        ),
+        started_at=min(observed) if observed else None,
+        ended_at=max(observed) if observed else None,
+        maximum_risk=max(finding.risk.score for finding in findings),
+        severity=max(
+            (finding.severity for finding in findings), key=severity_order.get
+        ),
+        severity_counts=severity_counts,
+        evidence_count=len(
+            {
+                evidence_id
+                for finding in findings
+                for evidence_id in finding.evidence_ids
+            }
+        ),
+        entity_count=len(entities),
+        entity_ids=sorted({entity_id for _, entity_id in entities})[:1024],
+        tags=sorted(
+            {
+                tag
+                for finding in findings
+                if finding.classification
+                for tag in finding.classification.tags
+            }
+        ),
+        grouping_policy="finding_centered_bounded_session",
+        inactivity_window_seconds=config.correlation_window_seconds,
+        maximum_trigger_span_seconds=config.incident_max_trigger_span_seconds,
     )
 
 
@@ -177,6 +362,10 @@ def _correlation_reasons(
     right_addresses = _network_addresses(right)
     if left_addresses & right_addresses:
         reasons.add(CorrelationReason.SHARED_NETWORK_ADDRESS)
+    left_service = left.attributes.get("service")
+    right_service = right.attributes.get("service")
+    if isinstance(left_service, str) and left_service and left_service == right_service:
+        reasons.add(CorrelationReason.SHARED_SERVICE)
     return sorted(reasons, key=lambda reason: reason.value)
 
 
