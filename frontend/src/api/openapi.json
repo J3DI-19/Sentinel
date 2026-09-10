@@ -140,6 +140,19 @@
         "title": "ActivityWindowExplanation",
         "type": "object"
       },
+      "AiControlUpdate": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "AiControlUpdate",
+        "type": "object"
+      },
       "Alert": {
         "additionalProperties": false,
         "properties": {
@@ -3497,6 +3510,19 @@
           "message"
         ],
         "title": "NormalizationIssue",
+        "type": "object"
+      },
+      "OllamaServerUpdate": {
+        "properties": {
+          "running": {
+            "title": "Running",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "running"
+        ],
+        "title": "OllamaServerUpdate",
         "type": "object"
       },
       "PageResponse_Alert_": {
@@ -7521,6 +7547,90 @@
           }
         },
         "summary": "Ai Health",
+        "tags": [
+          "health"
+        ]
+      },
+      "patch": {
+        "operationId": "update_ai_control_api_v1_health_ai_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiControlUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Ai Control Api V1 Health Ai Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Ai Control",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/health/ai/server": {
+      "patch": {
+        "operationId": "update_ollama_server_api_v1_health_ai_server_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OllamaServerUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Ollama Server Api V1 Health Ai Server Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Ollama Server",
         "tags": [
           "health"
         ]

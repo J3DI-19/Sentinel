@@ -688,7 +688,25 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update Ai Control */
+        patch: operations["update_ai_control_api_v1_health_ai_patch"];
+        trace?: never;
+    };
+    "/api/v1/health/ai/server": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Ollama Server */
+        patch: operations["update_ollama_server_api_v1_health_ai_server_patch"];
         trace?: never;
     };
     "/api/v1/health/db": {
@@ -1005,6 +1023,11 @@ export interface components {
              * Format: date-time
              */
             window_start: string;
+        };
+        /** AiControlUpdate */
+        AiControlUpdate: {
+            /** Enabled */
+            enabled: boolean;
         };
         /** Alert */
         Alert: {
@@ -2316,6 +2339,11 @@ export interface components {
             message: string;
             /** Source Value */
             source_value?: string | null;
+        };
+        /** OllamaServerUpdate */
+        OllamaServerUpdate: {
+            /** Running */
+            running: boolean;
         };
         /** PageResponse[Alert] */
         PageResponse_Alert_: {
@@ -4268,6 +4296,76 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    update_ai_control_api_v1_health_ai_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiControlUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ollama_server_api_v1_health_ai_server_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OllamaServerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

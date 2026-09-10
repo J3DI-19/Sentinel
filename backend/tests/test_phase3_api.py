@@ -1,3 +1,4 @@
+import json
 from time import sleep
 
 import pytest
@@ -143,6 +144,137 @@ def test_assistant_offline_returns_grounded_fallback_and_saves_history(client):
     assert history["items"][0]["message_count"] == 2
     assert history["items"][0]["title"] == "Summarize this case"
     assert client.get(f"/api/v1/cases/{cid}").status_code == 200
+
+
+def test_assistant_greeting_completes_without_retrieval_or_model(client, monkeypatch):
+    cid = case_id(client)
+    model_called = False
+
+    def unexpected_post(*args, **kwargs):
+        nonlocal model_called
+        model_called = True
+        raise AssertionError("a greeting must not invoke Ollama")
+
+    monkeypatch.setattr("app.services.phase3.httpx.post", unexpected_post)
+    session = client.post(
+        "/api/v1/assistant/sessions",
+        json={"scope": "specific_case", "case_ids": [cid]},
+    ).json()
+    job = client.post(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages",
+        json={"question": "hey"},
+    ).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+
+    answer = client.get(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages"
+    ).json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["model"] == "deterministic-greeting"
+    assert answer["text"].startswith("Hey!")
+    assert answer["citations"] == []
+    assert model_called is False
+
+
+def test_assistant_disabled_uses_grounded_fallback_without_model(client, monkeypatch):
+    cid = case_id(client)
+    client.app.state.phase3_service.set_ai_enabled(False)
+
+    def unexpected_post(*args, **kwargs):
+        raise AssertionError("disabled AI must not invoke Ollama")
+
+    monkeypatch.setattr("app.services.phase3.httpx.post", unexpected_post)
+    session = client.post(
+        "/api/v1/assistant/sessions",
+        json={"scope": "specific_case", "case_ids": [cid]},
+    ).json()
+    job = client.post(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages",
+        json={"question": "Summarize this case"},
+    ).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+
+    answer = client.get(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages"
+    ).json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["model"] == "deterministic-fallback"
+    assert "disabled in System Status" in answer["caveats"][0]
+
+
+def test_assistant_accepts_json_code_fences_and_bounds_grounding_context(client):
+    service = client.app.state.phase3_service
+    assert service._parse_assistant_json('```json\n{"answer":"hello"}\n```') == {"answer": "hello"}
+    assert service._requests_visualization("Summarize this case") is False
+    assert service._requests_visualization("Show a timeline") is True
+    cid = case_id(client)
+    context = service._assistant_context(
+        {"scope": "specific_case", "case_ids": [cid], "reference_ids": []},
+        "Summarize this case",
+    )
+    assert len(json.dumps(context["facts"], separators=(",", ":")).encode("utf-8")) <= 24 * 1024
+
+
+def test_assistant_bounds_ollama_generation_and_disables_thinking(client, monkeypatch):
+    cid = case_id(client)
+    captured = {}
+
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "message": {
+                    "content": json.dumps({
+                        "answer": "Review the persisted case.",
+                        "citations": [f"case:{cid}"],
+                        "caveats": [],
+                        "visualization": None,
+                    })
+                }
+            }
+
+    def fake_post(url, *, json, timeout):
+        captured.update({"url": url, "payload": json, "timeout": timeout})
+        return FakeResponse()
+
+    monkeypatch.setattr("app.services.phase3.httpx.post", fake_post)
+    session = client.post(
+        "/api/v1/assistant/sessions",
+        json={"scope": "specific_case", "case_ids": [cid]},
+    ).json()
+    job = client.post(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages",
+        json={"question": "Summarize this case"},
+    ).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+
+    answer = client.get(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages"
+    ).json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["model"] == client.app.state.phase3_service.settings.ollama_model
+    assert captured["payload"]["think"] is False
+    assert captured["payload"]["options"] == {"temperature": 0, "num_predict": 512}
+    system_prompt = captured["payload"]["messages"][0]["content"]
+    assert "visualization must be null" in system_prompt
+    assert "use exactly one component" in system_prompt
+    assert "Every component must include all six fields" in system_prompt
+    assert "span as the integer 1, 2, or 3" in system_prompt
+    assert "height as compact, standard, or tall" in system_prompt
 
 
 def test_assistant_validates_selected_reference_scope_and_retrieves_event(client):
