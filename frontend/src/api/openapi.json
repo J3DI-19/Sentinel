@@ -4206,6 +4206,170 @@
         ],
         "title": "ValidationStatus",
         "type": "string"
+      },
+      "VisualizationComponentV1": {
+        "additionalProperties": false,
+        "properties": {
+          "data_ref": {
+            "maxLength": 180,
+            "minLength": 1,
+            "title": "Data Ref",
+            "type": "string"
+          },
+          "height": {
+            "default": "standard",
+            "enum": [
+              "compact",
+              "standard",
+              "tall"
+            ],
+            "title": "Height",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "span": {
+            "default": 1,
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "title": "Span",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "timeline",
+              "risk_breakdown",
+              "event_activity",
+              "entity_graph",
+              "evidence_table",
+              "alert_list"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "data_ref"
+        ],
+        "title": "VisualizationComponentV1",
+        "type": "object"
+      },
+      "VisualizationLayoutV1": {
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/VisualizationComponentV1"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Components",
+            "type": "array"
+          },
+          "layout_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Layout Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "layout_id",
+          "title",
+          "components"
+        ],
+        "title": "VisualizationLayoutV1",
+        "type": "object"
+      },
+      "VisualizationResolveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "layout": {
+            "$ref": "#/components/schemas/VisualizationLayoutV1"
+          }
+        },
+        "required": [
+          "layout"
+        ],
+        "title": "VisualizationResolveRequest",
+        "type": "object"
+      },
+      "VisualizationResolvedV1": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_ids": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Analysis Ids",
+            "type": "object"
+          },
+          "datasets": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              ]
+            },
+            "title": "Datasets",
+            "type": "object"
+          },
+          "layout": {
+            "$ref": "#/components/schemas/VisualizationLayoutV1"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "layout",
+          "datasets",
+          "analysis_ids"
+        ],
+        "title": "VisualizationResolvedV1",
+        "type": "object"
       }
     }
   },
@@ -6601,6 +6765,84 @@
         ]
       }
     },
+    "/api/v1/cases/{case_id}/visualizations/fallback": {
+      "get": {
+        "operationId": "fallback_visualization_api_v1_cases__case_id__visualizations_fallback_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "case_id",
+            "required": true,
+            "schema": {
+              "title": "Case Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "intent",
+            "required": false,
+            "schema": {
+              "default": "overview",
+              "enum": [
+                "overview",
+                "timeline",
+                "risk",
+                "correlation",
+                "alerts",
+                "evidence",
+                "live"
+              ],
+              "title": "Intent",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysis_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Analysis Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualizationResolvedV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fallback Visualization",
+        "tags": [
+          "phase3"
+        ]
+      }
+    },
     "/api/v1/dashboard/summary": {
       "get": {
         "operationId": "dashboard_api_v1_dashboard_summary_get",
@@ -7573,6 +7815,48 @@
           }
         },
         "summary": "Generate Report",
+        "tags": [
+          "phase3"
+        ]
+      }
+    },
+    "/api/v1/visualizations/resolve": {
+      "post": {
+        "description": "Resolve a validated layout exclusively from persisted investigation data.",
+        "operationId": "resolve_visualization_api_v1_visualizations_resolve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisualizationResolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisualizationResolvedV1"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resolve Visualization",
         "tags": [
           "phase3"
         ]

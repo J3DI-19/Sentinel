@@ -536,6 +536,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cases/{case_id}/visualizations/fallback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fallback Visualization */
+        get: operations["fallback_visualization_api_v1_cases__case_id__visualizations_fallback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/summary": {
         parameters: {
             query?: never;
@@ -905,6 +922,26 @@ export interface paths {
         put?: never;
         /** Generate Report */
         post: operations["generate_report_api_v1_reports__report_id__generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/visualizations/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve Visualization
+         * @description Resolve a validated layout exclusively from persisted investigation data.
+         */
+        post: operations["resolve_visualization_api_v1_visualizations_resolve_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2489,6 +2526,73 @@ export interface components {
          * @enum {string}
          */
         ValidationStatus: "accepted" | "accepted_with_warnings" | "rejected";
+        /** VisualizationComponentV1 */
+        VisualizationComponentV1: {
+            /** Data Ref */
+            data_ref: string;
+            /**
+             * Height
+             * @default standard
+             * @enum {string}
+             */
+            height: "compact" | "standard" | "tall";
+            /** Id */
+            id: string;
+            /**
+             * Span
+             * @default 1
+             * @enum {integer}
+             */
+            span: 1 | 2 | 3;
+            /** Title */
+            title: string;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "timeline" | "risk_breakdown" | "event_activity" | "entity_graph" | "evidence_table" | "alert_list";
+        };
+        /** VisualizationLayoutV1 */
+        VisualizationLayoutV1: {
+            /** Components */
+            components: components["schemas"]["VisualizationComponentV1"][];
+            /** Layout Id */
+            layout_id: string;
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+            /** Title */
+            title: string;
+        };
+        /** VisualizationResolveRequest */
+        VisualizationResolveRequest: {
+            layout: components["schemas"]["VisualizationLayoutV1"];
+        };
+        /** VisualizationResolvedV1 */
+        VisualizationResolvedV1: {
+            /** Analysis Ids */
+            analysis_ids: {
+                [key: string]: string;
+            };
+            /** Datasets */
+            datasets: {
+                [key: string]: {
+                    [key: string]: unknown;
+                }[] | {
+                    [key: string]: unknown;
+                };
+            };
+            layout: components["schemas"]["VisualizationLayoutV1"];
+            /**
+             * Schema Version
+             * @default 1.0
+             * @constant
+             */
+            schema_version: "1.0";
+        };
     };
     responses: never;
     parameters: never;
@@ -3716,6 +3820,40 @@ export interface operations {
             };
         };
     };
+    fallback_visualization_api_v1_cases__case_id__visualizations_fallback_get: {
+        parameters: {
+            query?: {
+                intent?: "overview" | "timeline" | "risk" | "correlation" | "alerts" | "evidence" | "live";
+                analysis_id?: string | null;
+            };
+            header?: never;
+            path: {
+                case_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisualizationResolvedV1"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     dashboard_api_v1_dashboard_summary_get: {
         parameters: {
             query?: never;
@@ -4402,6 +4540,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_visualization_api_v1_visualizations_resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisualizationResolveRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisualizationResolvedV1"];
                 };
             };
             /** @description Validation Error */

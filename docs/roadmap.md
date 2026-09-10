@@ -1,6 +1,6 @@
 # Traceveil Roadmap
 
-> Current software status (9 September 2026): 114 of 164 roadmap items are complete. The persisted batch workflow, authenticated live intake, deterministic investigation APIs, curated evaluation datasets, classification transparency, and case-analysis UX are implemented. Real-time browser delivery, the remaining AI workflows, and physical hardware acceptance remain tracked separately.
+> Current software status (10 September 2026): 124 of 164 roadmap items are complete. The persisted batch workflow, authenticated live intake, deterministic investigation APIs, curated evaluation datasets, classification transparency, case-analysis UX, and safe AI-selected visualization engine are implemented. The remaining AI chat workflows and physical hardware acceptance remain tracked separately.
 
 ## 1. Initialization
 - [x] Set up React + Vite frontend
@@ -169,16 +169,25 @@ genuine live ingestion, real-time delivery, and historical review of genuine liv
 incidents are acceptance dependencies of Steps 5 and 7, not Step 8.
 
 ## 9. Visualization Engine + Qwen
-- [ ] Create allowed visualization components
-- [ ] Create and validate versioned layout JSON
-- [ ] Allow only deterministic data references
-- [ ] Let Qwen summarize validated results
-- [ ] Let Qwen choose safe visualization layouts
-- [ ] Reject unknown components and fields
-- [ ] Reject invented numerical values
-- [ ] Reject unsafe output
-- [ ] Add deterministic fallback layouts
-- [ ] Support visualization of both historical and live investigation data
+- [x] Create allowed visualization components
+- [x] Create and validate versioned layout JSON
+- [x] Allow only deterministic data references
+- [x] Let Qwen summarize validated results
+- [x] Let Qwen choose safe visualization layouts
+- [x] Reject unknown components and fields
+- [x] Reject invented numerical values
+- [x] Reject unsafe output
+- [x] Add deterministic fallback layouts
+- [x] Support visualization of both historical and live investigation data
+
+**Current result:** Step 9 is complete. Qwen may select and arrange only the six
+versioned, allow-listed visualization components. Layouts contain deterministic
+references rather than datasets; the backend validates those references and
+resolves bounded persisted results for the frontend renderer. Unknown fields,
+components, versions, unsafe strings, embedded data, invented numerical claims,
+and references outside the supplied scope are rejected. Server-owned fallback
+layouts work independently of Qwen and can be pinned to historical analysis
+snapshots; latest snapshots include persisted batch and live investigation data.
 
 ## 10. AI Investigation Chat
 - [ ] Add case-based chat

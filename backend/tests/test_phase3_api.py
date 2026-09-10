@@ -50,6 +50,10 @@ def test_authenticated_live_telemetry_is_persisted_and_streamed(client):
             break
         sleep(0.01)
     assert {item["topic"] for item in messages} >= {"event.accepted", "device.updated", "metrics.updated"}
+    live_view = client.get(f"/api/v1/cases/{cid}/visualizations/fallback", params={"intent": "live"})
+    assert live_view.status_code == 200
+    activity = next(iter(live_view.json()["datasets"].values()))
+    assert sum(point["Events"] for point in activity) >= 1
 
 
 def test_malformed_live_payload_is_counted_without_an_event(client):
@@ -145,6 +149,71 @@ def test_assistant_rejects_unretrieved_citations_numbers_and_layout_data(client)
         service._validate_assistant_result({"answer": "There were 3 events.", "citations": ["case:1"], "visualization": {"schema_version": "1.0", "component": "event_activity", "data_ref": "case:1", "values": [3]}}, context)
     with pytest.raises(ValueError, match="unsafe_assistant_answer"):
         service._validate_assistant_result({"answer": "Follow https://untrusted.invalid", "citations": [], "visualization": None}, context)
+
+
+def test_step9_accepts_qwen_layout_selection_without_embedded_values(client):
+    service = client.app.state.phase3_service
+    data_ref = "case:1:analysis:latest:event_activity"
+    context = {
+        "allowed_refs": ["case:1"],
+        "allowed_visualization_refs": [data_ref],
+        "facts": [{"ref": "case:1", "data": {"event_count": 3}}],
+    }
+    result = {
+        "answer": "There were 3 persisted events.", "citations": ["case:1"], "caveats": [],
+        "visualization": {
+            "schema_version": "1.0", "layout_id": "qwen-activity", "title": "Event activity",
+            "components": [{"id": "activity", "type": "event_activity", "title": "Activity", "data_ref": data_ref, "span": 3, "height": "standard"}],
+        },
+    }
+    service._validate_assistant_result(result, context)
+    assert result["visualization"]["components"][0]["data_ref"] == data_ref
+
+
+def test_step9_resolves_only_allowlisted_persisted_visualizations(client):
+    cid = case_id(client)
+    client.app.state.batch_service.reanalyze(cid)
+    analysis_id = client.get(f"/api/v1/cases/{cid}/analyses").json()["items"][0]["analysis_id"]
+    components = []
+    for index, kind in enumerate(("timeline", "risk_breakdown", "event_activity", "entity_graph", "evidence_table", "alert_list")):
+        components.append({
+            "id": f"view-{index}", "type": kind, "title": kind.replace("_", " ").title(),
+            "data_ref": f"case:{cid}:analysis:{analysis_id}:{kind}", "span": 1, "height": "standard",
+        })
+    response = client.post("/api/v1/visualizations/resolve", json={"layout": {
+        "schema_version": "1.0", "layout_id": "all-components", "title": "Verified views", "components": components,
+    }})
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body["datasets"]) == {f"view-{index}" for index in range(6)}
+    assert set(body["analysis_ids"].values()) == {analysis_id}
+
+
+def test_step9_rejects_unknown_fields_components_and_mismatched_references(client):
+    cid = case_id(client)
+    client.app.state.batch_service.reanalyze(cid)
+    base = {"schema_version": "1.0", "layout_id": "safe", "title": "Safe", "components": [{
+        "id": "activity", "type": "event_activity", "title": "Activity",
+        "data_ref": f"case:{cid}:analysis:latest:event_activity", "span": 2, "height": "standard",
+    }]}
+    embedded = {**base, "values": [1, 2, 3]}
+    assert client.post("/api/v1/visualizations/resolve", json={"layout": embedded}).status_code == 422
+    unknown = {**base, "components": [{**base["components"][0], "type": "generated_react"}]}
+    assert client.post("/api/v1/visualizations/resolve", json={"layout": unknown}).status_code == 422
+    mismatch = {**base, "components": [{**base["components"][0], "data_ref": f"case:{cid}:analysis:latest:timeline"}]}
+    assert client.post("/api/v1/visualizations/resolve", json={"layout": mismatch}).status_code == 422
+
+
+def test_step9_fallback_is_deterministic_and_pins_historical_snapshot(client):
+    cid = case_id(client)
+    client.app.state.batch_service.reanalyze(cid)
+    analysis_id = client.get(f"/api/v1/cases/{cid}/analyses").json()["items"][0]["analysis_id"]
+    first = client.get(f"/api/v1/cases/{cid}/visualizations/fallback", params={"intent": "overview", "analysis_id": analysis_id})
+    second = client.get(f"/api/v1/cases/{cid}/visualizations/fallback", params={"intent": "overview", "analysis_id": analysis_id})
+    assert first.status_code == 200
+    assert first.json() == second.json()
+    assert set(first.json()["analysis_ids"].values()) == {analysis_id}
+    assert all(f":analysis:{analysis_id}:" in component["data_ref"] for component in first.json()["layout"]["components"])
 
 
 def test_fake_smtp_delivery_is_explicit_audited_and_idempotent(client, monkeypatch):

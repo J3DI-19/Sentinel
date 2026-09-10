@@ -5,7 +5,11 @@ export interface LiveMetrics { case_id: number; session_id: string | null; devic
 export interface DeviceState { case_id: number; session_id: string; device_id: string; source_id: string; last_seen_at: string; last_observed_at: string; latest_metrics: Record<string, string | number | boolean | null>; event_count: number; stale: boolean }
 export type StreamTopic = "event.accepted" | "alert.created" | "device.updated" | "metrics.updated" | "session.updated" | "heartbeat";
 export interface StreamEnvelope { schema_version: "1.0"; id?: number; topic: StreamTopic; case_id?: number; session_id?: string | null; occurred_at?: string; payload?: Record<string, unknown> }
-export interface AssistantMessage { message_id: string; role: "user" | "assistant"; kind: string; text: string; citations: string[]; caveats: string[]; visualization: { schema_version: "1.0"; component: string; data_ref: string } | null; model: string | null; created_at: string }
+export type VisualizationType = "timeline" | "risk_breakdown" | "event_activity" | "entity_graph" | "evidence_table" | "alert_list";
+export interface VisualizationComponent { id: string; type: VisualizationType; title: string; data_ref: string; span: 1 | 2 | 3; height: "compact" | "standard" | "tall" }
+export interface VisualizationLayout { schema_version: "1.0"; layout_id: string; title: string; components: VisualizationComponent[] }
+export interface ResolvedVisualization { schema_version: "1.0"; layout: VisualizationLayout; datasets: Record<string, unknown>; analysis_ids: Record<string, string> }
+export interface AssistantMessage { message_id: string; role: "user" | "assistant"; kind: string; text: string; citations: string[]; caveats: string[]; visualization: VisualizationLayout | null; model: string | null; created_at: string }
 export interface AssistantJob { job_id: string; session_id: string; status: "queued" | "processing" | "completed" | "failed"; error: { code: string; message: string; retryable: boolean } | null }
 export interface ReportRecord { report_id: string; case_id: number; title: string; sections: string[]; status: "draft" | "generated" | "approved"; narrative: string | null; content_hash: string | null; approved_by: string | null; approved_at: string | null; created_at: string; updated_at: string }
 export interface EmailDraft { draft_id: string; report_id: string; recipient: string; subject: string; body: string; status: "draft" | "approved" | "sent" | "delivery_unknown"; approved_at: string | null; delivery_error: string | null }
@@ -22,6 +26,8 @@ export const phase3Api = {
   ask(sessionId: string, question: string, signal?: AbortSignal) { return apiClient.request<AssistantJob>(`/assistant/sessions/${sessionId}/messages`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question }) }); },
   assistantJob(jobId: string, signal?: AbortSignal) { return apiClient.request<AssistantJob>(`/assistant/jobs/${jobId}`, { signal }); },
   messages(sessionId: string, signal?: AbortSignal) { return apiClient.request<Page<AssistantMessage>>(`/assistant/sessions/${sessionId}/messages`, { signal }); },
+  resolveVisualization(layout: VisualizationLayout, signal?: AbortSignal) { return apiClient.request<ResolvedVisualization>("/visualizations/resolve", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ layout }) }); },
+  fallbackVisualization(caseId: number, analysisId?: string, signal?: AbortSignal) { const query = new URLSearchParams({ intent: "overview" }); if (analysisId) query.set("analysis_id", analysisId); return apiClient.request<ResolvedVisualization>(`/cases/${caseId}/visualizations/fallback?${query}`, { signal }); },
   reports(caseId: number, signal?: AbortSignal) { return apiClient.request<Page<ReportRecord>>(`/cases/${caseId}/reports`, { signal }); },
   createReport(caseId: number, title: string, signal?: AbortSignal) { return apiClient.request<ReportRecord>(`/cases/${caseId}/reports`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title }) }); },
   generateReport(reportId: string, signal?: AbortSignal) { return apiClient.request<ReportRecord>(`/reports/${reportId}/generate`, { method: "POST", signal }); },

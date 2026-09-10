@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from app.evidence.schemas import LiveTelemetryInput
 from app.core.errors import DatabaseUnavailableError
+from app.visualization.schemas import VisualizationResolveRequest, VisualizationResolvedV1
 
 
 router = APIRouter(tags=["phase3"])
@@ -190,6 +191,24 @@ def assistant_message(session_id: UUID, body: AssistantMessageCreate, request: R
 @router.get("/assistant/jobs/{job_id}")
 def assistant_job(job_id: UUID, request: Request):
     return service(request).get_assistant_job(str(job_id))
+
+
+@router.post("/visualizations/resolve", response_model=VisualizationResolvedV1)
+def resolve_visualization(body: VisualizationResolveRequest, request: Request):
+    """Resolve a validated layout exclusively from persisted investigation data."""
+    return service(request).visualizations.resolve(body.layout)
+
+
+@router.get("/cases/{case_id}/visualizations/fallback", response_model=VisualizationResolvedV1)
+def fallback_visualization(
+    case_id: int,
+    request: Request,
+    intent: Literal["overview", "timeline", "risk", "correlation", "alerts", "evidence", "live"] = "overview",
+    analysis_id: UUID | None = None,
+):
+    selector = str(analysis_id) if analysis_id else "latest"
+    layout = service(request).visualizations.fallback(case_id, intent, selector)
+    return service(request).visualizations.resolve(layout)
 
 
 @router.post("/cases/{case_id}/reports", status_code=201)

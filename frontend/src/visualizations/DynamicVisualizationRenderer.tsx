@@ -32,6 +32,11 @@ function EvidenceTable({ data }: RendererProps) {
   return <div className="dynamic-table-wrap"><table className="dynamic-table"><thead><tr><th>Time</th><th>Evidence</th><th>Device</th><th>Event</th><th>Severity</th></tr></thead><tbody>{rows.map(row=><tr key={row.id}><td><code>{row.time}</code></td><td><code>{row.id}</code></td><td>{row.device}</td><td>{row.event}</td><td><SeverityBadge severity={row.severity}/></td></tr>)}</tbody></table></div>;
 }
 
+function AlertList({ data }: RendererProps) {
+  const rows = data as { id:string; time:string; title:string; severity:Severity; risk:number; status:string }[];
+  return <div className="dynamic-table-wrap"><table className="dynamic-table"><thead><tr><th>Time</th><th>Alert</th><th>Severity</th><th>Risk</th><th>Status</th></tr></thead><tbody>{rows.map(row=><tr key={row.id}><td><code>{row.time}</code></td><td>{row.title}</td><td><SeverityBadge severity={row.severity}/></td><td><RiskBadge score={row.risk}/></td><td>{row.status}</td></tr>)}</tbody></table></div>;
+}
+
 function Timeline({ data }: RendererProps) { return <div className="dynamic-timeline"><InvestigationTimeline entries={data as TimelineEntry[]}/></div>; }
 
 function Summary({ data }: RendererProps) {
@@ -56,15 +61,17 @@ const dynamicVisualizationRegistry: Record<string, (props: RendererProps) => Rea
   "metric-card": Metric, "bar-chart": MultiBar, "line-chart": ActivityArea, "area-chart": ActivityArea, "pie-chart": Distribution,
   "evidence-table": EvidenceTable, "investigation-timeline": Timeline, "device-graph": DeviceGraph,
   "finding-panel": Finding, "risk-breakdown": Risk, "text-summary": Summary,
+  "timeline": Timeline, "risk_breakdown": Risk, "event_activity": ActivityArea,
+  "entity_graph": DeviceGraph, "evidence_table": EvidenceTable, "alert_list": AlertList,
 };
 
 function VisualizationFallback({ spec, reason }: { spec: VisualizationComponentSpec; reason: "unknown-component" | "missing-data" }) {
   return <div className="visualization-fallback" role="status"><span>◇</span><strong>Visualization unavailable</strong><p>{reason === "unknown-component" ? `“${spec.type}” is not in the approved registry.` : `Dataset “${spec.dataRef}” could not be resolved.`}</p></div>;
 }
 
-export function DynamicVisualizationRenderer({ specification }: { specification: VisualizationSpec }) {
+export function DynamicVisualizationRenderer({ specification, datasets = visualizationDatasets }: { specification: VisualizationSpec; datasets?: Record<string, unknown> }) {
   return <div className="dynamic-layout" key={specification.id}>{specification.components.map(spec => {
-    const Component = dynamicVisualizationRegistry[spec.type]; const data = visualizationDatasets[spec.dataRef];
+    const Component = dynamicVisualizationRegistry[spec.type]; const data = datasets[spec.dataRef];
     return <section className={`visual-panel visual-span-${spec.span || 1} visual-height-${spec.height || "standard"}`} key={spec.id}><header><div><span>Verified data view</span><h3>{spec.title}</h3></div><code>{spec.type}</code></header><div className="visual-panel-body">{!Component ? <VisualizationFallback spec={spec} reason="unknown-component"/> : data === undefined ? <VisualizationFallback spec={spec} reason="missing-data"/> : <Component data={data} spec={spec}/>}</div></section>;
   })}</div>;
 }

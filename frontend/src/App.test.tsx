@@ -48,8 +48,8 @@ describe("Traceveil investigation interface", () => {
     expect(await screen.findByRole("heading", { name: "Traceveil Assistant" })).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByText("ready").length).toBeGreaterThan(0));
     expect(screen.getByText("Scoped to persisted case 1")).toBeInTheDocument();
-    expect(screen.getByText("Validated data references")).toBeInTheDocument();
-    expect(screen.getByText(/Generated code, arbitrary URLs/)).toBeInTheDocument();
+    expect(screen.getByText("Validated investigation overview")).toBeInTheDocument();
+    expect(screen.getByText(/Only allow-listed layouts and backend-resolved values/)).toBeInTheDocument();
   });
 
   it("opens the Assistant in Auto scope without requiring case selection", async () => {
