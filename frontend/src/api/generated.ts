@@ -45,7 +45,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Assistant Sessions */
+        get: operations["assistant_sessions_api_v1_assistant_sessions_get"];
         put?: never;
         /** Create Assistant Session */
         post: operations["create_assistant_session_api_v1_assistant_sessions_post"];
@@ -1356,10 +1357,96 @@ export interface components {
              */
             confirmed: true;
         };
+        /** AssistantErrorPublic */
+        AssistantErrorPublic: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Retryable */
+            retryable: boolean;
+        };
+        /** AssistantJobPublic */
+        AssistantJobPublic: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            error: components["schemas"]["AssistantErrorPublic"] | null;
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "processing" | "completed" | "failed";
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** AssistantMessageCreate */
         AssistantMessageCreate: {
             /** Question */
             question: string;
+        };
+        /** AssistantMessagePage */
+        AssistantMessagePage: {
+            /** Items */
+            items: components["schemas"]["AssistantMessagePublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** AssistantMessagePublic */
+        AssistantMessagePublic: {
+            /** Caveats */
+            caveats: string[];
+            /** Citations */
+            citations: string[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+            /** Model */
+            model: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Text */
+            text: string;
+            /** Visualization */
+            visualization: {
+                [key: string]: unknown;
+            } | null;
         };
         /** AssistantSessionCreate */
         AssistantSessionCreate: {
@@ -1373,6 +1460,48 @@ export interface components {
              * @enum {string}
              */
             scope: "auto" | "all_cases" | "specific_case" | "selected_references";
+        };
+        /** AssistantSessionPage */
+        AssistantSessionPage: {
+            /** Items */
+            items: components["schemas"]["AssistantSessionPublic"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** AssistantSessionPublic */
+        AssistantSessionPublic: {
+            /** Case Ids */
+            case_ids: number[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Message Count */
+            message_count: number;
+            /** Reference Ids */
+            reference_ids: string[];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "auto" | "all_cases" | "specific_case" | "selected_references";
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** BaselineSummary */
         BaselineSummary: {
@@ -2650,7 +2779,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AssistantJobPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_sessions_api_v1_assistant_sessions_get: {
+        parameters: {
+            query?: {
+                case_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantSessionPage"];
                 };
             };
             /** @description Validation Error */
@@ -2683,7 +2843,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AssistantSessionPublic"];
                 };
             };
             /** @description Validation Error */
@@ -2714,7 +2874,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AssistantSessionPublic"];
                 };
             };
             /** @description Validation Error */
@@ -2745,7 +2905,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AssistantMessagePage"];
                 };
             };
             /** @description Validation Error */
@@ -2780,7 +2940,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AssistantJobPublic"];
                 };
             };
             /** @description Validation Error */

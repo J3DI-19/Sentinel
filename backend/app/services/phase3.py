@@ -525,17 +525,68 @@ class Phase3Service:
     def create_assistant_session(self, scope: str, case_ids: list[int], reference_ids: list[str]) -> dict:
         if scope not in {"auto", "all_cases", "specific_case", "selected_references"}:
             raise ValueError("invalid_assistant_scope")
+        case_ids = list(dict.fromkeys(case_ids))
+        reference_ids = list(dict.fromkeys(reference_ids))
+        if scope == "specific_case" and not case_ids:
+            raise ValueError("assistant_case_scope_required")
+        if scope == "selected_references" and not reference_ids:
+            raise ValueError("assistant_references_required")
+        for case_id in case_ids:
+            self.batch.get_case(case_id)
+        for reference in reference_ids:
+            reference_case = self._validate_assistant_reference(reference)
+            if case_ids and reference_case not in case_ids:
+                raise ValueError("assistant_reference_outside_case_scope")
+            if reference_case not in case_ids:
+                case_ids.append(reference_case)
         now, session_id = utcnow(), str(uuid4())
         with self.repository.write_lock, self.db:
             self.db.execute("INSERT INTO assistant_sessions VALUES(?,?,?,?,?,?)", (session_id, scope, canonical_json(case_ids), canonical_json(reference_ids), now, now))
         return self.get_assistant_session(session_id)
+
+    def _validate_assistant_reference(self, reference: str) -> int:
+        match = re.fullmatch(r"case:([1-9]\d*):(finding|alert|incident|timeline|evidence|event|correlation):(.+)", reference)
+        if not match:
+            raise ValueError("invalid_assistant_reference")
+        case_id, kind, identifier = int(match.group(1)), match.group(2), match.group(3)
+        self.batch.get_case(case_id)
+        if kind in {"finding", "alert", "incident", "timeline", "correlation"}:
+            artifact_kind = "graph_edge" if kind == "correlation" else kind
+            found = self.db.execute(
+                "SELECT 1 FROM analysis_artifacts WHERE case_id=? AND kind=? AND item_id=? LIMIT 1",
+                (case_id, artifact_kind, identifier),
+            ).fetchone()
+        elif kind == "evidence":
+            found = self.db.execute(
+                "SELECT 1 FROM evidence_metadata WHERE case_id=? AND evidence_id=? AND committed_at IS NOT NULL",
+                (case_id, identifier),
+            ).fetchone()
+        else:
+            found = self.db.execute(
+                "SELECT 1 FROM canonical_events WHERE case_id=? AND event_id=?",
+                (case_id, identifier),
+            ).fetchone()
+        if not found:
+            raise ValueError("assistant_reference_not_found")
+        return case_id
 
     def get_assistant_session(self, session_id: str) -> dict:
         row = self.db.execute("SELECT * FROM assistant_sessions WHERE session_id=?", (session_id,)).fetchone()
         if not row:
             raise KeyError("assistant_session_not_found")
         result = dict(row); result["case_ids"] = json.loads(result.pop("case_ids_json")); result["reference_ids"] = json.loads(result.pop("reference_ids_json"))
+        first = self.db.execute("SELECT text FROM assistant_messages WHERE session_id=? AND role='user' ORDER BY created_at,message_id LIMIT 1", (session_id,)).fetchone()
+        result["title"] = (first[0][:80] if first else "New investigation chat")
+        result["message_count"] = self.db.execute("SELECT COUNT(*) FROM assistant_messages WHERE session_id=?", (session_id,)).fetchone()[0]
         return result
+
+    def list_assistant_sessions(self, case_id: int | None = None) -> list[dict]:
+        rows = self.db.execute("SELECT session_id FROM assistant_sessions ORDER BY updated_at DESC,session_id DESC").fetchall()
+        sessions = [self.get_assistant_session(row[0]) for row in rows]
+        if case_id is not None:
+            self.batch.get_case(case_id)
+            sessions = [item for item in sessions if case_id in item["case_ids"]]
+        return sessions[:100]
 
     def submit_assistant_message(self, session_id: str, question: str) -> dict:
         self.get_assistant_session(session_id)
@@ -561,26 +612,47 @@ class Phase3Service:
             item = dict(row); item["citations"] = json.loads(item.pop("citations_json")); item["caveats"] = json.loads(item.pop("caveats_json")); item["visualization"] = json.loads(item.pop("visualization_json")) if item["visualization_json"] else None; result.append(item)
         return result
 
-    def _assistant_context(self, session: dict) -> dict:
+    def _assistant_context(self, session: dict, question: str = "") -> dict:
         case_ids = session["case_ids"]
         if session["scope"] in {"auto", "all_cases"} or not case_ids:
             case_ids = [row[0] for row in self.db.execute("SELECT id FROM cases ORDER BY COALESCE(updated_at,created_at) DESC LIMIT 10").fetchall()]
-        facts, refs = [], []
+        facts = []
         for case_id in case_ids[:10]:
             try:
                 case = self.batch.get_case(case_id)
             except KeyError:
                 continue
-            facts.append({"ref": f"case:{case_id}", "kind": "case", "data": case}); refs.append(f"case:{case_id}")
+            counts = self.db.execute("SELECT COUNT(*),COUNT(DISTINCT entity_id) FROM canonical_events WHERE case_id=?", (case_id,)).fetchone()
+            facts.append({"ref": f"case:{case_id}", "kind": "case", "data": {**case, "event_count": counts[0], "entity_count": counts[1]}})
             latest = self.db.execute("SELECT analysis_id FROM analysis_runs WHERE case_id=? ORDER BY created_at DESC LIMIT 1", (case_id,)).fetchone()
             if latest:
-                rows = self.db.execute("SELECT kind,item_id,payload_json FROM analysis_artifacts WHERE analysis_id=? AND kind IN ('finding','alert','incident','timeline') ORDER BY COALESCE(risk,0) DESC,occurred_at DESC LIMIT 40", (latest[0],)).fetchall()
+                rows = self.db.execute("SELECT kind,item_id,payload_json FROM analysis_artifacts WHERE analysis_id=? AND kind IN ('finding','alert','incident','timeline','graph_edge') ORDER BY COALESCE(risk,0) DESC,occurred_at DESC LIMIT 200", (latest[0],)).fetchall()
                 for row in rows:
-                    ref = f"case:{case_id}:{row['kind']}:{row['item_id']}"; facts.append({"ref": ref, "kind": row["kind"], "data": json.loads(row["payload_json"])}); refs.append(ref)
+                    public_kind = "correlation" if row["kind"] == "graph_edge" else row["kind"]
+                    ref = f"case:{case_id}:{public_kind}:{row['item_id']}"; facts.append({"ref": ref, "kind": public_kind, "data": json.loads(row["payload_json"])})
+            for row in self.db.execute("SELECT evidence_id,original_filename,source_type,source_hash,accepted_records,rejected_records,received_at FROM evidence_metadata WHERE case_id=? AND committed_at IS NOT NULL ORDER BY received_at DESC LIMIT 50", (case_id,)).fetchall():
+                data = dict(row); ref = f"case:{case_id}:evidence:{row['evidence_id']}"; facts.append({"ref": ref, "kind": "evidence", "data": data})
+            for row in self.db.execute("SELECT event_id,canonical_json FROM canonical_events WHERE case_id=? ORDER BY COALESCE(observed_at,ingested_at) DESC,event_id DESC LIMIT 200", (case_id,)).fetchall():
+                ref = f"case:{case_id}:event:{row['event_id']}"; facts.append({"ref": ref, "kind": "event", "data": json.loads(row["canonical_json"])})
         selected = set(session["reference_ids"])
         if selected:
             facts = [fact for fact in facts if fact["ref"] in selected or fact["kind"] == "case"]
-            refs = [fact["ref"] for fact in facts]
+        else:
+            tokens = {token for token in re.findall(r"[a-z0-9_-]+", question.lower()) if len(token) > 2}
+            kind_hints = {
+                "alert": {"alert", "trigger", "rule"}, "finding": {"finding", "risk", "score"},
+                "correlation": {"correlation", "relationship", "linked"}, "timeline": {"timeline", "sequence", "chronology", "live"},
+                "evidence": {"evidence", "file", "source"}, "event": {"event", "activity", "telemetry"},
+            }
+            def relevance(fact: dict) -> tuple[int, str]:
+                haystack = canonical_json(fact).lower()
+                lexical = sum(3 for token in tokens if token in haystack)
+                hint = sum(5 for token in tokens if token in kind_hints.get(fact["kind"], set()))
+                return lexical + hint + (1 if fact["kind"] != "case" else 0), fact["ref"]
+            cases = [fact for fact in facts if fact["kind"] == "case"]
+            ranked = sorted((fact for fact in facts if fact["kind"] != "case"), key=relevance, reverse=True)
+            facts = [*cases, *ranked[:40]]
+        refs = [fact["ref"] for fact in facts]
         encoded = canonical_json(facts)
         while len(encoded.encode("utf-8")) > 64 * 1024 and len(facts) > 1:
             facts.pop(); encoded = canonical_json(facts)
@@ -590,7 +662,34 @@ class Phase3Service:
                 visualization_refs.extend(self.visualizations.available_refs(case_id))
             except KeyError:
                 continue
-        return {"facts": facts, "allowed_refs": refs, "allowed_visualization_refs": visualization_refs}
+        return {"facts": facts, "allowed_refs": refs, "allowed_visualization_refs": visualization_refs, "deterministic_explanation": self._deterministic_explanation(facts)}
+
+    def _deterministic_explanation(self, facts: list[dict]) -> dict:
+        selected = next((fact for fact in facts if fact["kind"] != "case"), facts[0] if facts else None)
+        if not selected:
+            return {"text": "No persisted investigation records match this scope.", "citations": []}
+        data, kind, ref = selected["data"], selected["kind"], selected["ref"]
+        if kind == "alert":
+            text = f"Alert {data.get('title', data.get('alert_id', 'record'))} was produced by rule {data.get('rule_id', 'unknown')} with {data.get('severity', 'unknown')} severity and risk score {data.get('risk_score', 'unavailable')}."
+        elif kind == "finding":
+            risk = data.get("risk", {}); factors = ", ".join(item.get("name", "factor") for item in risk.get("factors", []))
+            text = f"Finding {data.get('title', data.get('finding_id', 'record'))} has persisted risk score {risk.get('score', 'unavailable')}. Recorded factors are {factors or 'unavailable'}."
+        elif kind == "correlation":
+            text = f"The persisted correlation links {data.get('source_node_id', 'a source')} to {data.get('target_node_id', 'a target')} through {', '.join(data.get('relationships', [])) or 'recorded relationships'}."
+        elif kind == "timeline":
+            sequence = sorted(
+                (fact for fact in facts if fact["kind"] == "timeline"),
+                key=lambda fact: fact["data"].get("occurred_at") or fact["data"].get("ingested_at") or "",
+            )[:8]
+            entries = [f"{fact['data'].get('title', fact['data'].get('entry_id', 'record'))} at {fact['data'].get('occurred_at') or fact['data'].get('ingested_at', 'an unavailable time')}" for fact in sequence]
+            return {"text": f"Persisted sequence: {'; '.join(entries)}.", "citations": [fact["ref"] for fact in sequence]}
+        elif kind == "event":
+            text = f"The persisted {data.get('event_type', 'event')} event was recorded from {data.get('provenance', {}).get('origin', 'an unknown origin')} at {data.get('observed_at') or data.get('ingested_at', 'an unavailable time')}."
+        elif kind == "evidence":
+            text = f"Evidence {data.get('original_filename', data.get('evidence_id', 'record'))} contains {data.get('accepted_records', 'an unavailable number of')} accepted records from source type {data.get('source_type', 'unknown')}."
+        else:
+            text = f"Case {data.get('name', data.get('id', 'record'))} contains {data.get('event_count', 0)} persisted events and {data.get('entity_count', 0)} entities."
+        return {"text": text, "citations": [ref]}
 
     def _process_assistant(self, job_id: str) -> None:
         job = self.get_assistant_job(job_id)
@@ -598,7 +697,7 @@ class Phase3Service:
             self.db.execute("UPDATE assistant_jobs SET status='processing',updated_at=? WHERE job_id=?", (utcnow(), job_id))
         session = self.get_assistant_session(job["session_id"])
         question = self.db.execute("SELECT text FROM assistant_messages WHERE message_id=?", (job["user_message_id"],)).fetchone()[0]
-        context = self._assistant_context(session)
+        context = self._assistant_context(session, question)
         if not context["facts"]:
             result = {"answer": "No persisted investigation records match this scope.", "citations": [], "caveats": ["No evidence context was available."], "visualization": None}
             model = "deterministic-fallback"
@@ -619,24 +718,33 @@ class Phase3Service:
                 result = json.loads(content)
                 self._validate_assistant_result(result, context)
                 model = self.settings.ollama_model
-            except (httpx.HTTPError, httpx.TimeoutException) as exc:
-                raise RuntimeError(f"ollama_offline:{exc}") from exc
+            except (httpx.HTTPError, httpx.TimeoutException):
+                result = self._deterministic_assistant_result(context, "Qwen is offline; deterministic explanation used.")
+                model = "deterministic-fallback"
             except Exception:
-                first = context["facts"][0]
-                case_id = int(first["ref"].split(":")[1])
-                fallback = self.visualizations.fallback(case_id)
-                result = {"answer": "I could not validate the model response. Review the cited persisted record directly.", "citations": [first["ref"]], "caveats": ["Deterministic fallback used after response validation failed."], "visualization": fallback.model_dump(mode="json")}
+                result = self._deterministic_assistant_result(context, "Qwen output failed validation; deterministic explanation used.")
                 model = "deterministic-fallback"
         message_id, now = str(uuid4()), utcnow()
         with self.repository.write_lock, self.db:
             self.db.execute("INSERT INTO assistant_messages VALUES(?,?,?,?,?,?,?,?,?,?)", (message_id, job["session_id"], "assistant", "narration", str(result["answer"]), canonical_json(result.get("citations", [])), canonical_json(result.get("caveats", [])), canonical_json(result["visualization"]) if result.get("visualization") else None, model, now))
             self.db.execute("UPDATE assistant_jobs SET status='completed',context_json=?,result_message_id=?,updated_at=? WHERE job_id=?", (canonical_json(context), message_id, now, job_id))
 
+    def _deterministic_assistant_result(self, context: dict, caveat: str) -> dict:
+        explanation = context["deterministic_explanation"]
+        visualization = None
+        if context["facts"]:
+            case_id = int(context["facts"][0]["ref"].split(":")[1])
+            try:
+                visualization = self.visualizations.fallback(case_id).model_dump(mode="json")
+            except KeyError:
+                visualization = None
+        return {"answer": explanation["text"], "citations": explanation["citations"], "caveats": [caveat], "visualization": visualization}
+
     def _validate_assistant_result(self, result: dict, context: dict) -> None:
         if not isinstance(result.get("answer"), str) or "```" in result["answer"] or re.search(r"https?://", result["answer"]):
             raise ValueError("unsafe_assistant_answer")
         citations = result.get("citations", [])
-        if not isinstance(citations, list) or any(item not in context["allowed_refs"] for item in citations):
+        if not isinstance(citations, list) or (context["facts"] and not citations) or any(item not in context["allowed_refs"] for item in citations):
             raise ValueError("invalid_assistant_citation")
         context_text = canonical_json(context["facts"])
         for number in re.findall(r"\b\d+(?:\.\d+)?\b", result["answer"]):

@@ -123,7 +123,7 @@ def test_controlled_live_authentication_sequence_creates_persisted_alert(client)
     ).json()["total"] >= 1
 
 
-def test_assistant_offline_is_retryable_and_does_not_affect_core(client):
+def test_assistant_offline_returns_grounded_fallback_and_saves_history(client):
     cid = case_id(client)
     session = client.post("/api/v1/assistant/sessions", json={"scope": "specific_case", "case_ids": [cid]}).json()
     job = client.post(f"/api/v1/assistant/sessions/{session['session_id']}/messages", json={"question": "Summarize this case"}).json()
@@ -132,10 +132,51 @@ def test_assistant_offline_is_retryable_and_does_not_affect_core(client):
         if current["status"] in {"completed", "failed"}:
             break
         sleep(0.01)
-    assert current["status"] == "failed"
-    assert current["error"]["code"] == "ollama_offline"
-    assert current["error"]["retryable"] is True
+    assert current["status"] == "completed"
+    messages = client.get(f"/api/v1/assistant/sessions/{session['session_id']}/messages").json()["items"]
+    assert [item["role"] for item in messages] == ["user", "assistant"]
+    assert messages[-1]["model"] == "deterministic-fallback"
+    assert messages[-1]["citations"] == [f"case:{cid}"]
+    assert "Qwen is offline" in messages[-1]["caveats"][0]
+    history = client.get("/api/v1/assistant/sessions", params={"case_id": cid}).json()
+    assert history["total"] == 1
+    assert history["items"][0]["message_count"] == 2
+    assert history["items"][0]["title"] == "Summarize this case"
     assert client.get(f"/api/v1/cases/{cid}").status_code == 200
+
+
+def test_assistant_validates_selected_reference_scope_and_retrieves_event(client):
+    cid = case_id(client)
+    client.post(f"/api/v1/cases/{cid}/live-sessions", json={"source_ids": ["live-lab-01"]})
+    payload = {
+        "schema_version": "1.0", "case_id": cid, "source_id": "live-lab-01",
+        "device_id": "sensor-chat", "event_type": "telemetry",
+        "observed_at": "2026-08-15T11:00:00Z", "sequence": 901,
+        "metrics": {"temperature": 27},
+    }
+    receipt = client.post("/api/v1/live/telemetry", json=payload, headers={"X-Traceveil-Source-Token": "traceveil-demo-token"}).json()
+    event_id = wait_receipt(client, receipt["receipt_id"])["event_id"]
+    reference = f"case:{cid}:event:{event_id}"
+    created = client.post("/api/v1/assistant/sessions", json={"scope": "selected_references", "case_ids": [cid], "reference_ids": [reference]})
+    assert created.status_code == 201
+    context = client.app.state.phase3_service._assistant_context(created.json(), "Explain this event")
+    assert reference in context["allowed_refs"]
+    assert {fact["kind"] for fact in context["facts"]} == {"case", "event"}
+    job = client.post(f"/api/v1/assistant/sessions/{created.json()['session_id']}/messages", json={"question": "Explain this event"}).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+    answer = client.get(f"/api/v1/assistant/sessions/{created.json()['session_id']}/messages").json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["citations"] == [reference]
+    assert "telemetry" in answer["text"]
+    other = case_id(client)
+    outside = client.post("/api/v1/assistant/sessions", json={"scope": "specific_case", "case_ids": [other], "reference_ids": [reference]})
+    assert outside.status_code == 409
+    missing = client.post("/api/v1/assistant/sessions", json={"scope": "selected_references", "case_ids": [cid], "reference_ids": [f"case:{cid}:event:missing"]})
+    assert missing.status_code == 409
 
 
 def test_assistant_rejects_unretrieved_citations_numbers_and_layout_data(client):
@@ -143,12 +184,26 @@ def test_assistant_rejects_unretrieved_citations_numbers_and_layout_data(client)
     context = {"allowed_refs": ["case:1"], "facts": [{"ref": "case:1", "data": {"event_count": 3}}]}
     with pytest.raises(ValueError, match="invalid_assistant_citation"):
         service._validate_assistant_result({"answer": "Review the case.", "citations": ["case:999"], "visualization": None}, context)
+    with pytest.raises(ValueError, match="invalid_assistant_citation"):
+        service._validate_assistant_result({"answer": "Review the case.", "citations": [], "visualization": None}, context)
     with pytest.raises(ValueError, match="invented_numeric_claim"):
         service._validate_assistant_result({"answer": "There were 99 events.", "citations": ["case:1"], "visualization": None}, context)
     with pytest.raises(ValueError, match="embedded_visualization_data"):
         service._validate_assistant_result({"answer": "There were 3 events.", "citations": ["case:1"], "visualization": {"schema_version": "1.0", "component": "event_activity", "data_ref": "case:1", "values": [3]}}, context)
     with pytest.raises(ValueError, match="unsafe_assistant_answer"):
         service._validate_assistant_result({"answer": "Follow https://untrusted.invalid", "citations": [], "visualization": None}, context)
+
+
+@pytest.mark.parametrize(("kind", "data", "expected"), [
+    ("alert", {"title": "Repeated login failures", "rule_id": "AUTH-001", "severity": "critical", "risk_score": 92}, "AUTH-001"),
+    ("finding", {"title": "Credential attack", "risk": {"score": 91, "factors": [{"name": "confidence"}]}}, "risk score 91"),
+    ("correlation", {"source_node_id": "device-a", "target_node_id": "peer-b", "relationships": ["shared_actor"]}, "shared_actor"),
+    ("timeline", {"title": "Live alert created", "occurred_at": "2026-09-10T10:00:00Z"}, "Persisted sequence"),
+])
+def test_assistant_builds_deterministic_explanation_packets(client, kind, data, expected):
+    packet = client.app.state.phase3_service._deterministic_explanation([{"ref": f"case:1:{kind}:record", "kind": kind, "data": data}])
+    assert expected in packet["text"]
+    assert packet["citations"] == [f"case:1:{kind}:record"]
 
 
 def test_step9_accepts_qwen_layout_selection_without_embedded_values(client):

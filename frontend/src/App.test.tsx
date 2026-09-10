@@ -48,6 +48,9 @@ describe("Traceveil investigation interface", () => {
     expect(await screen.findByRole("heading", { name: "Traceveil Assistant" })).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByText("ready").length).toBeGreaterThan(0));
     expect(screen.getByText("Scoped to persisted case 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("Conversation history")).toBeInTheDocument();
+    expect(screen.getByText("1 selected reference")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /New chat/ })).toBeInTheDocument();
     expect(screen.getByText("Validated investigation overview")).toBeInTheDocument();
     expect(screen.getByText(/Only allow-listed layouts and backend-resolved values/)).toBeInTheDocument();
   });

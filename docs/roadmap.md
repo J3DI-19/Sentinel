@@ -1,6 +1,6 @@
 # Traceveil Roadmap
 
-> Current software status (10 September 2026): 124 of 164 roadmap items are complete. The persisted batch workflow, authenticated live intake, deterministic investigation APIs, curated evaluation datasets, classification transparency, case-analysis UX, and safe AI-selected visualization engine are implemented. The remaining AI chat workflows and physical hardware acceptance remain tracked separately.
+> Current software status (10 September 2026): 133 of 164 roadmap items are complete. The persisted batch workflow, authenticated live intake, deterministic investigation APIs, curated evaluation datasets, classification transparency, case-analysis UX, safe AI-selected visualization engine, and grounded investigation chat are implemented. Reporting automation and physical hardware acceptance remain tracked separately.
 
 ## 1. Initialization
 - [x] Set up React + Vite frontend
@@ -190,15 +190,27 @@ layouts work independently of Qwen and can be pinned to historical analysis
 snapshots; latest snapshots include persisted batch and live investigation data.
 
 ## 10. AI Investigation Chat
-- [ ] Add case-based chat
-- [ ] Answer questions using selected evidence
-- [ ] Explain alerts
-- [ ] Explain risk scores
-- [ ] Explain correlations
-- [ ] Explain live incident sequences
-- [ ] Return evidence references
-- [ ] Save chat history
-- [ ] Handle Qwen being offline
+- [x] Add case-based chat
+- [x] Answer questions using selected evidence
+- [x] Explain alerts
+- [x] Explain risk scores
+- [x] Explain correlations
+- [x] Explain live incident sequences
+- [x] Return evidence references
+- [x] Save chat history
+- [x] Handle Qwen being offline
+
+**Current result:** Step 10 is complete. Assistant sessions validate case and
+selected-record scope, persist messages and jobs, and can be listed and reopened.
+Bounded deterministic retrieval covers cases, evidence, canonical events,
+findings, alerts, incidents, timelines, correlations, risk factors, and persisted
+live activity. Qwen receives explanation packets and an explicit citation allow
+list; responses without grounded citations, with unknown references, unsafe
+content, or invented numerical claims are rejected. If Qwen is unavailable or
+its output fails validation, the job completes with a clearly labelled,
+evidence-linked deterministic explanation instead. The connected interface
+supports conversation history, new conversations, URL-selected evidence,
+cancellation, bounded polling, and offline fallback messaging.
 
 ## 11. Alerts, Email, Reports and Automation
 - [ ] Add SMTP setup
