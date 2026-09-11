@@ -73,8 +73,16 @@ describe("Traceveil investigation interface", () => {
     fireEvent.click(jumpButton);
     expect(thread.scrollTop).toBe(1_000);
     expect(screen.queryByRole("button", { name: "↓ Jump to latest" })).not.toBeInTheDocument();
-    expect(screen.getByText("Validated investigation overview")).toBeInTheDocument();
-    expect(screen.getByText(/Only allow-listed layouts and backend-resolved values/)).toBeInTheDocument();
+    expect(screen.getByText("No visual for this response")).toBeInTheDocument();
+    expect(screen.getByText(/Choose a visual before sending/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Response visual")).toHaveValue("none");
+    const visualSelector = within(screen.getByLabelText("Response visual"));
+    expect(visualSelector.getByRole("option", { name: "Severity mix · Pie" })).toBeInTheDocument();
+    expect(visualSelector.getByRole("option", { name: "Top entities · Bars" })).toBeInTheDocument();
+    expect(visualSelector.getByRole("option", { name: "Top findings · Ranked" })).toBeInTheDocument();
+    expect(visualSelector.queryByRole("option", { name: /Risk factors/i })).not.toBeInTheDocument();
+    expect(visualSelector.queryByRole("option", { name: /Evidence records/i })).not.toBeInTheDocument();
+    expect(visualSelector.queryByRole("option", { name: /Alerts · Table/i })).not.toBeInTheDocument();
   });
 
   it("opens the Assistant in Auto scope without requiring case selection", async () => {
@@ -114,6 +122,38 @@ describe("Traceveil investigation interface", () => {
     expect(within(history).getByRole("option", { name: "Existing investigation · 1 turn" })).toBeInTheDocument();
     expect(within(history).queryByRole("option", { name: "New chat" })).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([url, options]) => String(url).endsWith("/assistant/sessions") && options?.method === "POST")).toBe(false);
+  });
+
+  it("clears stale visuals and lets an earlier response reopen its pinned visual", async () => {
+    const session = { session_id: "33333333-3333-4333-8333-333333333333", scope: "specific_case", case_ids: [1], reference_ids: [], title: "Show activity", message_count: 4, created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:03:00Z" };
+    const layout = { schema_version: "1.0", layout_id: "activity-view", title: "Pinned activity", components: [{ id: "activity", type: "event_activity", title: "Event activity", data_ref: "case:1:analysis:11111111-1111-4111-8111-111111111111:event_activity", span: 3, height: "standard" }] };
+    const messages = [
+      { message_id: "m1", role: "user", kind: "grounded_question:event_activity", text: "Show activity", citations: [], caveats: [], visualization: null, model: null, created_at: "2026-01-01T00:00:00Z" },
+      { message_id: "m2", role: "assistant", kind: "narration", text: "Here is the activity.", citations: ["case:1"], caveats: [], visualization: layout, model: "qwen", created_at: "2026-01-01T00:01:00Z" },
+      { message_id: "m3", role: "user", kind: "grounded_question:none", text: "Summarize it", citations: [], caveats: [], visualization: null, model: null, created_at: "2026-01-01T00:02:00Z" },
+      { message_id: "m4", role: "assistant", kind: "narration", text: "Summary without a visual.", citations: ["case:1"], caveats: [], visualization: null, model: "qwen", created_at: "2026-01-01T00:03:00Z" },
+    ];
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const path = String(input);
+      const response = path.includes("/cases?page=")
+        ? { items: [{ id: 1, name: "Persisted demo", description: "", case_type: "batch", status: "active", owner: "Investigator", created_at: "2026-01-01T00:00:00Z", updated_at: null }], page: 1, page_size: 100, total: 1 }
+        : path.includes("/assistant/sessions?case_id=1") && init?.method !== "POST"
+        ? { items: [session], page: 1, page_size: 100, total: 1 }
+        : path.endsWith(`/assistant/sessions/${session.session_id}/messages`)
+        ? { items: messages, page: 1, page_size: 100, total: 4 }
+        : path.endsWith("/visualizations/resolve")
+        ? { schema_version: "1.0", layout, datasets: { activity: [] }, analysis_ids: { activity: "11111111-1111-4111-8111-111111111111" } }
+        : { service: path.endsWith("/db") ? "database" : "api", status: "ok" };
+      return Promise.resolve(new Response(JSON.stringify(response), { status: 200 }));
+    }));
+    window.history.replaceState({}, "", "/assistant?case=1");
+    render(<App />);
+
+    expect(await screen.findByText("Summary without a visual.")).toBeInTheDocument();
+    expect(screen.getByText("No visual for this response")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Open visual ↗" }));
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Pinned activity" })).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Visual open ↗" })).toBeInTheDocument();
   });
 
   it("renders a consolidated live monitoring hierarchy", async () => {

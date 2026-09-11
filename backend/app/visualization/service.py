@@ -46,32 +46,42 @@ class VisualizationService:
 
     def available_refs(self, case_id: int, selector: str = "latest") -> list[str]:
         # Resolve first so nonexistent cases/snapshots are never advertised to Qwen.
-        self._analysis_id(case_id, selector)
+        analysis_id = self._analysis_id(case_id, selector)
         return [
-            f"case:{case_id}:analysis:{selector}:{kind}"
-            for kind in ("timeline", "risk_breakdown", "event_activity", "entity_graph", "evidence_table", "alert_list")
+            f"case:{case_id}:analysis:{analysis_id}:{kind}"
+            for kind in ("timeline", "risk_breakdown", "severity_distribution", "event_activity", "entity_graph", "evidence_table", "alert_list", "top_entities", "top_findings")
         ]
 
     def fallback(self, case_id: int, intent: str = "overview", selector: str = "latest") -> VisualizationLayoutV1:
-        self._analysis_id(case_id, selector)
+        analysis_id = self._analysis_id(case_id, selector)
         selected = {
             "timeline": [("timeline", "Investigation timeline", 3, "tall")],
             "risk": [("risk_breakdown", "Risk breakdown", 2, "standard")],
+            "risk_breakdown": [("risk_breakdown", "Risk breakdown", 2, "standard")],
+            "severity_distribution": [("severity_distribution", "Finding severity distribution", 2, "standard")],
+            "entities": [("top_entities", "Top entities", 2, "standard")],
+            "top_entities": [("top_entities", "Top entities", 2, "standard")],
+            "findings": [("top_findings", "Priority findings", 3, "tall")],
+            "top_findings": [("top_findings", "Priority findings", 3, "tall")],
             "correlation": [("entity_graph", "Entity correlations", 3, "tall")],
+            "entity_graph": [("entity_graph", "Entity correlations", 3, "tall")],
             "alerts": [("alert_list", "Investigation alerts", 3, "standard")],
+            "alert_list": [("alert_list", "Investigation alerts", 3, "standard")],
             "evidence": [("evidence_table", "Evidence activity", 3, "standard")],
+            "evidence_table": [("evidence_table", "Evidence activity", 3, "standard")],
             "live": [("event_activity", "Persisted live activity", 3, "standard")],
+            "event_activity": [("event_activity", "Event activity", 3, "standard")],
         }.get(intent, [
             ("event_activity", "Event activity", 2, "standard"),
-            ("risk_breakdown", "Risk breakdown", 1, "standard"),
-            ("alert_list", "Alerts", 3, "standard"),
+            ("severity_distribution", "Finding severity distribution", 1, "standard"),
+            ("top_findings", "Priority findings", 3, "tall"),
         ])
         components = [
             {
                 "id": f"fallback-{kind.replace('_', '-')}",
                 "type": kind,
                 "title": title,
-                "data_ref": f"case:{case_id}:analysis:{selector}:{kind}",
+                "data_ref": f"case:{case_id}:analysis:{analysis_id}:{kind}",
                 "span": span,
                 "height": height,
             }
@@ -115,6 +125,8 @@ class VisualizationService:
             return self._timeline(analysis_id)
         if kind == "risk_breakdown":
             return self._risk(analysis_id)
+        if kind == "severity_distribution":
+            return self._severity_distribution(analysis_id)
         if kind == "event_activity":
             return self._activity(analysis_id)
         if kind == "entity_graph":
@@ -123,6 +135,10 @@ class VisualizationService:
             return self._evidence(case_id, analysis_id)
         if kind == "alert_list":
             return self._alerts(analysis_id)
+        if kind == "top_entities":
+            return self._top_entities(analysis_id)
+        if kind == "top_findings":
+            return self._top_findings(analysis_id)
         raise ValueError("unknown_visualization_component")
 
     def _timeline(self, analysis_id: str) -> list[dict]:
@@ -147,6 +163,66 @@ class VisualizationService:
         return [
             {"label": factor["name"].replace("_", " ").title(), "value": int(factor["score"])}
             for factor in finding.get("risk", {}).get("factors", [])
+        ]
+
+    def _severity_distribution(self, analysis_id: str) -> list[dict]:
+        counts: dict[str, int] = defaultdict(int)
+        for finding in self._artifacts(analysis_id, "finding", 1000):
+            severity = str(finding.get("severity") or "low").lower()
+            counts[severity if severity in _SEVERITY_ORDER else "low"] += 1
+        colors = {
+            "critical": "#c93b55",
+            "high": "#fb5f68",
+            "medium": "#f4b84a",
+            "low": "#27c2e8",
+        }
+        return [
+            {"name": severity.title(), "value": counts[severity], "color": colors[severity]}
+            for severity in ("critical", "high", "medium", "low")
+            if counts[severity]
+        ]
+
+    def _top_entities(self, analysis_id: str) -> list[dict]:
+        nodes = sorted(
+            self._artifacts(analysis_id, "graph_node", 1000),
+            key=lambda item: (
+                -int(item.get("maximum_risk", 0)),
+                -int(item.get("event_count", 0)),
+                str(item.get("label", "")).lower(),
+            ),
+        )
+        return [
+            {
+                "id": str(item["node_id"]),
+                "label": str(item["label"]),
+                "kind": str(item["kind"]),
+                "eventCount": int(item["event_count"]),
+                "maximumRisk": int(item["maximum_risk"]),
+            }
+            for item in nodes[:8]
+        ]
+
+    def _top_findings(self, analysis_id: str) -> list[dict]:
+        findings = sorted(
+            self._artifacts(analysis_id, "finding", 1000),
+            key=lambda item: (
+                -int(item.get("risk", {}).get("score", 0)),
+                -_SEVERITY_ORDER.get(str(item.get("severity", "low")).lower(), 0),
+                str(item.get("title", "")).lower(),
+            ),
+        )
+        return [
+            {
+                "id": str(item["finding_id"]),
+                "title": str(item["title"]),
+                "summary": str(item.get("summary") or "Persisted analysis finding"),
+                "severity": str(item.get("severity") or "low").title(),
+                "risk": int(item.get("risk", {}).get("score", 0)),
+                "confidence": int(item.get("confidence", 0)),
+                "entity": str(item.get("entity_id") or "Case-wide"),
+                "eventCount": len(item.get("event_ids", [])),
+            }
+            for item in findings[:8]
         ]
 
     def _activity(self, analysis_id: str) -> list[dict]:

@@ -14,7 +14,7 @@ from app.core.config import Settings
 OLLAMA_THINKING_ENABLED = False
 OLLAMA_TEMPERATURE = 0
 OLLAMA_MAX_OUTPUT_TOKENS = 256
-OLLAMA_GROUNDING_CONTEXT_BYTES = 12 * 1024
+OLLAMA_GROUNDING_CONTEXT_BYTES = 8 * 1024
 OLLAMA_REQUEST_CONTEXT_TOKENS = 8 * 1024
 OLLAMA_KEEP_ALIVE = "15m"
 _managed_ollama_process: subprocess.Popen | None = None
@@ -28,8 +28,13 @@ def ollama_executable() -> str | None:
         local_app_data = os.environ.get("LOCALAPPDATA")
         if local_app_data:
             candidate = Path(local_app_data) / "Programs" / "Ollama" / "ollama.exe"
-            if candidate.is_file():
-                return str(candidate)
+            try:
+                if candidate.is_file():
+                    return str(candidate)
+            except OSError:
+                # Health reporting must not fail just because this process
+                # cannot inspect the user's Ollama installation directory.
+                pass
     return None
 
 

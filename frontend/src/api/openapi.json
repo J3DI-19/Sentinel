@@ -925,6 +925,21 @@
             "minLength": 1,
             "title": "Question",
             "type": "string"
+          },
+          "visualization_mode": {
+            "default": "none",
+            "enum": [
+              "none",
+              "auto",
+              "timeline",
+              "severity_distribution",
+              "event_activity",
+              "entity_graph",
+              "top_entities",
+              "top_findings"
+            ],
+            "title": "Visualization Mode",
+            "type": "string"
           }
         },
         "required": [
@@ -4579,10 +4594,13 @@
             "enum": [
               "timeline",
               "risk_breakdown",
+              "severity_distribution",
               "event_activity",
               "entity_graph",
               "evidence_table",
-              "alert_list"
+              "alert_list",
+              "top_entities",
+              "top_findings"
             ],
             "title": "Type",
             "type": "string"
@@ -7174,7 +7192,12 @@
                 "correlation",
                 "alerts",
                 "evidence",
-                "live"
+                "live",
+                "severity_distribution",
+                "event_activity",
+                "entity_graph",
+                "top_entities",
+                "top_findings"
               ],
               "title": "Intent",
               "type": "string"

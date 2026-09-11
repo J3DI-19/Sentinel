@@ -117,7 +117,7 @@ def test_ollama_online_reports_installed_model(monkeypatch):
     assert result["active_context_length"] == 32768
     assert result["thinking_enabled"] is False
     assert result["max_output_tokens"] == 256
-    assert result["grounding_context_limit_bytes"] == 12 * 1024
+    assert result["grounding_context_limit_bytes"] == 8 * 1024
     assert result["request_context_length"] == 8 * 1024
     assert result["keep_alive"] == "15m"
 

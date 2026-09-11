@@ -1424,6 +1424,12 @@ export interface components {
             include_evidence?: boolean | null;
             /** Question */
             question: string;
+            /**
+             * Visualization Mode
+             * @default none
+             * @enum {string}
+             */
+            visualization_mode: "none" | "auto" | "timeline" | "severity_distribution" | "event_activity" | "entity_graph" | "top_entities" | "top_findings";
         };
         /** AssistantMessagePage */
         AssistantMessagePage: {
@@ -2709,7 +2715,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "timeline" | "risk_breakdown" | "event_activity" | "entity_graph" | "evidence_table" | "alert_list";
+            type: "timeline" | "risk_breakdown" | "severity_distribution" | "event_activity" | "entity_graph" | "evidence_table" | "alert_list" | "top_entities" | "top_findings";
         };
         /** VisualizationLayoutV1 */
         VisualizationLayoutV1: {
@@ -4013,7 +4019,7 @@ export interface operations {
     fallback_visualization_api_v1_cases__case_id__visualizations_fallback_get: {
         parameters: {
             query?: {
-                intent?: "overview" | "timeline" | "risk" | "correlation" | "alerts" | "evidence" | "live";
+                intent?: "overview" | "timeline" | "risk" | "correlation" | "alerts" | "evidence" | "live" | "severity_distribution" | "event_activity" | "entity_graph" | "top_entities" | "top_findings";
                 analysis_id?: string | null;
             };
             header?: never;

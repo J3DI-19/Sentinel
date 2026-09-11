@@ -27,6 +27,22 @@ function Distribution({ data }: RendererProps) {
   return <div className="dynamic-pie"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={rows} dataKey="value" nameKey="name" innerRadius={38} outerRadius={62} paddingAngle={3}>{rows.map(row=><Cell key={row.name} fill={row.color}/>)}</Pie><Tooltip contentStyle={tooltipStyle}/></PieChart></ResponsiveContainer><div className="mini-legend">{rows.map(row=><span key={row.name}><i style={{background:row.color}}/>{row.name} <b>{row.value}%</b></span>)}</div></div>;
 }
 
+function SeverityDistribution({ data }: RendererProps) {
+  const rows = data as { name: string; value: number; color: string }[];
+  const total = rows.reduce((sum, row) => sum + row.value, 0);
+  return <div className="dynamic-pie"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={rows} dataKey="value" nameKey="name" innerRadius={38} outerRadius={62} paddingAngle={3}>{rows.map(row=><Cell key={row.name} fill={row.color}/>)}</Pie><Tooltip contentStyle={tooltipStyle} formatter={(value) => [`${value} finding${Number(value) === 1 ? "" : "s"}`, "Count"]}/></PieChart></ResponsiveContainer><div className="mini-legend" aria-label="Finding severity distribution">{rows.map(row=><span key={row.name}><i style={{background:row.color}}/>{row.name} <b>{row.value} · {total ? Math.round(row.value / total * 100) : 0}%</b></span>)}</div></div>;
+}
+
+function TopEntities({ data }: RendererProps) {
+  const rows = data as { id:string; label:string; kind:string; eventCount:number; maximumRisk:number }[];
+  return <div className="top-entities" aria-label="Top entities ranking">{rows.map((row, index)=><div className="top-entity" key={row.id}><b>{index + 1}</b><div><span>{row.label}</span><small>{row.kind} · {row.eventCount.toLocaleString("en-US")} event{row.eventCount === 1 ? "" : "s"}</small><i><em style={{width:`${row.maximumRisk}%`}}/></i></div><RiskBadge score={row.maximumRisk}/></div>)}</div>;
+}
+
+function TopFindings({ data }: RendererProps) {
+  const rows = data as { id:string; title:string; summary:string; severity:Severity; risk:number; confidence:number; entity:string; eventCount:number }[];
+  return <div className="top-findings" aria-label="Top findings ranking">{rows.map((row, index)=><article key={row.id}><b>{index + 1}</b><div><header><span>{row.title}</span><code>{row.entity}</code></header><p>{row.summary}</p><small>{row.eventCount.toLocaleString("en-US")} supporting event{row.eventCount === 1 ? "" : "s"} · {row.confidence}% confidence</small></div><div><SeverityBadge severity={row.severity}/><RiskBadge score={row.risk}/></div></article>)}</div>;
+}
+
 function EvidenceTable({ data }: RendererProps) {
   const rows = data as { id:string; time:string; device:string; event:string; severity:Severity }[];
   return <div className="dynamic-table-wrap"><table className="dynamic-table"><thead><tr><th>Time</th><th>Evidence</th><th>Device</th><th>Event</th><th>Severity</th></tr></thead><tbody>{rows.map(row=><tr key={row.id}><td><code>{row.time}</code></td><td><code>{row.id}</code></td><td>{row.device}</td><td>{row.event}</td><td><SeverityBadge severity={row.severity}/></td></tr>)}</tbody></table></div>;
@@ -62,7 +78,8 @@ const dynamicVisualizationRegistry: Record<string, (props: RendererProps) => Rea
   "evidence-table": EvidenceTable, "investigation-timeline": Timeline, "device-graph": DeviceGraph,
   "finding-panel": Finding, "risk-breakdown": Risk, "text-summary": Summary,
   "timeline": Timeline, "risk_breakdown": Risk, "event_activity": ActivityArea,
-  "entity_graph": DeviceGraph, "evidence_table": EvidenceTable, "alert_list": AlertList,
+  "severity_distribution": SeverityDistribution, "entity_graph": DeviceGraph, "evidence_table": EvidenceTable, "alert_list": AlertList,
+  "top_entities": TopEntities, "top_findings": TopFindings,
 };
 
 function VisualizationFallback({ spec, reason }: { spec: VisualizationComponentSpec; reason: "unknown-component" | "missing-data" }) {

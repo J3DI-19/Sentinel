@@ -138,7 +138,7 @@ def test_assistant_offline_returns_grounded_fallback_and_saves_history(client):
     assert [item["role"] for item in messages] == ["user", "assistant"]
     assert messages[-1]["model"] == "deterministic-fallback"
     assert messages[-1]["citations"] == [f"case:{cid}"]
-    assert "Qwen is offline" in messages[-1]["caveats"][0]
+    assert "generation was unavailable" in messages[-1]["caveats"][0]
     history = client.get("/api/v1/assistant/sessions", params={"case_id": cid}).json()
     assert history["total"] == 1
     assert history["items"][0]["message_count"] == 2
@@ -281,7 +281,7 @@ def test_assistant_accepts_json_code_fences_and_bounds_grounding_context(client)
         {"scope": "specific_case", "case_ids": [cid], "reference_ids": []},
         "Summarize this case",
     )
-    assert len(json.dumps(context["facts"], separators=(",", ":")).encode("utf-8")) <= 12 * 1024
+    assert len(json.dumps(context["facts"], separators=(",", ":")).encode("utf-8")) <= 8 * 1024
 
 
 def test_assistant_bounds_ollama_generation_and_disables_thinking(client, monkeypatch):
@@ -333,10 +333,7 @@ def test_assistant_bounds_ollama_generation_and_disables_thinking(client, monkey
     assert captured["payload"]["keep_alive"] == "15m"
     system_prompt = captured["payload"]["messages"][0]["content"]
     assert "visualization must be null" in system_prompt
-    assert "use exactly one component" in system_prompt
-    assert "Every component must include all six fields" in system_prompt
-    assert "span as the integer 1, 2, or 3" in system_prompt
-    assert "height as compact, standard, or tall" in system_prompt
+    assert "attaches verified citations and visuals separately" in system_prompt
 
 
 def test_assistant_validates_selected_reference_scope_and_retrieves_event(client):
@@ -400,7 +397,7 @@ def test_assistant_builds_deterministic_explanation_packets(client, kind, data, 
     assert packet["citations"] == [f"case:1:{kind}:record"]
 
 
-def test_step9_accepts_qwen_layout_selection_without_embedded_values(client):
+def test_step9_validates_allowlisted_layouts_without_embedded_values(client):
     service = client.app.state.phase3_service
     data_ref = "case:1:analysis:latest:event_activity"
     context = {
@@ -419,12 +416,100 @@ def test_step9_accepts_qwen_layout_selection_without_embedded_values(client):
     assert result["visualization"]["components"][0]["data_ref"] == data_ref
 
 
+def test_assistant_visual_mode_is_deterministic_and_pins_the_analysis(client):
+    cid = case_id(client)
+    service = client.app.state.phase3_service
+    service.batch.reanalyze(cid)
+    service.set_ai_enabled(False)
+    analysis_id = client.get(f"/api/v1/cases/{cid}/analyses").json()["items"][0]["analysis_id"]
+    session = client.post(
+        "/api/v1/assistant/sessions",
+        json={"scope": "specific_case", "case_ids": [cid]},
+    ).json()
+    job = client.post(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages",
+        json={
+            "question": "give me the timeline",
+            "include_evidence": True,
+            "visualization_mode": "auto",
+        },
+    ).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+
+    answer = client.get(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages"
+    ).json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["visualization"]["components"][0]["type"] == "timeline"
+    assert f":analysis:{analysis_id}:timeline" in answer["visualization"]["components"][0]["data_ref"]
+    assert ":analysis:latest:" not in answer["visualization"]["components"][0]["data_ref"]
+
+
+def test_assistant_does_not_attach_a_visual_unless_requested(client):
+    cid = case_id(client)
+    service = client.app.state.phase3_service
+    service.batch.reanalyze(cid)
+    service.set_ai_enabled(False)
+    session = client.post(
+        "/api/v1/assistant/sessions",
+        json={"scope": "specific_case", "case_ids": [cid]},
+    ).json()
+    job = client.post(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages",
+        json={
+            "question": "Summarize this case",
+            "include_evidence": True,
+            "visualization_mode": "none",
+        },
+    ).json()
+    for _ in range(200):
+        current = client.get(f"/api/v1/assistant/jobs/{job['job_id']}").json()
+        if current["status"] in {"completed", "failed"}:
+            break
+        sleep(0.01)
+
+    answer = client.get(
+        f"/api/v1/assistant/sessions/{session['session_id']}/messages"
+    ).json()["items"][-1]
+    assert current["status"] == "completed"
+    assert answer["visualization"] is None
+
+
+def test_auto_scope_resolves_an_explicit_case_name_before_retrieving_facts(client):
+    zeek_id = client.post("/api/v1/cases", json={"name": "Zeek Blind"}).json()["id"]
+    client.post("/api/v1/cases", json={"name": "HAI ICS Blind"})
+    context = client.app.state.phase3_service._assistant_context(
+        {"scope": "auto", "case_ids": [], "reference_ids": []},
+        "can you show me the timeline for zeek?",
+    )
+    case_refs = [fact["ref"] for fact in context["facts"] if fact["kind"] == "case"]
+    assert case_refs == [f"case:{zeek_id}"]
+    assert all(reference.startswith(f"case:{zeek_id}") for reference in context["allowed_refs"])
+
+
+def test_automatic_visual_mode_selects_the_focused_analysis_views(client):
+    service = client.app.state.phase3_service
+    assert service._automatic_visualization_mode("risk pie chart for fridge case?") == "severity_distribution"
+    assert service._automatic_visualization_mode("show the risk distribution") == "severity_distribution"
+    assert service._automatic_visualization_mode("what happened in the fridge case?") == "timeline"
+    assert service._automatic_visualization_mode("show relationships between devices") == "entity_graph"
+    assert service._automatic_visualization_mode("which devices are busiest?") == "top_entities"
+    assert service._automatic_visualization_mode("show traffic volume") == "event_activity"
+    assert service._automatic_visualization_mode("summarize the important risks") == "top_findings"
+    assert service._automatic_visualization_mode("summarize this case") == "top_findings"
+
+
 def test_step9_resolves_only_allowlisted_persisted_visualizations(client):
     cid = case_id(client)
     client.app.state.batch_service.reanalyze(cid)
     analysis_id = client.get(f"/api/v1/cases/{cid}/analyses").json()["items"][0]["analysis_id"]
     components = []
-    for index, kind in enumerate(("timeline", "risk_breakdown", "event_activity", "entity_graph", "evidence_table", "alert_list")):
+    kinds = ("timeline", "severity_distribution", "event_activity", "entity_graph", "top_entities", "top_findings")
+    for index, kind in enumerate(kinds):
         components.append({
             "id": f"view-{index}", "type": kind, "title": kind.replace("_", " ").title(),
             "data_ref": f"case:{cid}:analysis:{analysis_id}:{kind}", "span": 1, "height": "standard",
@@ -434,8 +519,16 @@ def test_step9_resolves_only_allowlisted_persisted_visualizations(client):
     }})
     assert response.status_code == 200
     body = response.json()
-    assert set(body["datasets"]) == {f"view-{index}" for index in range(6)}
+    assert set(body["datasets"]) == {f"view-{index}" for index in range(len(kinds))}
     assert set(body["analysis_ids"].values()) == {analysis_id}
+
+    alert_response = client.post("/api/v1/visualizations/resolve", json={"layout": {
+        "schema_version": "1.0", "layout_id": "alert-component", "title": "Verified alerts", "components": [{
+            "id": "alerts", "type": "alert_list", "title": "Alerts",
+            "data_ref": f"case:{cid}:analysis:{analysis_id}:alert_list", "span": 1, "height": "standard",
+        }],
+    }})
+    assert alert_response.status_code == 200
 
 
 def test_step9_rejects_unknown_fields_components_and_mismatched_references(client):
@@ -463,6 +556,13 @@ def test_step9_fallback_is_deterministic_and_pins_historical_snapshot(client):
     assert first.json() == second.json()
     assert set(first.json()["analysis_ids"].values()) == {analysis_id}
     assert all(f":analysis:{analysis_id}:" in component["data_ref"] for component in first.json()["layout"]["components"])
+    for intent in ("top_entities", "top_findings"):
+        focused = client.get(
+            f"/api/v1/cases/{cid}/visualizations/fallback",
+            params={"intent": intent, "analysis_id": analysis_id},
+        )
+        assert focused.status_code == 200
+        assert focused.json()["layout"]["components"][0]["type"] == intent
 
 
 def test_fake_smtp_delivery_is_explicit_audited_and_idempotent(client, monkeypatch):

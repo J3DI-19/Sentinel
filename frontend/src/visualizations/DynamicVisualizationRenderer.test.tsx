@@ -19,4 +19,20 @@ describe("DynamicVisualizationRenderer", () => {
     expect(screen.getByText("Persisted alert")).toBeInTheDocument();
     expect(screen.getByText(/81 risk/i)).toBeInTheDocument();
   });
+
+  it("renders finding severity as a pie with counts and percentages", () => {
+    render(<DynamicVisualizationRenderer datasets={{ severity: [{ name: "High", value: 3, color: "#fb5f68" }, { name: "Low", value: 1, color: "#27c2e8" }] }} specification={{ id: "severity", name: "Severity", description: "", evidenceRefs: [], components: [{ id: "severity", type: "severity_distribution", title: "Finding severity distribution", dataRef: "severity" }] }}/>);
+    expect(screen.getByLabelText("Finding severity distribution")).toHaveTextContent("High 3 · 75%");
+    expect(screen.getByLabelText("Finding severity distribution")).toHaveTextContent("Low 1 · 25%");
+  });
+
+  it("renders ranked entities and findings from persisted datasets", () => {
+    const { rerender } = render(<DynamicVisualizationRenderer datasets={{ entities: [{ id: "entity-1", label: "Fridge-01", kind: "device", eventCount: 42, maximumRisk: 87 }] }} specification={{ id: "entities", name: "Entities", description: "", evidenceRefs: [], components: [{ id: "entities", type: "top_entities", title: "Top entities", dataRef: "entities" }] }}/>);
+    expect(screen.getByLabelText("Top entities ranking")).toHaveTextContent("Fridge-01");
+    expect(screen.getByLabelText("Top entities ranking")).toHaveTextContent("42 events");
+
+    rerender(<DynamicVisualizationRenderer datasets={{ findings: [{ id: "finding-1", title: "Unusual telemetry", summary: "A persisted anomaly was detected.", severity: "High", risk: 87, confidence: 92, entity: "Fridge-01", eventCount: 4 }] }} specification={{ id: "findings", name: "Findings", description: "", evidenceRefs: [], components: [{ id: "findings", type: "top_findings", title: "Top findings", dataRef: "findings" }] }}/>);
+    expect(screen.getByLabelText("Top findings ranking")).toHaveTextContent("Unusual telemetry");
+    expect(screen.getByLabelText("Top findings ranking")).toHaveTextContent("4 supporting events · 92% confidence");
+  });
 });

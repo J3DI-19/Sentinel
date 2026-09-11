@@ -41,6 +41,7 @@ class AssistantSessionCreate(BaseModel):
 class AssistantMessageCreate(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
     include_evidence: bool | None = None
+    visualization_mode: Literal["none", "auto", "timeline", "severity_distribution", "event_activity", "entity_graph", "top_entities", "top_findings"] = "none"
 
 
 class AssistantSessionPublic(BaseModel):
@@ -246,7 +247,9 @@ def assistant_messages(session_id: UUID, request: Request):
 
 @router.post("/assistant/sessions/{session_id}/messages", status_code=202, response_model=AssistantJobPublic)
 def assistant_message(session_id: UUID, body: AssistantMessageCreate, request: Request):
-    return service(request).submit_assistant_message(str(session_id), body.question, body.include_evidence)
+    return service(request).submit_assistant_message(
+        str(session_id), body.question, body.include_evidence, body.visualization_mode
+    )
 
 
 @router.get("/assistant/jobs/{job_id}", response_model=AssistantJobPublic)
@@ -264,7 +267,7 @@ def resolve_visualization(body: VisualizationResolveRequest, request: Request):
 def fallback_visualization(
     case_id: int,
     request: Request,
-    intent: Literal["overview", "timeline", "risk", "correlation", "alerts", "evidence", "live"] = "overview",
+    intent: Literal["overview", "timeline", "risk", "correlation", "alerts", "evidence", "live", "severity_distribution", "event_activity", "entity_graph", "top_entities", "top_findings"] = "overview",
     analysis_id: UUID | None = None,
 ):
     selector = str(analysis_id) if analysis_id else "latest"

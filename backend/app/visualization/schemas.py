@@ -10,15 +10,18 @@ from pydantic_core import PydanticCustomError
 VisualizationType = Literal[
     "timeline",
     "risk_breakdown",
+    "severity_distribution",
     "event_activity",
     "entity_graph",
     "evidence_table",
     "alert_list",
+    "top_entities",
+    "top_findings",
 ]
 
 _DATA_REF = re.compile(
     r"^case:(?P<case_id>[1-9]\d*):analysis:(?P<analysis>latest|[0-9a-fA-F-]{36}):"
-    r"(?P<dataset>timeline|risk_breakdown|event_activity|entity_graph|evidence_table|alert_list)$"
+    r"(?P<dataset>timeline|risk_breakdown|severity_distribution|event_activity|entity_graph|evidence_table|alert_list|top_entities|top_findings)$"
 )
 _UNSAFE_TEXT = re.compile(r"(?:https?://|<[^>]+>|```|javascript:)", re.IGNORECASE)
 
