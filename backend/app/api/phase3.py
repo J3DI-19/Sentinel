@@ -40,6 +40,7 @@ class AssistantSessionCreate(BaseModel):
 
 class AssistantMessageCreate(BaseModel):
     question: str = Field(min_length=1, max_length=4000)
+    include_evidence: bool | None = None
 
 
 class AssistantSessionPublic(BaseModel):
@@ -245,7 +246,7 @@ def assistant_messages(session_id: UUID, request: Request):
 
 @router.post("/assistant/sessions/{session_id}/messages", status_code=202, response_model=AssistantJobPublic)
 def assistant_message(session_id: UUID, body: AssistantMessageCreate, request: Request):
-    return service(request).submit_assistant_message(str(session_id), body.question)
+    return service(request).submit_assistant_message(str(session_id), body.question, body.include_evidence)
 
 
 @router.get("/assistant/jobs/{job_id}", response_model=AssistantJobPublic)

@@ -909,6 +909,17 @@
       },
       "AssistantMessageCreate": {
         "properties": {
+          "include_evidence": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Evidence"
+          },
           "question": {
             "maxLength": 4000,
             "minLength": 1,

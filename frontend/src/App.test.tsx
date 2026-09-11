@@ -4,6 +4,7 @@ import App from "./App";
 
 describe("Traceveil investigation interface", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
       const path = String(input);
       const response = path.endsWith("/dashboard/summary")
@@ -46,11 +47,32 @@ describe("Traceveil investigation interface", () => {
     window.history.replaceState({}, "", "/assistant?case=1&alert=ALT-8831");
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Traceveil Assistant" })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getAllByText("ready").length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText("Ready").length).toBeGreaterThan(0));
     expect(screen.getByText("Scoped to persisted case 1")).toBeInTheDocument();
-    expect(screen.getByLabelText("Conversation history")).toBeInTheDocument();
-    expect(screen.getByText("1 selected reference")).toBeInTheDocument();
+    const scope = screen.getByLabelText("Investigation scope");
+    expect(scope).toHaveValue("1");
+    expect(within(scope).getByRole("option", { name: "Case 1 · Persisted demo" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Chat history")).toBeInTheDocument();
+    expect(screen.getByText(/1 selected reference/)).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /Include investigation evidence/ })).toBeChecked();
     expect(screen.getByRole("button", { name: /New chat/ })).toBeInTheDocument();
+    const composer = screen.getByLabelText("Assistant message");
+    const askButton = screen.getByRole("button", { name: /Ask/ });
+    expect(askButton).toBeDisabled();
+    fireEvent.change(composer, { target: { value: "hey" } });
+    expect(askButton).toBeEnabled();
+
+    const thread = screen.getByLabelText("Conversation messages");
+    Object.defineProperties(thread, {
+      scrollHeight: { configurable: true, value: 1_000 },
+      clientHeight: { configurable: true, value: 300 },
+      scrollTop: { configurable: true, value: 100, writable: true },
+    });
+    fireEvent.scroll(thread);
+    const jumpButton = screen.getByRole("button", { name: "↓ Jump to latest" });
+    fireEvent.click(jumpButton);
+    expect(thread.scrollTop).toBe(1_000);
+    expect(screen.queryByRole("button", { name: "↓ Jump to latest" })).not.toBeInTheDocument();
     expect(screen.getByText("Validated investigation overview")).toBeInTheDocument();
     expect(screen.getByText(/Only allow-listed layouts and backend-resolved values/)).toBeInTheDocument();
   });
@@ -60,9 +82,38 @@ describe("Traceveil investigation interface", () => {
     render(<App />);
     expect(await screen.findByRole("heading", { name: "Traceveil Assistant" })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText("Auto retrieval across persisted cases")).toBeInTheDocument());
-    expect(screen.getByPlaceholderText("Ask about persisted investigation evidence…")).toBeInTheDocument();
-    expect(screen.getByText("Ask about persisted evidence")).toBeInTheDocument();
-    expect(screen.getByText(/Verify AI narration/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Investigation scope")).toHaveValue("all");
+    expect(screen.getByRole("option", { name: "All persisted cases" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Case 1 · Persisted demo" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: /Include investigation evidence/ })).not.toBeChecked();
+    expect(screen.getByPlaceholderText("Message Traceveil Assistant…")).toBeInTheDocument();
+    expect(screen.getByText("Start with a question—or just say hello")).toBeInTheDocument();
+    expect(screen.getByText(/Enter to send/)).toBeInTheDocument();
+  });
+
+  it("restores a useful chat without creating or listing abandoned empty sessions", async () => {
+    const existing = { session_id: "11111111-1111-4111-8111-111111111111", scope: "auto", case_ids: [], reference_ids: [], title: "Existing investigation", message_count: 2, created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:01:00Z" };
+    const abandoned = { ...existing, session_id: "22222222-2222-4222-8222-222222222222", title: "New investigation chat", message_count: 0 };
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const path = String(input);
+      const response = path.includes("/cases?page=")
+        ? { items: [{ id: 1, name: "Persisted demo", description: "", case_type: "batch", status: "active", owner: "Investigator", created_at: "2026-01-01T00:00:00Z", updated_at: null }], page: 1, page_size: 100, total: 1 }
+        : path.endsWith("/assistant/sessions") && init?.method !== "POST"
+        ? { items: [abandoned, existing], page: 1, page_size: 100, total: 2 }
+        : path.endsWith(`/assistant/sessions/${existing.session_id}/messages`)
+        ? { items: [{ message_id: "m1", role: "user", kind: "question", text: "Existing investigation", citations: [], caveats: [], visualization: null, model: null, created_at: "2026-01-01T00:00:00Z" }, { message_id: "m2", role: "assistant", kind: "narration", text: "Ready to continue.", citations: [], caveats: [], visualization: null, model: "qwen", created_at: "2026-01-01T00:01:00Z" }], page: 1, page_size: 100, total: 2 }
+        : { service: path.endsWith("/db") ? "database" : "api", status: "ok" };
+      return Promise.resolve(new Response(JSON.stringify(response), { status: 200 }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    window.history.replaceState({}, "", "/assistant");
+    render(<App />);
+
+    const history = await screen.findByLabelText("Chat history");
+    await waitFor(() => expect(history).toHaveValue(existing.session_id));
+    expect(within(history).getByRole("option", { name: "Existing investigation · 1 turn" })).toBeInTheDocument();
+    expect(within(history).queryByRole("option", { name: "New chat" })).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url, options]) => String(url).endsWith("/assistant/sessions") && options?.method === "POST")).toBe(false);
   });
 
   it("renders a consolidated live monitoring hierarchy", async () => {

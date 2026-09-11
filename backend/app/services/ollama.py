@@ -13,8 +13,10 @@ from app.core.config import Settings
 
 OLLAMA_THINKING_ENABLED = False
 OLLAMA_TEMPERATURE = 0
-OLLAMA_MAX_OUTPUT_TOKENS = 512
-OLLAMA_GROUNDING_CONTEXT_BYTES = 24 * 1024
+OLLAMA_MAX_OUTPUT_TOKENS = 256
+OLLAMA_GROUNDING_CONTEXT_BYTES = 12 * 1024
+OLLAMA_REQUEST_CONTEXT_TOKENS = 8 * 1024
+OLLAMA_KEEP_ALIVE = "15m"
 _managed_ollama_process: subprocess.Popen | None = None
 
 
@@ -139,6 +141,8 @@ async def ollama_status(settings: Settings, *, enabled: bool = True) -> dict[str
             "temperature": OLLAMA_TEMPERATURE,
             "max_output_tokens": OLLAMA_MAX_OUTPUT_TOKENS,
             "grounding_context_limit_bytes": OLLAMA_GROUNDING_CONTEXT_BYTES,
+            "request_context_length": OLLAMA_REQUEST_CONTEXT_TOKENS,
+            "keep_alive": OLLAMA_KEEP_ALIVE,
             "generation_timeout_seconds": settings.ollama_timeout_seconds,
         }
 
@@ -207,5 +211,7 @@ async def ollama_status(settings: Settings, *, enabled: bool = True) -> dict[str
         "temperature": OLLAMA_TEMPERATURE,
         "max_output_tokens": OLLAMA_MAX_OUTPUT_TOKENS,
         "grounding_context_limit_bytes": OLLAMA_GROUNDING_CONTEXT_BYTES,
+        "request_context_length": OLLAMA_REQUEST_CONTEXT_TOKENS,
+        "keep_alive": OLLAMA_KEEP_ALIVE,
         "generation_timeout_seconds": settings.ollama_timeout_seconds,
     }

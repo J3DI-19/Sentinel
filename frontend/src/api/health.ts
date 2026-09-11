@@ -25,6 +25,8 @@ export type ServiceStatus = {
   temperature?: number;
   max_output_tokens?: number;
   grounding_context_limit_bytes?: number;
+  request_context_length?: number;
+  keep_alive?: string;
   generation_timeout_seconds?: number;
   message?: string;
 };

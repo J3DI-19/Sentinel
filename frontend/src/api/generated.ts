@@ -1420,6 +1420,8 @@ export interface components {
         };
         /** AssistantMessageCreate */
         AssistantMessageCreate: {
+            /** Include Evidence */
+            include_evidence?: boolean | null;
             /** Question */
             question: string;
         };
