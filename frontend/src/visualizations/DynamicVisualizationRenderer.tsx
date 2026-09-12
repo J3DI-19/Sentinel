@@ -1,3 +1,4 @@
+import { useEffect, useState, type DragEvent, type KeyboardEvent } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { InvestigationTimeline, RiskBreakdown } from "../components/traceveil/domain";
 import { MetricCard, RiskBadge, SeverityBadge } from "../components/ui/core";
@@ -82,13 +83,43 @@ const dynamicVisualizationRegistry: Record<string, (props: RendererProps) => Rea
   "top_entities": TopEntities, "top_findings": TopFindings,
 };
 
+const visualIcons: Record<string, string> = {
+  timeline: "⌁", event_activity: "⌇", severity_distribution: "◒",
+  entity_graph: "⌘", top_entities: "◇", top_findings: "✦",
+};
+
 function VisualizationFallback({ spec, reason }: { spec: VisualizationComponentSpec; reason: "unknown-component" | "missing-data" }) {
   return <div className="visualization-fallback" role="status"><span>◇</span><strong>Visualization unavailable</strong><p>{reason === "unknown-component" ? `“${spec.type}” is not in the approved registry.` : `Dataset “${spec.dataRef}” could not be resolved.`}</p></div>;
 }
 
 export function DynamicVisualizationRenderer({ specification, datasets = visualizationDatasets }: { specification: VisualizationSpec; datasets?: Record<string, unknown> }) {
-  return <div className="dynamic-layout" key={specification.id}>{specification.components.map(spec => {
+  const componentKey = specification.components.map(component => component.id).join("|");
+  const [order, setOrder] = useState(() => specification.components.map(component => component.id));
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [dragged, setDragged] = useState<string | null>(null);
+  useEffect(() => {
+    setOrder(specification.components.map(component => component.id));
+    setHidden([]);
+    setDragged(null);
+  }, [specification.id, componentKey]);
+  const ordered = order.map(id => specification.components.find(component => component.id === id)).filter((component): component is VisualizationComponentSpec => Boolean(component));
+  const visible = ordered.filter(component => !hidden.includes(component.id));
+  const move = (sourceId: string, targetId: string) => setOrder(current => {
+    const source = current.indexOf(sourceId); const target = current.indexOf(targetId);
+    if (source < 0 || target < 0 || source === target) return current;
+    const next = [...current]; const [item] = next.splice(source, 1); next.splice(target, 0, item); return next;
+  });
+  const moveByKeyboard = (id: string, direction: -1 | 1) => setOrder(current => {
+    const source = current.indexOf(id); const target = source + direction;
+    if (source < 0 || target < 0 || target >= current.length) return current;
+    const next = [...current]; [next[source], next[target]] = [next[target], next[source]]; return next;
+  });
+  const handleDragStart = (event: DragEvent<HTMLElement>, id: string) => { setDragged(id); event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", id); };
+  const handleDrop = (event: DragEvent<HTMLElement>, targetId: string) => { event.preventDefault(); const sourceId = dragged ?? event.dataTransfer.getData("text/plain"); if (sourceId) move(sourceId, targetId); setDragged(null); };
+  const handleHandleKey = (event: KeyboardEvent<HTMLElement>, id: string) => { if (!event.altKey || !["ArrowLeft", "ArrowRight"].includes(event.key)) return; event.preventDefault(); moveByKeyboard(id, event.key === "ArrowLeft" ? -1 : 1); };
+  if (!visible.length) return <div className="visual-empty-canvas" role="status"><span>◇</span><strong>Visual canvas cleared</strong><p>Restore the closed cards whenever you need them.</p><button type="button" onClick={() => setHidden([])}>Restore {hidden.length} visual{hidden.length === 1 ? "" : "s"}</button></div>;
+  return <div className="visual-layout-shell">{hidden.length > 0 && <div className="visual-layout-toolbar"><span>{hidden.length} closed visual{hidden.length === 1 ? "" : "s"}</span><button type="button" onClick={() => setHidden([])}>Restore closed</button></div>}<div className={`dynamic-layout ${visible.length === 1 ? "dynamic-layout-single" : ""}`} key={specification.id}>{visible.map(spec => {
     const Component = dynamicVisualizationRegistry[spec.type]; const data = datasets[spec.dataRef];
-    return <section className={`visual-panel visual-span-${spec.span || 1} visual-height-${spec.height || "standard"}`} key={spec.id}><header><div><span>Verified data view</span><h3>{spec.title}</h3></div><code>{spec.type}</code></header><div className="visual-panel-body">{!Component ? <VisualizationFallback spec={spec} reason="unknown-component"/> : data === undefined ? <VisualizationFallback spec={spec} reason="missing-data"/> : <Component data={data} spec={spec}/>}</div></section>;
-  })}</div>;
+    return <section className={`visual-panel visual-span-${spec.span || 1} visual-height-${spec.height || "standard"} ${dragged === spec.id ? "visual-panel-dragging" : ""}`} key={spec.id} onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "move"; }} onDrop={event => handleDrop(event, spec.id)}><header draggable onDragStart={event => handleDragStart(event, spec.id)} onDragEnd={() => setDragged(null)} onKeyDown={event => handleHandleKey(event, spec.id)} tabIndex={0} aria-label={`Move ${spec.title} visual. Use Alt plus arrow keys to reorder.`}><div className="visual-title-group"><b className="visual-title-icon" aria-hidden="true">{visualIcons[spec.type] ?? "◇"}</b><div><span>Verified data view</span><h3>{spec.title}</h3></div></div><div className="visual-panel-actions"><code>{spec.type.replaceAll("_", " ")}</code><span className="visual-drag-grip" aria-hidden="true">⠿</span><button className="visual-close" type="button" draggable={false} aria-label={`Close ${spec.title} visual`} title="Close visual" onClick={event => { event.stopPropagation(); setHidden(current => [...current, spec.id]); }}>×</button></div></header><div className="visual-panel-body">{!Component ? <VisualizationFallback spec={spec} reason="unknown-component"/> : data === undefined ? <VisualizationFallback spec={spec} reason="missing-data"/> : <Component data={data} spec={spec}/>}</div></section>;
+  })}</div></div>;
 }

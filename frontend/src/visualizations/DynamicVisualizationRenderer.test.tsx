@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DynamicVisualizationRenderer } from "./DynamicVisualizationRenderer";
 
@@ -34,5 +34,19 @@ describe("DynamicVisualizationRenderer", () => {
     rerender(<DynamicVisualizationRenderer datasets={{ findings: [{ id: "finding-1", title: "Unusual telemetry", summary: "A persisted anomaly was detected.", severity: "High", risk: 87, confidence: 92, entity: "Fridge-01", eventCount: 4 }] }} specification={{ id: "findings", name: "Findings", description: "", evidenceRefs: [], components: [{ id: "findings", type: "top_findings", title: "Top findings", dataRef: "findings" }] }}/>);
     expect(screen.getByLabelText("Top findings ranking")).toHaveTextContent("Unusual telemetry");
     expect(screen.getByLabelText("Top findings ranking")).toHaveTextContent("4 supporting events · 92% confidence");
+  });
+
+  it("lets the investigator close and restore visual cards", () => {
+    render(<DynamicVisualizationRenderer datasets={{ alerts: [{ id: "a-1", time: "2026-09-10T10:00:00Z", title: "Persisted alert", severity: "High", risk: 81, status: "pending" }] }} specification={{ id: "safe", name: "Safe", description: "", evidenceRefs: [], components: [{ id: "alerts", type: "alert_list", title: "Alerts", dataRef: "alerts" }] }}/>);
+    fireEvent.click(screen.getByRole("button", { name: "Close Alerts visual" }));
+    expect(screen.getByText("Visual canvas cleared")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Restore 1 visual" }));
+    expect(screen.getByText("Persisted alert")).toBeInTheDocument();
+  });
+
+  it("supports accessible keyboard reordering for visual cards", () => {
+    render(<DynamicVisualizationRenderer datasets={{ alerts: [] }} specification={{ id: "safe", name: "Safe", description: "", evidenceRefs: [], components: [{ id: "first", type: "alert_list", title: "First visual", dataRef: "alerts" }, { id: "second", type: "alert_list", title: "Second visual", dataRef: "alerts" }] }}/>);
+    fireEvent.keyDown(screen.getByLabelText(/Move Second visual/), { key: "ArrowLeft", altKey: true });
+    expect(screen.getAllByRole("heading", { level: 3 }).map(heading => heading.textContent)).toEqual(["Second visual", "First visual"]);
   });
 });
