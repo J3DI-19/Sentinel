@@ -44,6 +44,7 @@ export function ConnectedAssistantPage({ search = window.location.search }: { se
   const operation = useRef<AbortController | null>(null);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const followLatest = useRef(true);
+  const knownVisualMessageIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const controller = new AbortController();
@@ -88,10 +89,14 @@ export function ConnectedAssistantPage({ search = window.location.search }: { se
 
   useEffect(() => () => operation.current?.abort(), []);
   useEffect(() => {
-    if (state === "thinking") { setOpenVisualMessageIds([]); return; }
-    const latestAssistant = [...messages].reverse().find(message => message.role === "assistant");
-    setOpenVisualMessageIds(latestAssistant?.visualization ? [latestAssistant.message_id] : []);
-  }, [messages, state]);
+    const availableIds = messages.filter(message => message.role === "assistant" && message.visualization).map(message => message.message_id);
+    const unseenIds = availableIds.filter(id => !knownVisualMessageIds.current.has(id));
+    knownVisualMessageIds.current = new Set(availableIds);
+    setOpenVisualMessageIds(current => {
+      const retained = current.filter(id => availableIds.includes(id));
+      return [...new Set([...retained, ...unseenIds])].slice(-6);
+    });
+  }, [messages]);
   useEffect(() => {
     if (!followLatest.current && state !== "thinking") return;
     const frame = window.requestAnimationFrame(() => {
@@ -134,7 +139,7 @@ export function ConnectedAssistantPage({ search = window.location.search }: { se
   const ask = async (question: string, evidenceOverride = includeEvidence, visualOverride = visualizationMode) => {
     const normalizedQuestion = question.trim();
     if (!sessionId || !normalizedQuestion || state === "thinking") return;
-    const controller = new AbortController(); operation.current = controller; followLatest.current = true; setOpenVisualMessageIds([]); setState("thinking"); setError(null); setValue("");
+    const controller = new AbortController(); operation.current = controller; followLatest.current = true; setState("thinking"); setError(null); setValue("");
     try {
       const job = await phase3Api.ask(sessionId, normalizedQuestion, evidenceOverride, evidenceOverride ? visualOverride : "none", controller.signal);
       await refresh(sessionId, controller.signal);
@@ -159,7 +164,7 @@ export function ConnectedAssistantPage({ search = window.location.search }: { se
       schema_version: "1.0",
       layout_id: `workspace-${activeLayouts.map(item => item.messageId.slice(0, 6)).join("-")}`.slice(0, 64),
       title: "Investigation visual workspace",
-      components: activeLayouts.flatMap((item, messageIndex) => item.layout.components.map((component, componentIndex) => ({ ...component, id: `m${messageIndex + 1}-${componentIndex + 1}` }))).slice(0, 6),
+      components: activeLayouts.flatMap(item => item.layout.components.map(component => ({ ...component, id: `${item.messageId.slice(0, 12)}-${component.id}` }))).slice(0, 6),
     };
   }, [activeLayouts]);
   const activeCase = selectedCase ? cases.find(item => item.id === selectedCase) : null;
@@ -195,7 +200,7 @@ export function ConnectedAssistantPage({ search = window.location.search }: { se
         <div className="assistant-composer">
           <div className="composer-input-wrap"><textarea value={value} maxLength={4000} disabled={!sessionId || state === "thinking"} onChange={event => setValue(event.target.value)} placeholder={sessionId ? includeEvidence ? "Ask about this investigation…" : "Message Traceveil Assistant…" : "Preparing a conversation…"} aria-label="Assistant message" onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void ask(value); } }}/><span>{value.length.toLocaleString("en-US")}/4,000</span></div>
           {state === "thinking" ? <Button variant="secondary" onClick={() => { operation.current?.abort(); setState("ready"); }}><span className="visually-hidden">Stop response</span><span aria-hidden="true">■</span></Button> : <Button variant="primary" disabled={!sessionId || !value.trim()} onClick={() => void ask(value)}><span className="visually-hidden">Ask Traceveil</span><span aria-hidden="true">↑</span></Button>}
-          <div className="assistant-composer-controls"><label className="assistant-evidence-toggle"><input aria-label="Include investigation evidence" type="checkbox" checked={includeEvidence} disabled={state === "thinking"} onChange={event => { setIncludeEvidence(event.target.checked); if (!event.target.checked) { setVisualizationMode("none"); setOpenVisualMessageIds([]); } }}/><span><b>Evidence</b></span></label><label className="assistant-visual-select"><span>Visual</span><select aria-label="Response visual" value={visualizationMode} disabled={!includeEvidence || state === "thinking"} onChange={event => setVisualizationMode(event.target.value as AssistantVisualizationMode)}><option value="none">None</option><option value="auto">Automatic</option><option value="timeline">Investigation timeline</option><option value="event_activity">Event activity · Area</option><option value="top_entities">Top entities · Bars</option><option value="severity_distribution">Severity mix · Pie</option><option value="entity_graph">Entity relationships · Graph</option><option value="top_findings">Top findings · Ranked</option></select></label><small>Enter to send · Shift+Enter for newline</small></div>
+          <div className="assistant-composer-controls"><label className="assistant-evidence-toggle"><input aria-label="Include investigation evidence" type="checkbox" checked={includeEvidence} disabled={state === "thinking"} onChange={event => { setIncludeEvidence(event.target.checked); if (!event.target.checked) setVisualizationMode("none"); }}/><span><b>Evidence</b></span></label><label className="assistant-visual-select"><span>Visual</span><select aria-label="Response visual" value={visualizationMode} disabled={!includeEvidence || state === "thinking"} onChange={event => setVisualizationMode(event.target.value as AssistantVisualizationMode)}><option value="none">None</option><option value="auto">Automatic</option><option value="timeline">Investigation timeline</option><option value="event_activity">Event activity · Area</option><option value="top_entities">Top entities · Bars</option><option value="severity_distribution">Severity mix · Pie</option><option value="entity_graph">Entity relationships · Graph</option><option value="top_findings">Top findings · Ranked</option></select></label><small>Enter to send · Shift+Enter for newline</small></div>
         </div>
       </section>
 

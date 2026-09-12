@@ -98,8 +98,9 @@ export function DynamicVisualizationRenderer({ specification, datasets = visuali
   const [hidden, setHidden] = useState<string[]>([]);
   const [dragged, setDragged] = useState<string | null>(null);
   useEffect(() => {
-    setOrder(specification.components.map(component => component.id));
-    setHidden([]);
+    const availableIds = specification.components.map(component => component.id);
+    setOrder(current => [...current.filter(id => availableIds.includes(id)), ...availableIds.filter(id => !current.includes(id))]);
+    setHidden(current => current.filter(id => availableIds.includes(id)));
     setDragged(null);
   }, [specification.id, componentKey]);
   const ordered = order.map(id => specification.components.find(component => component.id === id)).filter((component): component is VisualizationComponentSpec => Boolean(component));

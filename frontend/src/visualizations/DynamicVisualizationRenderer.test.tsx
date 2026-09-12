@@ -44,6 +44,20 @@ describe("DynamicVisualizationRenderer", () => {
     expect(screen.getByText("Persisted alert")).toBeInTheDocument();
   });
 
+  it("keeps existing card state when a new visual is added", () => {
+    const alerts = { id: "alerts", type: "alert_list", title: "Alerts", dataRef: "alerts" };
+    const activity = { id: "activity", type: "event_activity", title: "Activity", dataRef: "activity" };
+    const datasets = { alerts: [], activity: [{ label: "10:00", Events: 4, Alerts: 1 }] };
+    const { rerender } = render(<DynamicVisualizationRenderer datasets={datasets} specification={{ id: "one", name: "One", description: "", evidenceRefs: [], components: [alerts] }}/>);
+
+    fireEvent.click(screen.getByRole("button", { name: "Close Alerts visual" }));
+    rerender(<DynamicVisualizationRenderer datasets={datasets} specification={{ id: "two", name: "Two", description: "", evidenceRefs: [], components: [alerts, activity] }}/>);
+
+    expect(screen.queryByRole("button", { name: "Close Alerts visual" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close Activity visual" })).toBeInTheDocument();
+    expect(screen.getByText("1 closed visual")).toBeInTheDocument();
+  });
+
   it("supports accessible keyboard reordering for visual cards", () => {
     render(<DynamicVisualizationRenderer datasets={{ alerts: [] }} specification={{ id: "safe", name: "Safe", description: "", evidenceRefs: [], components: [{ id: "first", type: "alert_list", title: "First visual", dataRef: "alerts" }, { id: "second", type: "alert_list", title: "Second visual", dataRef: "alerts" }] }}/>);
     fireEvent.keyDown(screen.getByLabelText(/Move Second visual/), { key: "ArrowLeft", altKey: true });

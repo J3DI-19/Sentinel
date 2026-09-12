@@ -124,7 +124,7 @@ describe("Traceveil investigation interface", () => {
     expect(fetchMock.mock.calls.some(([url, options]) => String(url).endsWith("/assistant/sessions") && options?.method === "POST")).toBe(false);
   });
 
-  it("clears stale visuals and lets an earlier response reopen its pinned visual", async () => {
+  it("keeps a response visual open until the investigator closes it", async () => {
     const session = { session_id: "33333333-3333-4333-8333-333333333333", scope: "specific_case", case_ids: [1], reference_ids: [], title: "Show activity", message_count: 4, created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:03:00Z" };
     const layout = { schema_version: "1.0", layout_id: "activity-view", title: "Pinned activity", components: [{ id: "activity", type: "event_activity", title: "Event activity", data_ref: "case:1:analysis:11111111-1111-4111-8111-111111111111:event_activity", span: 3, height: "standard" }] };
     const messages = [
@@ -150,10 +150,11 @@ describe("Traceveil investigation interface", () => {
     render(<App />);
 
     expect(await screen.findByText("Summary without a visual.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Pinned activity" })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Visual open ↗" }));
     expect(screen.getByText("No visual for this response")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Open visual ↗" }));
     await waitFor(() => expect(screen.getByRole("heading", { name: "Pinned activity" })).toBeInTheDocument());
-    expect(screen.getByRole("button", { name: "Visual open ↗" })).toBeInTheDocument();
   });
 
   it("renders a consolidated live monitoring hierarchy", async () => {
