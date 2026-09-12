@@ -44,6 +44,16 @@ describe("DynamicVisualizationRenderer", () => {
     expect(screen.getByText("Persisted alert")).toBeInTheDocument();
   });
 
+  it("opens a focused visual preview and closes it with Escape", () => {
+    render(<DynamicVisualizationRenderer datasets={{ alerts: [{ id: "a-1", time: "2026-09-10T10:00:00Z", title: "Persisted alert", severity: "High", risk: 81, status: "pending" }] }} specification={{ id: "safe", name: "Safe", description: "", evidenceRefs: [], components: [{ id: "alerts", type: "alert_list", title: "Alerts", dataRef: "alerts" }] }}/>);
+
+    fireEvent.click(screen.getByRole("button", { name: "Enlarge Alerts visual" }));
+    expect(screen.getByRole("dialog", { name: "Alerts" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close Alerts preview" })).toHaveFocus();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Alerts" })).not.toBeInTheDocument();
+  });
+
   it("keeps existing card state when a new visual is added", () => {
     const alerts = { id: "alerts", type: "alert_list", title: "Alerts", dataRef: "alerts" };
     const activity = { id: "activity", type: "event_activity", title: "Activity", dataRef: "activity" };
